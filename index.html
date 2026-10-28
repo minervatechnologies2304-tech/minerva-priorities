@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v19</title>
+<title>Minerva Priorities · v20</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -506,6 +506,8 @@ td .ce.dt{width:146px}td .due{display:inline-block;margin:2px 0 0 6px;font-size:
 .ownb:hover{border-color:var(--line);background:var(--surface)}.ownb .oc{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap}.ownb .av{width:22px;height:22px;font-size:9.5px}
 tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;border-bottom:1px solid var(--line)}tr.grp .qdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}tr.grp .count{color:var(--muted);margin-left:6px}
 .padd.top{padding:12px;margin:0 0 12px;border-top:0}.padd #pa-prio{flex:0 1 260px}
+.panel{min-width:0}@media (max-width:760px){main .panel{overflow-x:auto;max-width:100%}}
+#toast{pointer-events:none}#toast button{pointer-events:auto}
 .round{display:flex;flex-direction:column;gap:8px}
 .rperson{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:inset 4px 0 0 var(--line)}
 .rperson.asked{box-shadow:inset 4px 0 0 var(--ok)}.rperson:focus-within{border-color:var(--accent)}
@@ -524,7 +526,7 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v19</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v20</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -699,7 +701,7 @@ const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
 function blank(){return {v:1,tasks:[],away:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
-function noWait(o){const seen=new Set();(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on";
+function noWait(o){if(o&&o.gone){const lim=new Date();lim.setDate(lim.getDate()-90);const lk=lim.getFullYear()+"-"+String(lim.getMonth()+1).padStart(2,"0")+"-"+String(lim.getDate()).padStart(2,"0");Object.keys(o.gone).forEach(k=>{if(o.gone[k]<lk)delete o.gone[k]})}const seen=new Set();(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on";
   let id=t.id==null||t.id===""?"":String(t.id);if(!id||seen.has(id))id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);t.id=id;seen.add(id);
   if(!Array.isArray(t.owners))t.owners=t.owners?String(t.owners).split(/\s*[\/,&+]\s*/).filter(Boolean):[];
   if(!Array.isArray(t.updates))t.updates=[];t.title=String(t.title==null?"":t.title)});
@@ -790,13 +792,18 @@ async function gPost(body,url,key){const ac=new AbortController(),tm=setTimeout(
   try{return JSON.parse(t)}catch(e){const er=new Error(/<html/i.test(t)?"access":"bad");throw er}}
 function gState0(){return JSON.parse(JSON.stringify(D))}
 function applyRemote(st,v){D=noWait({...blank(),...st});try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}G.v=v;G.pending=false;gSave();if(!S.edit)render()}
+const bury=(...ids)=>{D.gone=D.gone||{};const k=todayKey();ids.forEach(id=>{if(id)D.gone[id]=k})};
+const unbury=id=>{if(D.gone)delete D.gone[id]};
 function mergeState(L,R){
   const out={...blank(),...R,...L};const rm=new Map((R.tasks||[]).map(t=>[t.id,t]));const tasks=[];
   (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));tasks.push({...t,updates:[...ups.values()]});rm.delete(t.id)}else tasks.push(t)});
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
   out.emails={...(R.emails||{}),...(L.emails||{})};
-  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;return noWait(out)}
+  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;
+  const gone={...(R.gone||{}),...(L.gone||{})},lst=new Set(L.staff||[]),lt=new Set((L.tasks||[]).map(t=>t.id)),la=new Set((L.away||[]).map(a=>a.id));
+  out.gone=gone;out.tasks=out.tasks.filter(t=>lt.has(t.id)||!gone[t.id]);out.away=(out.away||[]).filter(a=>la.has(a.id)||!gone[a.id]);out.staff=out.staff.filter(n=>lst.has(n)||!gone["staff:"+n]);
+  return noWait(out)}
 async function gPush(expect,force){const w=await gPost({action:"save",state:gState0(),expect,force:!!force});
   if(w.ok){Object.assign(G,{v:w.v,last:w.saved,open:w.open,total:w.total,sheet:w.url||G.sheet,pending:false});gSave();gConflict=null;gStatus("ok");return "ok"}
   if(w.error==="stale"||w.error==="busy")return "stale";
@@ -1113,7 +1120,7 @@ function openAway(id,person,date){
   </div><div class="mf">${a?`<button class="btn danger" data-m="del" style="margin-right:auto">Delete</button>`:""}<button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">${a?"Save":"Add"}</button></div>`,ev=>{
     const tb=ev.target.closest("[data-awtype]");if(tb){E.type=tb.dataset.awtype;document.querySelectorAll("#aw-types [data-awtype]").forEach(x=>x.setAttribute("aria-pressed",String(x===tb)));return}
     if(ev.target.id==="aw-all"){const on=ev.target.checked;document.getElementById("aw-times").hidden=on;document.getElementById("aw-endw").hidden=!on;return}
-    if(ev.target.closest("[data-m=del]")){const prev=awList().slice();D.away=awList().filter(x=>x.id!==a.id);closeModal();save();render();toast("Deleted",()=>{D.away=prev});return}
+    if(ev.target.closest("[data-m=del]")){const prev=awList().slice();D.away=awList().filter(x=>x.id!==a.id);bury(a.id);closeModal();save();render();toast("Deleted",()=>{D.away=prev});return}
     if(!ev.target.closest("[data-m=ok]"))return;
     const g=i=>document.getElementById(i);const pn=g("aw-p").value,d=g("aw-d").value,all=g("aw-all").checked,f=g("aw-f").value,t=g("aw-t").value,e=g("aw-e").value;
     if(!pn){toast("Choose who it's for.");g("aw-p").focus();return}if(!d){toast("Choose the date.");return}
@@ -1181,8 +1188,8 @@ function renderRun(){
 }
 /* ---------- meeting by priority: editable table, like the old sheet ---------- */
 const pDiscussed=t=>!!M().f[t.id]||seenToday(t)||t.status==="done";
-const isToday=t=>M().added.includes(t.id)||t.start===todayKey();
-function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t)&&carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))}
+const isToday=t=>M().added.includes(t.id);
+function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t)&&(t.start||"")<=tk&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))}
 function todayAll(){const tk=todayKey();return D.tasks.filter(t=>isToday(t)&&(t.status!=="done"||t.doneAt===tk))}
 const prioSort=(a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]);
 function prioTasks(p){return pendAll().filter(t=>t.prio===p).sort(prioSort)}
@@ -1377,7 +1384,7 @@ drawer.addEventListener("click",e=>{
   else if(k==="remove"){const id=t.id;modal(`<div class="mh"><h2>Remove from the list?</h2></div><div class="mb"><p style="margin:0">It moves to the Completed list as <b>Removed</b>, and you can reopen it later.</p><label class="lbl" for="rm-why">Reason (optional)</label><input class="inp" id="rm-why" placeholder="e.g. Alex H asked to remove it"></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Remove from list</button></div>`,ev=>{
       if(!ev.target.closest("[data-m=ok]"))return;const why=document.getElementById("rm-why").value.trim();closeModal();saveDrawer(false);const x=find(id);const prev=JSON.parse(JSON.stringify(x));
       if(why)x.updates.push({id:uid(),date:todayKey(),text:"Removed from list: "+why,at:new Date().toISOString()});x.status="done";x.doneAt=todayKey();x.doneHow="removed";save();closeDrawer();render();toast("Removed from the list",()=>Object.assign(x,prev))});return}
-  else if(k==="delete"){const id=t.id;confirmBox("Delete this task?","“"+esc(t.title)+"” and all its updates will be deleted. This can't be undone (except from a backup).","Delete",()=>{D.tasks=D.tasks.filter(x=>x.id!==id);save();closeDrawer();render();toast("Task deleted")},true);return}
+  else if(k==="delete"){const id=t.id;confirmBox("Delete this task?","“"+esc(t.title)+"” and all its updates will be deleted. This can't be undone (except from a backup).","Delete",()=>{D.tasks=D.tasks.filter(x=>x.id!==id);bury(id);save();closeDrawer();render();toast("Task deleted")},true);return}
   renderDrawer();
 });
 drawer.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="d-newp"){e.preventDefault();drawer.querySelector('[data-d="addp"]').click();return}if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(S.edit&&!S.edit.isNew&&e.target.id==="d-newu"){drawer.querySelector('[data-d="addu"]').click()}else saveDrawer(true)}});
@@ -1413,7 +1420,7 @@ view.addEventListener("click",e=>{
     case "pown":openOwners(id);break;
     case "tpadd":addForPerson(b.dataset.i);break;
     case "tpnone":{const m=M(),k="none:"+b.dataset.person,j=m.skip.indexOf(k);if(j>=0)m.skip.splice(j,1);else m.skip.push(k);save();render();if(j<0){const nx=view.querySelector(".rperson:not(.asked) [data-tp]");nx&&nx.focus({preventScroll:false})}break}
-    case "tdel":{const t=find(id);if(!t)break;const m=M(),i=D.tasks.indexOf(t);D.tasks.splice(i,1);m.added=m.added.filter(z=>z!==id);save();render();toast("Removed",()=>{D.tasks.splice(i,0,t);M().added.push(id)});break}
+    case "tdel":{const t=find(id);if(!t)break;const m=M(),i=D.tasks.indexOf(t);D.tasks.splice(i,1);m.added=m.added.filter(z=>z!==id);bury(id);save();render();toast("Removed",()=>{D.tasks.splice(i,0,t);M().added.push(id);unbury(id)});break}
     case "rnext":case "rprev":{const people=S.run.stage==="follow"?followPeople():todayPeople();const i=people.indexOf(S.run.person);const j=b.dataset.act==="rnext"?i+1:i-1;if(people[j]){S.run.person=people[j];S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50)}break}
     case "rskip":{const m=M(),k=S.run.stage+":"+S.run.person,i=m.skip.indexOf(k);if(i>=0)m.skip.splice(i,1);else m.skip.push(k);save();if(i<0&&S.run.stage==="follow"){const people=followPeople();const j=people.indexOf(S.run.person);if(people[j+1])S.run.person=people[j+1]}render();break}
     case "copymin":{const t=document.getElementById("minutes");try{navigator.clipboard.writeText(t.value).then(()=>toast("Minutes copied. Paste them into your email or Teams."),()=>{t.select();toast("Press Ctrl+C to copy")})}catch(_){t.select();toast("Press Ctrl+C to copy")}break}
@@ -1431,10 +1438,10 @@ view.addEventListener("click",e=>{
     case "print":S.tab="meet";render();setTimeout(()=>window.print(),100);break;
     case "backup":backup();break;
     case "snaps":showSnaps();break;
-    case "wipe":confirmBox("Delete all tasks?","Every task on this computer will be removed. Download a backup first if you might need them.","Delete everything",()=>{const prev=D;D={...blank(),staff:D.staff};save();render();toast("All tasks deleted",()=>{D=prev})},true);break;
-    case "rmstaff":{const n=b.dataset.name;D.staff=D.staff.filter(x=>x!==n);save();render();toast(n+" removed from the team list")}break;
+    case "wipe":confirmBox("Delete all tasks?","Every task on this computer will be removed. Download a backup first if you might need them.","Delete everything",()=>{const prev=JSON.parse(JSON.stringify(D));bury(...D.tasks.map(t=>t.id));D.tasks=[];D.meet={};D.seen={};save();render();toast("All tasks deleted",()=>{D=prev})},true);break;
+    case "rmstaff":{const n=b.dataset.name;D.staff=D.staff.filter(x=>x!==n);bury("staff:"+n);save();render();toast(n+" removed from the team list")}break;
     case "rename":{const n=b.dataset.name;modal(`<div class="mh"><h2>Rename ${esc(n)}</h2></div><div class="mb"><input class="inp" id="rn" value="${esc(n)}" maxlength="40"><p class="hint" style="margin:0">Their tasks are updated too.</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Rename</button></div>`,ev=>{
-      if(!ev.target.closest("[data-m=ok]"))return;const nn=document.getElementById("rn").value.trim();if(!nn)return;closeModal();D.staff=D.staff.map(x=>x===n?nn:x);if(D.emails&&D.emails[n]){D.emails[nn]=D.emails[n];delete D.emails[n]}D.tasks.forEach(t=>{t.owners=(t.owners||[]).map(o=>o===n?nn:o);if(t.bdm===n)t.bdm=nn});save();render();toast("Renamed to "+nn)});setTimeout(()=>{const x=document.getElementById("rn");x&&x.select()},30);break}
+      if(!ev.target.closest("[data-m=ok]"))return;const nn=document.getElementById("rn").value.trim();if(!nn)return;closeModal();D.staff=D.staff.map(x=>x===n?nn:x);if(D.emails&&D.emails[n]){D.emails[nn]=D.emails[n];delete D.emails[n]}(D.away||[]).forEach(a=>{if(a.person===n)a.person=nn});Object.values(D.meet||{}).forEach(m=>{m.skip=(m.skip||[]).map(x=>x==="none:"+n?"none:"+nn:x==="follow:"+n?"follow:"+nn:x)});bury("staff:"+n);unbury("staff:"+nn);D.tasks.forEach(t=>{t.owners=(t.owners||[]).map(o=>o===n?nn:o);if(t.bdm===n)t.bdm=nn});save();render();toast("Renamed to "+nn)});setTimeout(()=>{const x=document.getElementById("rn");x&&x.select()},30);break}
   }return}
   if(e.target.closest("button,input,a,label,select,textarea"))return;
   const r=e.target.closest(".row[data-id],.card[data-id]");if(r)openTask(r.dataset.id);
@@ -1451,7 +1458,7 @@ view.addEventListener("submit",e=>{e.preventDefault();
     D.tasks.push(t);M().added.push(t.id);D.seen[t.id]=todayKey();save();render();toast("Added to "+PRIO[t.prio].s+(who?" for "+who:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("pa-title");y&&y.focus()},0);return}
   if(e.target.id==="addPrio"){const x=document.getElementById("na-title"),title=x.value.trim();if(!title){x.focus();return}const R=S.run;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:R.person&&R.person!=="Unassigned"?[R.person]:[],prio:R.np,status:"ns",start:todayKey(),target:R.nd===0?todayKey():addWork(todayKey(),R.nd),updates:[],created:new Date().toISOString()};
-    D.tasks.push(t);M().added.push(t.id);save();render();toast("Added to "+PRIO[t.prio].s+" for "+(R.person||"the team"),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("na-title");y&&y.focus()},0);return}if(e.target.id==="staffForm"){const n=normName(document.getElementById("staffName").value);if(!n)return;if(!D.staff.some(s=>s.toLowerCase()===n.toLowerCase()))D.staff.push(n);save();render();toast(n+" added");setTimeout(()=>{const x=document.getElementById("staffName");x&&x.focus()},0)}});
+    D.tasks.push(t);M().added.push(t.id);save();render();toast("Added to "+PRIO[t.prio].s+" for "+(R.person||"the team"),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("na-title");y&&y.focus()},0);return}if(e.target.id==="staffForm"){const n=normName(document.getElementById("staffName").value);if(!n)return;if(!D.staff.some(s=>s.toLowerCase()===n.toLowerCase()))D.staff.push(n);unbury("staff:"+n);save();render();toast(n+" added");setTimeout(()=>{const x=document.getElementById("staffName");x&&x.focus()},0)}});
 view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.pf){const t=find(e.target.dataset.id);if(!t)return;const f=e.target.dataset.pf;let v=e.target.value;
     if(f==="title"){v=v.replace(/\s+/g," ").trim();if(!v){e.target.value=t.title;return}}
     if(f==="prio"){const was=t.prio;t.prio=+v;D.seen[t.id]=todayKey();save();render();toast("Moved to "+PRIO[t.prio].s,()=>{t.prio=was});return}
@@ -1540,7 +1547,7 @@ async function importExcel(file){
   </div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">${IC.up}Import</button></div>`,e=>{
     if(!e.target.closest("[data-m=ok]"))return;const mode=(document.querySelector('input[name=imode]:checked')||{}).value||"replace";closeModal();
     const prev=JSON.parse(JSON.stringify(D));
-    if(mode==="replace")D.tasks=[];
+    if(mode==="replace"){bury(...D.tasks.map(t=>t.id));D.tasks=[]}
     const have=new Set(D.tasks.map(t=>t.title.toLowerCase()));found.forEach(t=>{if(mode==="merge"&&have.has(t.title.toLowerCase()))return;delete t.src;D.tasks.push(t)});
     found.forEach(t=>t.owners.concat(t.bdm?[t.bdm]:[]).forEach(o=>{if(o&&!D.staff.some(s=>s.toLowerCase()===o.toLowerCase()))D.staff.push(o)}));
     save();S.tab="run";S.run.stage="follow";S.run.person=null;S.anim=true;render();toast("Imported "+found.length+" tasks",()=>{D=prev})});
