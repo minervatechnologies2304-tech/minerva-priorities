@@ -882,7 +882,7 @@ function renderMeet(){
   const ppl=Object.keys(staffOpen).sort(byName);
   h+=`<div class="tools"><label class="search">${IC.search}<input class="inp" id="q" type="search" placeholder="Search tasks, partners, updates" value="${esc(S.q)}" autocomplete="off"></label>
     <span class="eyebrow" style="margin-left:4px">Group by</span>
-    <div class="seg">${[["prio","Priority"],["person","Person"],["partner","Partner"],["status","Status"]].map(([k,l])=>`<button data-group="${k}" aria-pressed="${S.group===k}">${l}</button>`).join("")}</div></div>`;
+    <div class="seg">${[["prio","Priority"],["due","Due date"],["person","Person"],["partner","Partner"],["status","Status"]].map(([k,l])=>`<button data-group="${k}" aria-pressed="${S.group===k}">${l}</button>`).join("")}</div></div>`;
   h+=`<div class="people" role="group" aria-label="Go through one person at a time"><button class="chip all" data-focus="" aria-pressed="${!S.focus}">Everyone</button>${ppl.map(p=>`<button class="chip" data-focus="${esc(p)}" aria-pressed="${S.focus===p}">${av(p)}${esc(p)}<span class="n${staffOpen[p].o?" bad":""}">${staffOpen[p].n}</span></button>`).join("")}</div>`;
   let list=all.filter(t=>matchQ(t,S.q));
   if(S.focus)list=list.filter(t=>ownersOf(t).includes(S.focus));
@@ -893,12 +893,16 @@ function renderMeet(){
   if(!list.length)return h+`<div class="empty"><h2>Nothing here</h2><p>${S.q?"No task matches your search.":S.quick?"No tasks in this view.":"No open tasks."}</p></div>`;
   // groups
   let groups=[];
-  if(S.group==="prio")groups=[1,2,3,4].map(p=>({k:"p"+p,t:PRIO[p].l,sub:PRIO[p].s,dot:`var(--p${p})`,items:list.filter(t=>t.prio===p)}));
+  if(S.group==="due"){const tk2=todayKey(),tm=addWork(tk2,1),d0=new Date();const wEnd=key(new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+((5-d0.getDay()+7)%7)));const nwEnd=key(new Date(dateOf(wEnd).getFullYear(),dateOf(wEnd).getMonth(),dateOf(wEnd).getDate()+7));
+    const B=[["over","Overdue","var(--bad)",t=>t.target&&t.target<tk2],["today","Due today","var(--warn)",t=>t.target===tk2],["tom","Due "+(tm===key(new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+1))?"tomorrow":fmt(tm,{weekday:"long"})),"var(--p2)",t=>t.target===tm],
+      ["week","Later this week","var(--p3)",t=>t.target>tm&&t.target<=wEnd],["next","Next week","var(--p3)",t=>t.target>wEnd&&t.target<=nwEnd&&t.target>tm],["later","Later","var(--p4)",t=>t.target>nwEnd&&t.target>tm],["none","No target date","var(--line-2)",t=>!t.target]];
+    const used=new Set();groups=B.map(([k,l,c,f])=>{const items=list.filter(t=>!used.has(t.id)&&f(t));items.forEach(t=>used.add(t.id));const sub=items.length&&k!=="none"&&k!=="over"?items.map(t=>t.target).sort()[0]:null;return {k,t:l,dot:c,sub:k==="week"||k==="next"||k==="later"?(sub?"from "+fmt(sub,{weekday:"short",day:"numeric",month:"short"}):""):"",items}})}
+  else if(S.group==="prio")groups=[1,2,3,4].map(p=>({k:"p"+p,t:PRIO[p].l,sub:PRIO[p].s,dot:`var(--p${p})`,items:list.filter(t=>t.prio===p)}));
   else if(S.group==="status")groups=["wait","on","ns"].map(s=>({k:s,t:STATUS[s],items:list.filter(t=>t.status===s)}));
   else if(S.group==="person"){const names=[...new Set(list.flatMap(ownersOf))].sort(byName);groups=names.map(n=>({k:n,t:n,av:n,items:list.filter(t=>ownersOf(t).includes(n))}))}
   else{const names=[...new Set(list.map(t=>t.partner||"No partner"))].sort((a,b)=>(a==="No partner")-(b==="No partner")||byName(a,b));groups=names.map(n=>({k:n,t:n,items:list.filter(t=>(t.partner||"No partner")===n)}))}
   h+=groups.filter(g=>g.items.length).map(g=>`<section class="group"><div class="ghead">${g.dot?`<span class="dot" style="background:${g.dot}"></span>`:""}${g.av?av(g.av):""}<h3>${esc(g.t)}</h3><span class="count">${g.items.length}${g.sub?" · "+esc(g.sub):""}</span></div>
-    <div class="list">${g.items.sort(sortTasks).map(row).join("")}</div></section>`).join("");
+    <div class="list">${g.items.sort(S.group==="due"?(a,b)=>String(a.target||"9").localeCompare(String(b.target||"9"))||(a.prio-b.prio):sortTasks).map(row).join("")}</div></section>`).join("");
   return h;
 }
 function row(t){
