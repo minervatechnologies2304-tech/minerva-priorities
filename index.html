@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v20</title>
+<title>Minerva Priorities · v21</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -256,8 +256,6 @@ td.bad{color:var(--bad);font-weight:700}
 @media (prefers-reduced-motion:no-preference){
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @keyframes fade{from{opacity:0}to{opacity:1}}
-  .enter .group,.enter .panel,.enter .quad{animation:rise .35s cubic-bezier(.2,.8,.2,1) both}
-  .enter .group:nth-child(2){animation-delay:.04s}.enter .group:nth-child(3){animation-delay:.08s}.enter .group:nth-child(n+4){animation-delay:.12s}
   .row.leaving{opacity:0;transform:translateX(24px)}
   .row.flash{animation:flash 1s ease}
   @keyframes flash{0%{box-shadow:0 0 0 3px var(--ok)}100%{box-shadow:0 0 0 0 transparent}}
@@ -309,7 +307,6 @@ td.bad{color:var(--bad);font-weight:700}
 .card.new{border-color:var(--cyan);box-shadow:0 0 0 2px var(--cyan-soft)}
 .btn.glow{animation:glow 1.6s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--ok) 25%,transparent)}}
 .newtag{background:var(--cyan-soft);color:var(--navy2);font-weight:700;border-radius:6px;padding:0 6px;font-size:11.5px}
-@media (prefers-reduced-motion:no-preference){.enter .fu,.enter .addp{animation:rise .35s cubic-bezier(.2,.8,.2,1) both}.enter .fu:nth-child(2){animation-delay:.04s}.enter .fu:nth-child(n+3){animation-delay:.08s}}
 .av{flex:none}
 @media (max-width:1420px){.tabs button svg{display:none}.tabs button{padding:7px 9px;font-size:14px}.brand small{display:none}.bar{gap:10px}.brand .div,.brand img{margin:0}}
 @media (max-width:1180px){.hbtn{padding:7px 9px}.brand b{font-size:17px}}
@@ -444,13 +441,6 @@ header{background:linear-gradient(100deg,#003660 0%,#004679 55%,#005a92 100%);bo
 button,.btn,.row,.fu,.kpi,.chip,.card,.icon,.opt{transition:transform .12s ease,background-color .15s ease,box-shadow .15s ease,color .15s ease,filter .15s ease}
 .btn:active,.icon:active,.opt:active,.chip:active,.kpi:active{transform:scale(.97)}
 .row:active{transform:scale(.985)}
-.enter .group,.enter .panel,.enter .quad,.enter .fu,.enter .addp,.enter .today,.enter .meet,.enter .tools,.enter .people,.enter .phead,.enter .rail,.enter .runhead{animation:fadeUp .24s ease both!important}
-.enter>*:nth-child(2),.enter .group:nth-child(2),.enter .fu:nth-child(2){animation-delay:.03s!important}
-.enter>*:nth-child(3),.enter .group:nth-child(3),.enter .fu:nth-child(3){animation-delay:.06s!important}
-.enter>*:nth-child(n+4),.enter .group:nth-child(n+4),.enter .fu:nth-child(n+4){animation-delay:.08s!important}
-.modal:not([hidden]){animation:fadeIn .15s ease both}
-.modal:not([hidden]) .mbox{animation:popIn .2s cubic-bezier(.2,.8,.3,1) both}
-.toast:not([hidden]){animation:toastIn .18s ease both}
 .row.flash{animation:popIn .25s ease}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* opening transition: the dialler's logo zoom */
@@ -508,6 +498,54 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 .padd.top{padding:12px;margin:0 0 12px;border-top:0}.padd #pa-prio{flex:0 1 260px}
 .panel{min-width:0}@media (max-width:760px){main .panel{overflow-x:auto;max-width:100%}}
 #toast{pointer-events:none}#toast button{pointer-events:auto}
+
+/* ===== motion: iOS-style springs ===== */
+:root{--spring:cubic-bezier(.32,.72,0,1);--pop:cubic-bezier(.34,1.4,.64,1)}
+@keyframes pageIn{from{opacity:0;transform:translate3d(var(--dx,0px),var(--dy,8px),0)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:none}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes sheetOut{to{opacity:0;transform:translateY(8px) scale(.97)}}
+@keyframes dimIn{from{opacity:0}to{opacity:1}}@keyframes dimOut{to{opacity:0}}
+@keyframes toastUp{from{opacity:0;transform:translate(-50%,24px) scale(.92)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes toastDown{to{opacity:0;transform:translate(-50%,16px) scale(.96)}}
+@keyframes okPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 45%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+@keyframes tickIn{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
+.enter>*{animation:pageIn .55s var(--spring) both}
+.enter>*:nth-child(2){animation-delay:.035s}.enter>*:nth-child(3){animation-delay:.07s}.enter>*:nth-child(4){animation-delay:.1s}.enter>*:nth-child(n+5){animation-delay:.13s}
+.enter .cas{animation:rowIn .5s var(--spring) both;animation-delay:calc(var(--i,0) * 22ms + 90ms)}
+.modal:not([hidden]){animation:dimIn .25s ease both}
+.modal:not([hidden]) .mbox{animation:sheetIn .42s var(--pop) both}
+.modal.stay,.modal.stay .mbox{animation:none}
+.modal.out{animation:dimOut .18s ease both}.modal.out .mbox{animation:sheetOut .18s ease both}
+.toast{-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);border-radius:14px}
+.toast:not([hidden]){animation:toastUp .5s var(--spring) both}
+.toast.out{animation:toastDown .22s ease both}
+.drawer{transition:transform .5s var(--spring)}
+.scrim{transition:opacity .35s ease}
+.drawer.opening .dbody>*{animation:rowIn .5s var(--spring) both}
+.drawer.opening .dbody>*:nth-child(2){animation-delay:.04s}.drawer.opening .dbody>*:nth-child(3){animation-delay:.07s}.drawer.opening .dbody>*:nth-child(4){animation-delay:.1s}.drawer.opening .dbody>*:nth-child(n+5){animation-delay:.13s}
+.just-ok{animation:okPulse .7s ease-out}
+.dtag,.rst{display:inline-block}.pop-in{animation:tickIn .45s var(--pop) both}
+/* press feedback */
+button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transform .35s var(--spring),background-color .2s ease,box-shadow .25s ease,color .2s ease,border-color .2s ease,filter .2s ease}
+.btn:active,.icon:active,.opt:active,.chip:active,.awchip:active,.ownb:active{transform:scale(.95);transition-duration:.08s}
+.pq:active,.step:active,.kpi:active,.rp:active{transform:scale(.97);transition-duration:.08s}
+.row:active{transform:scale(.99)}
+/* sliding selection pills (tabs and segmented controls) */
+.tabs{position:relative}.tabs button{position:relative;z-index:1}
+.tabs .tabpill{position:absolute;left:0;top:2px;bottom:2px;width:0;border-radius:7px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);z-index:0;pointer-events:none;transition:transform .5s var(--spring),width .5s var(--spring)}
+.tabs.pilled button[aria-selected="true"]{background:transparent;box-shadow:none}
+.seg{position:relative}.seg button{position:relative;z-index:1}
+.seg .segpill{position:absolute;border-radius:7px;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.14);z-index:0;pointer-events:none}
+.seg.pilled button[aria-pressed="true"]{background:transparent;box-shadow:none}
+.mbar i{transition:width .7s var(--spring)}
+html{scroll-behavior:smooth}main{overflow-x:clip}
+/* full screen on a PC / shared screen: use the width, scale type up a touch */
+@media (min-width:1500px){.wrap{max-width:min(94vw,2000px)}html{font-size:16px}table.ptab{font-size:15px}.ce.ct{font-size:15.5px}}
+@media (min-width:1900px){html{font-size:17px}.kpi b{font-size:28px}table.ptab{font-size:16px}.ce.ct{font-size:16.5px}.rph b{font-size:17px}.pqt b{font-size:17px}}
+@media (min-width:1500px){html.present .wrap{max-width:96vw}}
+#splash img{width:clamp(220px,28vw,560px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .round{display:flex;flex-direction:column;gap:8px}
 .rperson{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:inset 4px 0 0 var(--line)}
 .rperson.asked{box-shadow:inset 4px 0 0 var(--ok)}.rperson:focus-within{border-color:var(--accent)}
@@ -526,7 +564,7 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v20</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v21</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -906,10 +944,10 @@ window.addEventListener("beforeunload",e=>{if(G.url&&G.pending){e.preventDefault
 
 /* ================= toast + modal ================= */
 let tT=null,tUndo=null;
-function toast(msg,undo){const t=document.getElementById("toast");tUndo=undo||null;t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button type="button" id="tundo">Undo</button>':""}`;t.hidden=false;clearTimeout(tT);tT=setTimeout(()=>{t.hidden=true;tUndo=null},undo?7000:3200)}
+function toast(msg,undo){const t=document.getElementById("toast");tUndo=undo||null;t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button type="button" id="tundo">Undo</button>':""}`;t.classList.remove("out");if(!t.hidden){t.style.animation="none";void t.offsetWidth;t.style.animation=""}t.hidden=false;clearTimeout(tT);tT=setTimeout(()=>{t.classList.add("out");tUndo=null;tT=setTimeout(()=>{t.hidden=true;t.classList.remove("out")},220)},undo?7000:3200)}
 document.getElementById("toast").addEventListener("click",e=>{if(e.target.id==="tundo"&&tUndo){const f=tUndo;tUndo=null;document.getElementById("toast").hidden=true;f();save();render();toast("Undone")}});
-function modal(html,onClick){const m=document.getElementById("modal");m.innerHTML=`<div class="mbox" role="dialog">${html}</div>`;m.hidden=false;m.onclick=e=>{if(e.target===m||e.target.closest("[data-m=close]")){closeModal();return}onClick&&onClick(e)}}
-function closeModal(){const m=document.getElementById("modal");m.hidden=true;m.innerHTML=""}
+function modal(html,onClick){const m=document.getElementById("modal");mTok++;const stay=!m.hidden&&!m.classList.contains("out");m.classList.remove("out");m.classList.toggle("stay",stay);m.innerHTML=`<div class="mbox" role="dialog">${html}</div>`;m.hidden=false;m.onclick=e=>{if(e.target===m||e.target.closest("[data-m=close]")){closeModal();return}onClick&&onClick(e)}}
+let mTok=0;function closeModal(){const m=document.getElementById("modal");if(m.hidden)return;const k=++mTok;if(RM()){m.hidden=true;m.innerHTML="";return}m.classList.add("out");setTimeout(()=>{if(k!==mTok)return;m.hidden=true;m.innerHTML="";m.classList.remove("out")},180)}
 function confirmBox(title,text,okLabel,fn,danger){modal(`<div class="mh"><h2>${esc(title)}</h2></div><div class="mb"><p style="margin:0">${text}</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn ${danger?"danger":""}" data-m="ok">${esc(okLabel)}</button></div>`,e=>{if(e.target.closest("[data-m=ok]")){closeModal();fn()}})}
 
 /* ================= task actions ================= */
@@ -926,11 +964,54 @@ function addUpdate(id,text,date){const t=find(id);if(!t||!String(text).trim())re
   if(t.status==="ns")t.status="on";save();return true}
 
 /* ================= views ================= */
+const RM=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
+const TABS=["run","meet","away","board","sum","done","set"];
+function pagePos(){const r=S.run||{};return TABS.indexOf(S.tab)*1000+(S.tab==="run"?(["follow","today","wrap"].indexOf(r.stage)+1)*100+(r.by!=="person"&&r.stage==="follow"?(r.pq||1)*10:0):0)+(S.tab==="away"?(S.aw||0)*10:0)}
+let lastPos=null;
+const FSEL=".row[data-id],tr.pr[data-id],.card[data-id],.fu[data-fid],.rperson[data-person],.ritem,.group,.quad[data-prio],.kpi,.pq,.step,.awchip[data-aw],.u,.staff li";
+function fkey(el,seen){let k;
+  if(el.matches(".ritem")){const x=el.querySelector("[data-id]");k="ri:"+(x&&x.dataset.id)}
+  else if(el.matches(".group,.kpi,.staff li")){k=el.className.split(" ")[0]+":"+(el.querySelector("h3,span,b")||el).textContent.trim().slice(0,40)}
+  else if(el.matches(".u")){const x=el.querySelector("[data-uid]");k="u:"+(x?x.dataset.uid:el.textContent.slice(0,30))}
+  else k=el.className.split(" ")[0]+":"+(el.dataset.id||el.dataset.fid||el.dataset.person||el.dataset.prio||el.dataset.rprio||el.dataset.stage||el.dataset.aw||"");
+  const n=(seen[k]=(seen[k]||0)+1);return n>1?k+"#"+n:k}
+function snapView(){const m=new Map(),seen={};view.querySelectorAll(FSEL).forEach(el=>{const r=el.getBoundingClientRect();if(r.bottom<-200||r.top>innerHeight+200)return;m.set(fkey(el,seen),{r,cls:el.className,el})});return m}
+function snapNums(){const m=new Map();view.querySelectorAll(".kpi").forEach(k=>{const l=k.querySelector("span"),b=k.querySelector("b");if(l&&b)m.set(l.textContent,+b.textContent)});const bar=view.querySelector(".mbar i");return {m,bar:bar?bar.style.width:null}}
+function tweenNum(el,from,to){if(isNaN(from)||isNaN(to)||from===to)return;const t0=performance.now(),d=550;const step=now=>{const k=Math.min(1,(now-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(step);else el.textContent=to};requestAnimationFrame(step);
+  el.animate&&el.animate([{transform:"scale(1)"},{transform:"scale(1.18)"},{transform:"scale(1)"}],{duration:450,easing:"cubic-bezier(.34,1.4,.64,1)"})}
+function morph(old,nums){
+  const seen={},easing="cubic-bezier(.32,.72,0,1)";let born=0;
+  view.querySelectorAll(FSEL).forEach(el=>{const k=fkey(el,seen),o=old.get(k);
+    if(o){old.delete(k);const r=el.getBoundingClientRect(),dx=o.r.left-r.left,dy=o.r.top-r.top;
+      if(Math.abs(dx)>1||Math.abs(dy)>1)el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],{duration:520,easing});
+      const gained=c=>!(" "+o.cls+" ").includes(" "+c+" ")&&el.classList.contains(c);
+      if(gained("handled")||gained("asked")||gained("seen")){el.classList.add("just-ok");setTimeout(()=>el.classList.remove("just-ok"),800);const t=el.querySelector(".dtag,.rst");t&&t.classList.add("pop-in")}}
+    else if(old.size&&born<14){born++;const r=el.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)el.animate([{opacity:0,transform:"translateY(-6px) scale(.97)"},{opacity:1,transform:"none"}],{duration:480,easing,delay:born*25})}});
+  // leavers fade and shrink in place
+  let gone=0;old.forEach(o=>{if(gone>=6||o.el.tagName==="TR"||o.el.matches(".group,.kpi,.step,.pq"))return;gone++;const g=o.el.cloneNode(true);Object.assign(g.style,{position:"fixed",left:o.r.left+"px",top:o.r.top+"px",width:o.r.width+"px",height:o.r.height+"px",margin:"0",zIndex:30,pointerEvents:"none",boxSizing:"border-box"});document.body.appendChild(g);
+    g.animate([{opacity:1,transform:"none"},{opacity:0,transform:"scale(.94) translateY(4px)"}],{duration:320,easing:"ease-out",fill:"forwards"}).onfinish=()=>g.remove();setTimeout(()=>g.remove(),600)});
+  view.querySelectorAll(".kpi").forEach(k=>{const l=k.querySelector("span"),b=k.querySelector("b");if(l&&b&&nums.m.has(l.textContent))tweenNum(b,nums.m.get(l.textContent),+b.textContent)});
+  const bar=view.querySelector(".mbar i");if(bar&&nums.bar&&nums.bar!==bar.style.width){const w=bar.style.width;bar.style.transition="none";bar.style.width=nums.bar;void bar.offsetWidth;bar.style.transition="";bar.style.width=w}
+}
+function placeTabPill(instant){const tabs=document.querySelector(".tabs");if(!tabs)return;let p=tabs.querySelector(".tabpill");if(!p){p=document.createElement("span");p.className="tabpill";tabs.prepend(p);instant=true}
+  const b=tabs.querySelector('button[aria-selected="true"]');if(!b)return;if(instant||RM())p.style.transition="none";p.style.width=b.offsetWidth+"px";p.style.transform=`translateX(${b.offsetLeft}px)`;tabs.classList.add("pilled");if(instant||RM()){void p.offsetWidth;p.style.transition=""}}
+function snapSegs(){return [...view.querySelectorAll(".seg")].map(sg=>{const b=sg.querySelector('button[aria-pressed="true"]');return b?{key:sg.textContent.slice(0,60),r:b.getBoundingClientRect()}:null})}
+function placeSegPills(old){view.querySelectorAll(".seg").forEach((sg,i)=>{const b=sg.querySelector('button[aria-pressed="true"]');if(!b)return;const p=document.createElement("span");p.className="segpill";const sr=sg.getBoundingClientRect(),br=b.getBoundingClientRect();
+  Object.assign(p.style,{left:(br.left-sr.left-sg.clientLeft)+"px",top:(br.top-sr.top-sg.clientTop)+"px",width:br.width+"px",height:br.height+"px"});sg.prepend(p);sg.classList.add("pilled");
+  const o=old&&old[i];if(o&&o.key===sg.textContent.slice(0,60)&&!RM()){const dx=o.r.left-br.left;if(Math.abs(dx)>1)p.animate([{transform:`translateX(${dx}px)`,width:o.r.width+"px"},{transform:"none",width:br.width+"px"}],{duration:480,easing:"cubic-bezier(.32,.72,0,1)"})}})}
+addEventListener("resize",()=>placeTabPill(true));
 function render(){
-  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
+  const anim=!RM(),pageChange=S.anim,old=anim&&!pageChange?snapView():null,nums=anim&&!pageChange?snapNums():{m:new Map()},segs=snapSegs();
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));placeTabPill(false);
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
   view.innerHTML=S.tab==="run"?renderRun():S.tab==="meet"?renderMeet():S.tab==="away"?renderAway():S.tab==="board"?renderBoard():S.tab==="sum"?renderSum():S.tab==="done"?renderDone():renderSet();
-  if(S.anim){view.classList.remove("enter");void view.offsetWidth;view.classList.add("enter");S.anim=false;setTimeout(()=>view.classList.remove("enter"),600)}
+  const pos=pagePos();
+  if(S.anim){const dir=lastPos==null||pos===lastPos?0:(pos>lastPos?1:-1);view.style.setProperty("--dx",dir*36+"px");view.style.setProperty("--dy",dir?"0px":"8px");
+    view.classList.remove("enter");void view.offsetWidth;
+    let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<14){el.classList.add("cas");el.style.setProperty("--i",i++)}});
+    view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},900)}
+  else if(old&&old.size)morph(old,nums);
+  lastPos=pos;placeSegPills(pageChange?null:segs);
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(s0!=null)el.setSelectionRange(s0,s1)}catch(e){}}}
 }
 function counts(list){const tk=todayKey();return {open:list.length,over:list.filter(isOver).length,today:list.filter(t=>t.target===tk).length,stale:list.filter(t=>staleDays(t)>=2).length,seen:list.filter(seenToday).length}}
@@ -1313,7 +1394,7 @@ const drawer=document.getElementById("drawer"), scrim=document.getElementById("s
 function openTask(id,focusUpdate){window.__lastErr="";
   if(id&&!find(id)){toast("Couldn't find that task. Reload the page and try again.");return}
   const t=id?JSON.parse(JSON.stringify(find(id))):{id:null,title:"",partner:"",endUser:"",country:"",bdm:"",owners:S.focus&&S.focus!=="Unassigned"?[S.focus]:[],prio:1,status:"ns",start:todayKey(),target:addWork(todayKey(),3),updates:[]};
-  S.edit={t,isNew:!id,newU:"",newUDate:todayKey()};renderDrawer();scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add("on");drawer.classList.add("on");drawer.setAttribute("aria-hidden","false");
+  S.edit={t,isNew:!id,newU:"",newUDate:todayKey()};drawer.classList.add("opening");renderDrawer();scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add("on");drawer.classList.add("on");setTimeout(()=>drawer.classList.remove("opening"),700);drawer.setAttribute("aria-hidden","false");
   setTimeout(()=>{const x=document.getElementById(focusUpdate?"d-newu":id?"d-newu":"d-title");x&&x.focus()},60);
 }
 function closeDrawer(){S.edit=null;scrim.classList.remove("on");drawer.classList.remove("on");drawer.setAttribute("aria-hidden","true");setTimeout(()=>{if(!S.edit){scrim.hidden=true;drawer.innerHTML=""}},280)}
@@ -1393,7 +1474,9 @@ scrim.addEventListener("click",()=>{if(S.edit){readDrawer();const E=S.edit;const
 /* ================= events ================= */
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.tab=b.dataset.tab;S.anim=true;render();window.scrollTo({top:0});if(S.tab==="set"&&G.url&&!gSnaps)gLoadSnaps()});
 document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
-document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on))});
+document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));
+  try{if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}setTimeout(()=>placeTabPill(true),350)});
+document.addEventListener("fullscreenchange",()=>setTimeout(()=>placeTabPill(true),100));
 document.getElementById("presentBtn").setAttribute("aria-pressed",String(document.documentElement.classList.contains("present")));
 view.addEventListener("input",e=>{const id=e.target.id;if(id==="gurl"){window.__gurlDraft=e.target.value;return}if(id==="q"){S.q=e.target.value;render()}else if(id==="dq"){S.doneQ=e.target.value;render()}});
 view.addEventListener("click",e=>{
