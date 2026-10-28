@@ -1,0 +1,16 @@
+{
+  "name": "Minerva Daily Priorities",
+  "short_name": "Priorities",
+  "description": "Morning meeting tracker for Minerva Technologies",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#003660",
+  "theme_color": "#003660",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
