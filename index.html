@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v16</title>
+<title>Minerva Priorities · v17</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -481,6 +481,30 @@ td.awc{cursor:pointer;height:46px}td.awc:hover{background:var(--surface-2)}
 td.awc .awchip{display:flex;margin-bottom:4px;flex-direction:column;align-items:flex-start;gap:0;padding:5px 9px;width:100%}
 .hol{font-size:10.5px;color:var(--bad);font-weight:600}
 .awdot{color:#E19A1C;font-size:10px;vertical-align:2px}
+.runby{display:inline-flex;align-items:center}
+.pqbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.pq{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:10px 12px;cursor:pointer;font:inherit;box-shadow:inset 4px 0 0 var(--qc)}
+.pq:hover{border-color:var(--qc)}.pq.on{border-color:var(--qc);box-shadow:inset 4px 0 0 var(--qc),0 0 0 2px var(--qc)}
+.pq .qdot{width:12px;height:12px;border-radius:4px;background:var(--qc);flex:none}.pqt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.pqt b{font-size:15px}.pqt small{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pq i{font-style:normal;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--fill);white-space:nowrap}.pq i.ok{color:var(--ok);background:var(--oks)}.pq i.g{color:var(--muted)}
+@media (max-width:900px){.pqbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rq{align-items:center}.rq>span:not(.qdot){display:flex;flex-direction:column;line-height:1.2}.rq small{font-size:11px;color:var(--muted);font-weight:500}.rp.rq.on small{color:inherit;opacity:.8}
+.qdot{width:12px;height:12px;border-radius:4px;flex:none;margin:0 4px}.qbig{width:18px;height:46px;border-radius:6px;flex:none}
+.ptwrap{padding:6px 8px;border-top:4px solid var(--pc)}
+table.ptab{font-size:14px;min-width:980px}table.ptab td{vertical-align:top;padding:6px 4px}table.ptab th{padding:8px 6px}
+table.ptab tr.handled td{background:color-mix(in srgb,var(--ok) 6%,transparent)}table.ptab tr.isdone td{opacity:.65}
+.ce{width:100%;box-sizing:border-box;border:1px solid transparent;background:transparent;border-radius:8px;padding:6px 7px;font:inherit;color:inherit;min-width:0}
+.ce:hover:not(:disabled){border-color:var(--line);background:var(--surface)}.ce:focus{border-color:var(--accent);background:var(--surface);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+select.ce{cursor:pointer}.ce.sm{font-size:12.5px;color:var(--muted);padding-top:2px}.ce.ct{font-weight:650;font-size:14.5px}
+.ce.upd{border-color:var(--line);background:var(--surface)}
+.c-task{min-width:250px;width:28%}.pp{display:flex;align-items:center;gap:2px;color:var(--muted)}.pp .ce{flex:1}.c-task small{display:block;padding:0 8px;color:var(--muted);font-size:12px}.c-task .dtag{color:var(--ok);font-weight:600}
+.c-own{min-width:110px}.c-lu{min-width:180px;max-width:300px;font-size:13px;padding-top:12px!important}.c-lu time{font-weight:700;color:var(--accent)}.c-lu em{color:var(--muted);font-size:12px}
+.c-upd{min-width:190px;width:20%}.c-dt{min-width:150px}.c-dt .st{display:flex;align-items:center;gap:2px;font-size:11.5px;color:var(--muted);margin-top:4px;padding-left:6px}.c-dt .st .ce{width:122px;font-size:12px;padding:3px 5px}
+table.ptab select[data-pf=status]{min-width:118px}.c-act{white-space:nowrap}.c-act .icon{vertical-align:middle}.c-act .mv{width:auto;font-size:12px;color:var(--muted);display:block;margin-top:4px}
+td .ce.dt{width:146px}td .due{display:inline-block;margin:2px 0 0 6px;font-size:11.5px}
+.ownb{display:flex;flex-direction:column;gap:3px;border:1px solid transparent;background:transparent;border-radius:8px;padding:4px 6px;text-align:left;color:inherit;font:inherit;cursor:pointer;width:100%}
+.ownb:hover{border-color:var(--line);background:var(--surface)}.ownb .oc{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap}.ownb .av{width:22px;height:22px;font-size:9.5px}
+.padd{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px 6px;border-top:1px dashed var(--line);margin-top:4px}.padd #pa-title{flex:1 1 280px}.padd select{flex:0 1 180px}.padd input[type=date]{flex:0 0 150px}
 </style>
 </head>
 <body>
@@ -488,7 +512,7 @@ td.awc .awchip{display:flex;margin-bottom:4px;flex-direction:column;align-items:
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v16</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v17</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -728,7 +752,7 @@ const IC={
 };
 
 /* ================= state ================= */
-const S={aw:0,awDay:null,run:{stage:"follow",person:null,np:1,nd:1},tab:"meet",group:"prio",q:"",focus:null,quick:null,anim:true,edit:null,showDone:"",doneQ:""};
+const S={aw:0,awDay:null,run:{stage:"follow",person:null,np:1,nd:1,by:(()=>{try{return localStorage.getItem("minerva-tracker:runby")||"prio"}catch(e){return "prio"}})(),pq:1},tab:"meet",group:"prio",q:"",focus:null,quick:null,anim:true,edit:null,showDone:"",doneQ:""};
 try{const g=localStorage.getItem("minerva-tracker:group");if(g)S.group=g;if(localStorage.getItem("minerva-tracker:present")==="1")document.documentElement.classList.add("present")}catch(e){}
 const view=document.getElementById("view");
 
@@ -1110,11 +1134,15 @@ function renderRun(){
   const tk=todayKey(), R=S.run, m=M();
   if(!D.tasks.length)return `<div class="empty"><h2>No tasks yet</h2><p>Import your Excel sheet first, then run the meeting from here.</p><div style="margin-top:12px"><button class="btn" data-act="goimport">${IC.up}Import the Excel sheet</button></div></div>`;
   const fp=followPeople(), allF=D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id]))), fDone=allF.filter(handled).length;
-  const steps=[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
-  let h=`<div class="runhead"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))} · Morning meeting</div></div>
-    <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<2?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
+  const byP=R.by!=="person";if(byP&&R.stage==="today")R.stage="follow";
+  const allP=D.tasks.filter(t=>t.status!=="done"||(t.doneAt===tk&&m.f[t.id])),pDisc=allP.filter(pDiscussed).length;
+  const steps=byP?[["follow","1","Go through priorities",`${pDisc} of ${allP.length} discussed`],["wrap","2","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
+  let h=`<div class="runhead"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))} · Morning meeting</div>
+    <div class="seg runby" style="margin-top:8px"><span class="lbl" style="margin:0 6px 0 4px">Go through by</span><button data-act="runby" data-v="prio" aria-pressed="${byP}">Priority</button><button data-act="runby" data-v="person" aria-pressed="${!byP}">Person</button></div></div>
+    <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   h+=awTodayBox();
   if(R.stage==="wrap")return h+renderWrap();
+  if(byP)return h+renderPrioRun();
   const people=R.stage==="follow"?fp:todayPeople();
   if(!people.length)return h+`<div class="empty"><h2>${R.stage==="follow"?"Nothing to follow up":"No one on the team yet"}</h2><p>${R.stage==="follow"?"There are no open tasks from before today.":"Add people in Data & settings."}</p>${R.stage==="follow"?`<button class="btn" data-stage="today" style="margin-top:10px">Go to today's priorities ›</button>`:""}</div>`;
   if(!R.person||!people.includes(R.person)){R.person=R.stage==="follow"?(people.find(p=>followTasks(p).some(t=>!handled(t)))||people[0]):people[0]}
@@ -1139,6 +1167,48 @@ function renderRun(){
   }
   return h+`</div></div>`;
 }
+/* ---------- meeting by priority: editable table, like the old sheet ---------- */
+const pDiscussed=t=>!!M().f[t.id]||seenToday(t)||t.status==="done";
+function prioTasks(p){const tk=todayKey(),m=M();return D.tasks.filter(t=>t.prio===p&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))
+  .sort((a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]))}
+function renderPrioRun(){
+  const R=S.run,m=M(),p=R.pq||1,list=prioTasks(p),left=q=>prioTasks(q).filter(t=>!pDiscussed(t)).length,L=lists();
+  const staff=[...new Set(D.staff)].filter(Boolean).sort(byName);
+  let h=`<div class="pqbar" role="tablist">${[1,2,3,4].map(q=>{const n=prioTasks(q).length,l=left(q);return `<button class="pq${q===p?" on":""}${n&&!l?" fin":""}" data-rprio="${q}" style="--qc:var(--p${q})"><span class="qdot"></span><span class="pqt"><b>${PRIO[q].s}</b><small>${PRIO[q].l}</small></span>${n?(l?`<i>${l} to go</i>`:'<i class="ok">✓ done</i>'):'<i class="g">empty</i>'}</button>`}).join("")}</div><div>`;
+  h+=`<div class="phead"><span class="qbig" style="background:var(--p${p})"></span><div style="flex:1;min-width:0"><h2>${PRIO[p].s} <span style="font-weight:500;color:var(--muted);font-size:.7em">· ${PRIO[p].l}</span></h2><p>${list.length} task${list.length===1?"":"s"} · ${list.filter(pDiscussed).length} discussed · type in any box to change it, it saves as you go</p></div>
+    <button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>
+    ${p<4?`<button class="btn sm${list.length&&!left(p)?" ok glow":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button>`}</div>`;
+  h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
+  h+=`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task · partner · end user</th><th>Responsible</th><th>Status</th><th>Target date</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
+    ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing in ${PRIO[p].s} right now. Add one below.</td></tr>`}</tbody></table>
+    <form class="padd" id="paddForm" autocomplete="off"><input class="inp" id="pa-title" placeholder="Add a new ${PRIO[p].s} task… (Enter to add)" maxlength="160"><select class="inp" id="pa-who"><option value="">Responsible…</option>${staff.map(n=>`<option${n===R.paWho?" selected":""}>${esc(n)}</option>`).join("")}</select><input class="inp" type="date" id="pa-due" value="${esc(R.paDue||addWork(todayKey(),1))}" title="Target date"><button class="btn" type="submit">${IC.plus}Add</button></form></div>`;
+  return h+`</div></div>`;
+}
+function prow(t){
+  const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
+  const sub=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
+  return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
+    <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}><div class="pp"><input class="ce sm" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span>→</span><input class="ce sm" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>${sub?`<small>${esc(sub)}</small>`:""}${o||disc?`<small class="dtag">${done?"✓ Completed today":o==="upd"?"✓ Updated today":o==="same"?"✓ No change":"✓ Discussed"}${o?` · <button type="button" class="link" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</small>`:""}</td>
+    <td class="c-own"><button type="button" class="ownb" data-act="pown" data-id="${t.id}" title="Change who is responsible">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</button></td>
+    <td>${done?`<span class="pill st-done">Completed</span>`:`<select class="ce" data-pf="status" data-id="${t.id}">${["ns","on"].map(k=>`<option value="${k}"${t.status===k?" selected":""}>${STATUS[k]}</option>`).join("")}</select>`}</td>
+    <td class="c-dt"><input class="ce dt" type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}" title="Target date"><span class="due ${d.c}">${esc(d.l)}</span><label class="st">Start <input class="ce dt sm" type="date" data-pf="start" data-id="${t.id}" value="${esc(t.start||"")}"></label></td>
+    <td class="c-lu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}${n>1?` <em>+${n-1} earlier</em>`:""}`:'<span class="hint">No updates yet</span>'}</td>
+    <td class="c-upd">${done?"":`<input class="ce upd" id="fb-${t.id}" placeholder="Type, then Enter to save" autocomplete="off">`}</td>
+    <td class="c-act">${done?"":`<button class="icon okh" data-act="fb-done" data-id="${t.id}" title="Mark completed">${IC.check}</button>`}${t.prio===1&&!done?`<button class="icon mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}</button>`:""}<button class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button>
+      <select class="ce mv" data-pf="prio" data-id="${t.id}" title="Move to another priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></td>
+  </tr>`;
+}
+function openOwners(id){const t=find(id);if(!t)return;let sel=(t.owners||[]).slice();
+  const draw=()=>{const staff=[...new Set([...D.staff,...sel])].filter(Boolean).sort(byName);
+    modal(`<div class="mh"><h2>Who is responsible?</h2></div><div class="mb"><p class="hint" style="margin:0">${esc(t.title)}. Tap to choose one or more people, tap again to remove.</p>
+      <div class="ochips">${staff.map(n=>`<button class="opt" data-ow="${esc(n)}" aria-pressed="${sel.includes(n)}">${av(n)}${esc(n)}${sel.includes(n)?" ✓":""}</button>`).join("")}</div>
+      <div class="addrow"><input class="inp" id="ow-new" placeholder="Add a new person" maxlength="40" autocomplete="off"><button class="btn ghost sm" data-ow-add="1">${IC.plus}Add</button></div></div>
+      <div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Save</button></div>`,ev=>{
+      const b=ev.target.closest("[data-ow]");if(b){const n=b.dataset.ow,i=sel.indexOf(n);if(i>=0)sel.splice(i,1);else sel.push(n);draw();return}
+      if(ev.target.closest("[data-ow-add]")){const x=document.getElementById("ow-new"),nm=normName(x.value);if(!nm){x.focus();return}if(!D.staff.some(z=>z.toLowerCase()===nm.toLowerCase()))D.staff.push(nm);if(!sel.includes(nm))sel.push(nm);draw();return}
+      if(ev.target.closest("[data-m=ok]")){t.owners=sel.slice();D.seen[t.id]=todayKey();closeModal();save();render();toast("Responsible: "+(sel.join(" + ")||"no one"))}});
+    const x=document.getElementById("ow-new");x&&x.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();document.querySelector("[data-ow-add]").click()}})};
+  draw()}
 function fu(t){
   const o=M().f[t.id], u=lastUpdate(t), d=dueInfo(t), n=(t.updates||[]).length;
   const meta=[t.partner&&`<b>${esc(t.partner)}</b>${t.endUser?" → "+esc(t.endUser):""}`,t.country&&esc(t.country),t.bdm&&"BDM "+esc(t.bdm)].filter(Boolean).join(" · ");
@@ -1160,7 +1230,7 @@ function feedback(id,kind){
   else if(kind==="wait"){t.status="wait"}
   else if(kind==="same"){D.seen[id]=todayKey()}
   m.f[id]=kind;save();render();
-  const nxt=view.querySelector(".fu:not(.handled) .inp");if(nxt)nxt.focus({preventScroll:false});
+  const nxt=view.querySelector(".fu:not(.handled) .inp, .pr:not(.handled) .upd");if(nxt)nxt.focus({preventScroll:false});
   toast(kind==="done"?"Completed: moved to the Completed list":OUT[kind][0],()=>{Object.assign(t,prev);if(prevO)m.f[id]=prevO;else delete m.f[id]});
 }
 function minutes(){
@@ -1274,6 +1344,7 @@ document.getElementById("presentBtn").setAttribute("aria-pressed",String(documen
 view.addEventListener("input",e=>{const id=e.target.id;if(id==="gurl"){window.__gurlDraft=e.target.value;return}if(id==="q"){S.q=e.target.value;render()}else if(id==="dq"){S.doneQ=e.target.value;render()}});
 view.addEventListener("click",e=>{
   const stg=e.target.closest("[data-stage]");if(stg){S.run.stage=stg.dataset.stage;S.run.person=null;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
+  const rq=e.target.closest("[data-rprio]");if(rq){S.run.pq=+rq.dataset.rprio;S.anim=true;render();window.scrollTo({top:0});return}
   const rp=e.target.closest("[data-rperson]");if(rp){S.run.person=rp.dataset.rperson;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
   const np=e.target.closest("[data-np]");if(np){S.run.np=+np.dataset.np;const nd={1:0,2:3,3:1,4:5}[S.run.np];S.run.nd=nd;render();const x=document.getElementById("na-title");x&&x.focus();return}
   const ndb=e.target.closest("[data-nd]");if(ndb){S.run.nd=+ndb.dataset.nd;render();const x=document.getElementById("na-title");x&&x.focus();return}
@@ -1290,6 +1361,9 @@ view.addEventListener("click",e=>{
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
     case "fb-undo":{const m=M();delete m.f[id];const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
+    case "runby":{S.run.by=b.dataset.v;try{localStorage.setItem("minerva-tracker:runby",S.run.by)}catch(_){}if(S.run.stage==="today"&&S.run.by==="prio")S.run.stage="follow";S.anim=true;render();break}
+    case "pnext":case "pprev":{S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
+    case "pown":openOwners(id);break;
     case "rnext":case "rprev":{const people=S.run.stage==="follow"?followPeople():todayPeople();const i=people.indexOf(S.run.person);const j=b.dataset.act==="rnext"?i+1:i-1;if(people[j]){S.run.person=people[j];S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50)}break}
     case "rskip":{const m=M(),k=S.run.stage+":"+S.run.person,i=m.skip.indexOf(k);if(i>=0)m.skip.splice(i,1);else m.skip.push(k);save();if(i<0&&S.run.stage==="follow"){const people=followPeople();const j=people.indexOf(S.run.person);if(people[j+1])S.run.person=people[j+1]}render();break}
     case "copymin":{const t=document.getElementById("minutes");try{navigator.clipboard.writeText(t.value).then(()=>toast("Minutes copied. Paste them into your email or Teams."),()=>{t.select();toast("Press Ctrl+C to copy")})}catch(_){t.select();toast("Press Ctrl+C to copy")}break}
@@ -1321,10 +1395,18 @@ view.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
 view.addEventListener("submit",e=>{e.preventDefault();
+  if(e.target.id==="paddForm"){const x=document.getElementById("pa-title"),title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}const R=S.run,who=document.getElementById("pa-who").value,due=document.getElementById("pa-due").value;R.paWho=who;R.paDue=due;
+    const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:who?[who]:[],prio:R.pq||1,status:"ns",start:todayKey(),target:due||"",updates:[],created:new Date().toISOString()};
+    D.tasks.push(t);M().added.push(t.id);D.seen[t.id]=todayKey();save();render();toast("Added to "+PRIO[t.prio].s+(who?" for "+who:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("pa-title");y&&y.focus()},0);return}
   if(e.target.id==="addPrio"){const x=document.getElementById("na-title"),title=x.value.trim();if(!title){x.focus();return}const R=S.run;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:R.person&&R.person!=="Unassigned"?[R.person]:[],prio:R.np,status:"ns",start:todayKey(),target:R.nd===0?todayKey():addWork(todayKey(),R.nd),updates:[],created:new Date().toISOString()};
     D.tasks.push(t);M().added.push(t.id);save();render();toast("Added to "+PRIO[t.prio].s+" for "+(R.person||"the team"),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("na-title");y&&y.focus()},0);return}if(e.target.id==="staffForm"){const n=normName(document.getElementById("staffName").value);if(!n)return;if(!D.staff.some(s=>s.toLowerCase()===n.toLowerCase()))D.staff.push(n);save();render();toast(n+" added");setTimeout(()=>{const x=document.getElementById("staffName");x&&x.focus()},0)}});
-view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.email!=null){const n=e.target.dataset.email,v=e.target.value.trim();D.emails=D.emails||{};if(v)D.emails[n]=v;else delete D.emails[n];save();toast(v?"Email saved for "+n:"Email removed for "+n);return}if(e.target.id==="xlfile"&&e.target.files[0])importExcel(e.target.files[0]);if(e.target.id==="bkfile"&&e.target.files[0])restore(e.target.files[0])});
+view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.pf){const t=find(e.target.dataset.id);if(!t)return;const f=e.target.dataset.pf;let v=e.target.value;
+    if(f==="title"){v=v.replace(/\s+/g," ").trim();if(!v){e.target.value=t.title;return}}
+    if(f==="prio"){const was=t.prio;t.prio=+v;D.seen[t.id]=todayKey();save();render();toast("Moved to "+PRIO[t.prio].s,()=>{t.prio=was});return}
+    t[f]=f==="partner"||f==="endUser"?v.trim():v;D.seen[t.id]=todayKey();save();
+    if(f==="start"||f==="target"||f==="status"){render()}else{const tr=e.target.closest("tr");tr&&tr.classList.add("handled");toast("Saved")}return}
+  if(e.target.dataset&&e.target.dataset.email!=null){const n=e.target.dataset.email,v=e.target.value.trim();D.emails=D.emails||{};if(v)D.emails[n]=v;else delete D.emails[n];save();toast(v?"Email saved for "+n:"Email removed for "+n);return}if(e.target.id==="xlfile"&&e.target.files[0])importExcel(e.target.files[0]);if(e.target.id==="bkfile"&&e.target.files[0])restore(e.target.files[0])});
 view.addEventListener("dragover",e=>{const dz=e.target.closest("#dropzone");if(dz){e.preventDefault();dz.classList.add("on")}const q=e.target.closest(".quad");if(q&&dragId){e.preventDefault();q.classList.add("drag")}});
 view.addEventListener("dragleave",e=>{const dz=e.target.closest("#dropzone");dz&&dz.classList.remove("on");const q=e.target.closest(".quad");q&&q.classList.remove("drag")});
 view.addEventListener("drop",e=>{const dz=e.target.closest("#dropzone");if(dz){e.preventDefault();dz.classList.remove("on");const f=e.dataTransfer.files[0];if(f)importExcel(f);return}
