@@ -461,6 +461,23 @@ button,.btn,.row,.fu,.kpi,.chip,.card,.icon,.opt{transition:transform .12s ease,
 html.spl body>*:not(#splash){opacity:0}
 html.spl-go body>*:not(#splash){transition:opacity 1.1s ease .2s}
 @media (max-width:640px){.tabs button{padding:5px 10px}}
+.awbox{background:var(--surface);border-radius:14px;box-shadow:var(--sh);padding:10px 14px;margin-bottom:12px}
+.awbh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.awbh b{font-size:15px}.awbh .btn{margin-left:auto}
+.awline{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.phead .awline{margin-top:6px}
+.awchip{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:10px;padding:5px 10px 5px 6px;background:color-mix(in srgb,var(--ac) 12%,var(--surface));box-shadow:inset 3px 0 0 var(--ac);font-size:13px;text-align:left;color:var(--ink);max-width:100%}
+.awchip .av{width:24px;height:24px;font-size:10px}
+.awchip b{font-weight:600}.awchip .awt{font-weight:600;color:var(--ac);white-space:nowrap}.awchip .awk{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.awchip:hover{background:color-mix(in srgb,var(--ac) 20%,var(--surface))}
+.awchip.now{box-shadow:inset 3px 0 0 var(--ac),0 0 0 2px color-mix(in srgb,var(--ac) 45%,transparent)}
+.awnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.awnav b{min-width:90px;text-align:center}
+table.aw td{vertical-align:top;min-width:150px}
+table.aw th[data-awday]{cursor:pointer}table.aw th.sel{color:var(--accent)}
+table.aw th.tod,table.aw td.tod{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+td.awc{cursor:pointer;height:46px}td.awc:hover{background:var(--surface-2)}
+td.awc .awchip{display:flex;margin-bottom:4px;flex-direction:column;align-items:flex-start;gap:0;padding:5px 9px;width:100%}
+.hol{font-size:10.5px;color:var(--bad);font-weight:600}
+.awdot{color:#E19A1C;font-size:10px;vertical-align:2px}
 </style>
 </head>
 <body>
@@ -472,6 +489,7 @@ html.spl-go body>*:not(#splash){transition:opacity 1.1s ease .2s}
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
+      <button data-tab="away" aria-selected="false">Availability</button>
       <button data-tab="board" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/></svg>Priority board</button>
       <button data-tab="sum" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Summary</button>
       <button data-tab="done" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Completed</button>
@@ -641,7 +659,7 @@ const PRIO={1:{k:"p1",l:"Important and Urgent",s:"Do now"},2:{k:"p2",l:"Importan
 const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
-function blank(){return {v:1,tasks:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
+function blank(){return {v:1,tasks:[],away:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return {...blank(),...o}}}catch(e){}return blank()}
 let saveT=null, storageOk=true;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
@@ -701,7 +719,7 @@ const IC={
 };
 
 /* ================= state ================= */
-const S={run:{stage:"follow",person:null,np:1,nd:1},tab:"meet",group:"prio",q:"",focus:null,quick:null,anim:true,edit:null,showDone:"",doneQ:""};
+const S={aw:0,awDay:null,run:{stage:"follow",person:null,np:1,nd:1},tab:"meet",group:"prio",q:"",focus:null,quick:null,anim:true,edit:null,showDone:"",doneQ:""};
 try{const g=localStorage.getItem("minerva-tracker:group");if(g)S.group=g;if(localStorage.getItem("minerva-tracker:present")==="1")document.documentElement.classList.add("present")}catch(e){}
 const view=document.getElementById("view");
 
@@ -731,6 +749,7 @@ function mergeState(L,R){
   const out={...blank(),...R,...L};const rm=new Map((R.tasks||[]).map(t=>[t.id,t]));const tasks=[];
   (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));tasks.push({...t,updates:[...ups.values()]});rm.delete(t.id)}else tasks.push(t)});
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
+  {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
   out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;return out}
 async function gPush(expect,force){const w=await gPost({action:"save",state:gState0(),expect,force:!!force});
   if(w.ok){Object.assign(G,{v:w.v,last:w.saved,open:w.open,total:w.total,sheet:w.url||G.sheet,pending:false});gSave();gConflict=null;gStatus("ok");return "ok"}
@@ -856,7 +875,7 @@ function addUpdate(id,text,date){const t=find(id);if(!t||!String(text).trim())re
 function render(){
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
-  view.innerHTML=S.tab==="run"?renderRun():S.tab==="meet"?renderMeet():S.tab==="board"?renderBoard():S.tab==="sum"?renderSum():S.tab==="done"?renderDone():renderSet();
+  view.innerHTML=S.tab==="run"?renderRun():S.tab==="meet"?renderMeet():S.tab==="away"?renderAway():S.tab==="board"?renderBoard():S.tab==="sum"?renderSum():S.tab==="done"?renderDone():renderSet();
   if(S.anim){view.classList.remove("enter");void view.offsetWidth;view.classList.add("enter");S.anim=false;setTimeout(()=>view.classList.remove("enter"),600)}
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(s0!=null)el.setSelectionRange(s0,s1)}catch(e){}}}
 }
@@ -976,6 +995,67 @@ function renderSet(){
   </div>`;
 }
 
+/* ================= availability (who is out, and when) ================= */
+const AWT={meeting:["Client meeting","#0077B6"],site:["Site visit","#0F8B8D"],travel:["Travel","#8A5CD0"],training:["Training","#E19A1C"],leave:["Leave","#D6453D"],other:["Other","#6B7C8F"]};
+const awList=()=>(D.away=D.away||[]);
+function awOn(k){return awList().filter(a=>a.date<=k&&(a.end||a.date)>=k).sort((a,b)=>(a.allDay?0:1)-(b.allDay?0:1)||String(a.from||"").localeCompare(String(b.from||""))||byName(a.person,b.person))}
+function awTime(a,k){if(a.allDay||!a.from)return (a.end&&a.end!==a.date)?"All day ("+fmt(a.date)+" – "+fmt(a.end)+")":"All day";return a.from+(a.to?"–"+a.to:"")}
+function awNow(a){const tk=todayKey();if(!(a.date<=tk&&(a.end||a.date)>=tk))return false;if(a.allDay||!a.from)return true;const d=new Date(),hm=pad(d.getHours())+":"+pad(d.getMinutes());return hm>=a.from&&(!a.to||hm<a.to)}
+function awChip(a,k,withName){const t=AWT[a.type]||AWT.other;return `<button class="awchip${awNow(a)&&k===todayKey()?" now":""}" style="--ac:${t[1]}" data-aw="${a.id}" title="${esc(t[0]+(a.note?": "+a.note:""))}">${withName?`${av(a.person)}<b>${esc(a.person)}</b>`:""}<span class="awt">${esc(awTime(a,k))}</span><span class="awk">${esc(t[0])}${a.note?" · "+esc(a.note):""}</span></button>`}
+function awTodayBox(person){const tk=todayKey(),list=awOn(tk).filter(a=>!person||a.person===person);
+  if(person)return list.length?`<div class="awline">${list.map(a=>awChip(a,tk,false)).join("")}</div>`:"";
+  return `<div class="awbox"><div class="awbh"><b>Not available today</b><span class="hint">${list.length?list.length+" logged":"Everyone is available"}</span><button class="btn ghost sm" data-awadd="">${IC.plus}Log time away</button></div>${list.length?`<div class="awline">${list.map(a=>awChip(a,tk,true)).join("")}</div>`:""}</div>`}
+function weekStart(off){const d=new Date();d.setHours(0,0,0,0);const w=(d.getDay()+6)%7;d.setDate(d.getDate()-w+off*7);return d}
+function renderAway(){
+  const start=weekStart(S.aw), days=Array.from({length:5},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);return key(d)}), tk=todayKey();
+  const people=[...new Set([...D.staff,...awList().map(a=>a.person)])].filter(Boolean).sort(byName);
+  const sel=S.awDay&&days.includes(S.awDay)?S.awDay:(days.includes(tk)?tk:days[0]);
+  const lbl=dateOf(days[0]).toLocaleDateString("en-GB",{day:"numeric",month:"short"})+" – "+dateOf(days[4]).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  let h=`<div class="today"><div><div class="eyebrow">Availability</div><h1>Who's out, and when</h1></div>
+    <div class="awnav"><button class="btn ghost sm" data-awk="-1">‹</button><b>${S.aw===0?"This week":S.aw===1?"Next week":S.aw===-1?"Last week":esc(lbl)}</b><button class="btn ghost sm" data-awk="1">›</button>${S.aw?`<button class="btn ghost sm" data-awk="0">This week</button>`:""}<button class="btn" data-awadd="">${IC.plus}Log time away</button></div></div>
+  <p class="sub">${esc(lbl)} · Client meetings, site visits, travel, training and leave. Click an entry to change or delete it, or click an empty box to add one.</p>`;
+  if(!people.length)return h+`<div class="empty"><h2>No team yet</h2><p>Import the Excel sheet or add people in Data &amp; settings first.</p></div>`;
+  h+=`<div class="panel scroll awgrid"><table class="t aw"><thead><tr><th>Person</th>${days.map(k=>`<th class="${k===tk?"tod":""}${k===sel?" sel":""}" data-awday="${k}">${esc(dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric"}))}${HOL.has(k)?' <span class="hol">Holiday</span>':""}</th>`).join("")}</tr></thead><tbody>
+    ${people.map(pn=>`<tr><td><span class="person">${av(pn)}${esc(pn)}</span></td>${days.map(k=>{const l=awOn(k).filter(a=>a.person===pn);return `<td class="awc${k===tk?" tod":""}" data-awcell="${esc(pn)}|${k}">${l.map(a=>awChip(a,k,false)).join("")}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>`;
+  const dl=awOn(sel);
+  h+=`<div class="panel" style="margin-top:12px"><h3>${esc(dateOf(sel).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h3><p class="sub">${dl.length?dl.length+" logged":"Everyone is available"}</p>${dl.length?`<div class="awline">${dl.map(a=>awChip(a,sel,true)).join("")}</div>`:""}</div>`;
+  return h;
+}
+function openAway(id,person,date){
+  const a=id?awList().find(x=>x.id===id):null, E=a?{...a}:{id:null,person:person||(S.run&&S.tab==="run"?S.run.person:"")||"",type:"meeting",date:date||todayKey(),end:"",allDay:false,from:"10:00",to:"12:00",note:""};
+  const people=[...new Set([...D.staff,E.person])].filter(Boolean).sort(byName);
+  modal(`<div class="mh"><h2>${a?"Edit time away":"Log time away"}</h2></div><div class="mb">
+    <div class="g2"><div><label class="lbl" for="aw-p">Person</label><select class="inp" id="aw-p"><option value="">Choose…</option>${people.map(n=>`<option${n===E.person?" selected":""}>${esc(n)}</option>`).join("")}</select></div>
+      <div><label class="lbl" for="aw-d">Date</label><input class="inp" type="date" id="aw-d" value="${esc(E.date)}"></div></div>
+    <div><span class="lbl">Reason</span><div class="opts" id="aw-types">${Object.entries(AWT).map(([k,[l,c]])=>`<button type="button" class="opt" style="--oc:${c}" data-awtype="${k}" aria-pressed="${E.type===k}"><span class="sw" style="background:${c}"></span>${l}</button>`).join("")}</div></div>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="aw-all" ${E.allDay?"checked":""}> All day</label>
+    <div class="g3" id="aw-times" ${E.allDay?"hidden":""}><div><label class="lbl" for="aw-f">From</label><input class="inp" type="time" id="aw-f" value="${esc(E.from||"")}"></div><div><label class="lbl" for="aw-t">To</label><input class="inp" type="time" id="aw-t" value="${esc(E.to||"")}"></div><div></div></div>
+    <div id="aw-endw" ${E.allDay?"":"hidden"}><label class="lbl" for="aw-e">Until (for more than one day)</label><input class="inp" type="date" id="aw-e" value="${esc(E.end||"")}" min="${esc(E.date)}"></div>
+    <div><label class="lbl" for="aw-n">Details (optional)</label><input class="inp" id="aw-n" maxlength="120" placeholder="e.g. Meeting at ADNOC, Abu Dhabi" value="${esc(E.note||"")}"></div>
+  </div><div class="mf">${a?`<button class="btn danger" data-m="del" style="margin-right:auto">Delete</button>`:""}<button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">${a?"Save":"Add"}</button></div>`,ev=>{
+    const tb=ev.target.closest("[data-awtype]");if(tb){E.type=tb.dataset.awtype;document.querySelectorAll("#aw-types [data-awtype]").forEach(x=>x.setAttribute("aria-pressed",String(x===tb)));return}
+    if(ev.target.id==="aw-all"){const on=ev.target.checked;document.getElementById("aw-times").hidden=on;document.getElementById("aw-endw").hidden=!on;return}
+    if(ev.target.closest("[data-m=del]")){const prev=awList().slice();D.away=awList().filter(x=>x.id!==a.id);closeModal();save();render();toast("Deleted",()=>{D.away=prev});return}
+    if(!ev.target.closest("[data-m=ok]"))return;
+    const g=i=>document.getElementById(i);const pn=g("aw-p").value,d=g("aw-d").value,all=g("aw-all").checked,f=g("aw-f").value,t=g("aw-t").value,e=g("aw-e").value;
+    if(!pn){toast("Choose who it's for.");g("aw-p").focus();return}if(!d){toast("Choose the date.");return}
+    if(!all&&!f){toast("Add a start time, or tick All day.");g("aw-f").focus();return}
+    if(!all&&t&&t<=f){toast("The end time is before the start time.");return}
+    const rec={id:a?a.id:uid(),person:pn,type:E.type,date:d,allDay:all,from:all?"":f,to:all?"":t,end:all&&e&&e>d?e:"",note:g("aw-n").value.trim()};
+    if(a)Object.assign(a,rec);else awList().push(rec);
+    closeModal();save();render();toast((a?"Saved: ":"Logged: ")+pn+" · "+AWT[rec.type][0]);
+  });
+  setTimeout(()=>{const x=document.getElementById(E.person?"aw-n":"aw-p");x&&x.focus()},40);
+}
+document.addEventListener("click",e=>{
+  const ad=e.target.closest("[data-awadd]");if(ad){openAway(null,ad.dataset.awadd||null,null);return}
+  const ch=e.target.closest("[data-aw]");if(ch){e.stopPropagation();openAway(ch.dataset.aw);return}
+  if(!view.contains(e.target))return;
+  const nav=e.target.closest("[data-awk]");if(nav){const v=+nav.dataset.awk;S.aw=v===0?0:S.aw+v;S.awDay=null;S.anim=true;render();return}
+  const dy=e.target.closest("[data-awday]");if(dy){S.awDay=dy.dataset.awday;render();return}
+  const cell=e.target.closest("[data-awcell]");if(cell){const [pn,k]=cell.dataset.awcell.split("|");openAway(null,pn,k)}
+},true);
+
 /* ================= run the meeting ================= */
 function M(){const tk=todayKey();D.meet=D.meet||{};return D.meet[tk]||(D.meet[tk]={f:{},added:[],skip:[]})}
 const carried=t=>(t.start||"")<todayKey();
@@ -991,14 +1071,15 @@ function renderRun(){
   const steps=[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
   let h=`<div class="runhead"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))} · Morning meeting</div></div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<2?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
+  h+=awTodayBox();
   if(R.stage==="wrap")return h+renderWrap();
   const people=R.stage==="follow"?fp:todayPeople();
   if(!people.length)return h+`<div class="empty"><h2>${R.stage==="follow"?"Nothing to follow up":"No one on the team yet"}</h2><p>${R.stage==="follow"?"There are no open tasks from before today.":"Add people in Data & settings."}</p>${R.stage==="follow"?`<button class="btn" data-stage="today" style="margin-top:10px">Go to today's priorities ›</button>`:""}</div>`;
   if(!R.person||!people.includes(R.person)){R.person=R.stage==="follow"?(people.find(p=>followTasks(p).some(t=>!handled(t)))||people[0]):people[0]}
   const left=p=>R.stage==="follow"?followTasks(p).filter(t=>!handled(t)).length:open().filter(t=>ownersOf(t).includes(p)).length;
   const i=people.indexOf(R.person), skipped=m.skip.includes(R.stage+":"+R.person);
-  h+=`<div class="runwrap"><nav class="rail" aria-label="People">${people.map(p=>{const l=left(p),sk=m.skip.includes(R.stage+":"+p);return `<button class="rp${p===R.person?" on":""}${R.stage==="follow"&&!l?" fin":""}" data-rperson="${esc(p)}">${av(p)}<span>${esc(p)}</span>${R.stage==="follow"?(sk?'<em>Absent</em>':l?`<i>${l}</i>`:'<i class="ok">✓</i>'):`<i class="g">${l}</i>`}</button>`}).join("")}</nav><div class="stage">`;
-  h+=`<div class="phead">${av(R.person)}<div style="flex:1;min-width:0"><h2>${esc(R.person)}</h2><p>${R.stage==="follow"?`${followTasks(R.person).length} priorities from before today · ${left(R.person)} to go`:`${left(R.person)} open · add what they're working on today`}</p></div>
+  h+=`<div class="runwrap"><nav class="rail" aria-label="People">${people.map(p=>{const l=left(p),sk=m.skip.includes(R.stage+":"+p);const out=awOn(todayKey()).some(a=>a.person===p);return `<button class="rp${p===R.person?" on":""}${R.stage==="follow"&&!l?" fin":""}" data-rperson="${esc(p)}">${av(p)}<span>${esc(p)}${out?' <small class="awdot" title="Not available for part of today">●</small>':""}</span>${R.stage==="follow"?(sk?'<em>Absent</em>':l?`<i>${l}</i>`:'<i class="ok">✓</i>'):`<i class="g">${l}</i>`}</button>`}).join("")}</nav><div class="stage">`;
+  h+=`<div class="phead">${av(R.person)}<div style="flex:1;min-width:0"><h2>${esc(R.person)}</h2><p>${R.stage==="follow"?`${followTasks(R.person).length} priorities from before today · ${left(R.person)} to go`:`${left(R.person)} open · add what they're working on today`}</p>${awTodayBox(R.person)}</div>
     <button class="btn ghost sm" data-act="rskip">${skipped?"Mark present":"Absent today"}</button>
     <button class="btn ghost sm" data-act="rprev" ${i<=0?"disabled":""}>‹ Back</button>
     ${i<people.length-1?`<button class="btn sm${R.stage==="follow"&&!left(R.person)?" ok glow":""}" data-act="rnext">Next: ${esc(people[i+1])} ›</button>`:R.stage==="follow"?`<button class="btn ok sm" data-stage="today">Start today's priorities ›</button>`:`<button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button>`}</div>`;
