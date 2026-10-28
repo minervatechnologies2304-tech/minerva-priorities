@@ -660,7 +660,8 @@ const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
 function blank(){return {v:1,tasks:[],away:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
-function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return {...blank(),...o}}}catch(e){}return blank()}
+function noWait(o){(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on"});return o}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return noWait({...blank(),...o})}}catch(e){}return blank()}
 let saveT=null, storageOk=true;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
 // one automatic snapshot per day, last 14 kept
@@ -744,13 +745,13 @@ async function gPost(body,url,key){const ac=new AbortController(),tm=setTimeout(
   catch(e){throw new TypeError(e.name==="AbortError"?"timeout":"network")}finally{clearTimeout(tm)}
   try{return JSON.parse(t)}catch(e){const er=new Error(/<html/i.test(t)?"access":"bad");throw er}}
 function gState0(){return JSON.parse(JSON.stringify(D))}
-function applyRemote(st,v){D={...blank(),...st};try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}G.v=v;G.pending=false;gSave();if(!S.edit)render()}
+function applyRemote(st,v){D=noWait({...blank(),...st});try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}G.v=v;G.pending=false;gSave();if(!S.edit)render()}
 function mergeState(L,R){
   const out={...blank(),...R,...L};const rm=new Map((R.tasks||[]).map(t=>[t.id,t]));const tasks=[];
   (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));tasks.push({...t,updates:[...ups.values()]});rm.delete(t.id)}else tasks.push(t)});
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
-  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;return out}
+  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;return noWait(out)}
 async function gPush(expect,force){const w=await gPost({action:"save",state:gState0(),expect,force:!!force});
   if(w.ok){Object.assign(G,{v:w.v,last:w.saved,open:w.open,total:w.total,sheet:w.url||G.sheet,pending:false});gSave();gConflict=null;gStatus("ok");return "ok"}
   if(w.error==="stale"||w.error==="busy")return "stale";
@@ -867,7 +868,7 @@ function markDone(id){const t=find(id);if(!t||t.status==="done")return;const pre
   if(el&&!matchMedia("(prefers-reduced-motion:reduce)").matches){el.classList.add("leaving");setTimeout(go,260)}else go()}
 function markSeen(id){const t=find(id);if(!t)return;const was=D.seen[id];D.seen[id]=todayKey();save();render();
   const el=view.querySelector(`.row[data-id="${id}"]`);el&&el.classList.add("flash");toast("Marked as discussed today",()=>{if(was)D.seen[id]=was;else delete D.seen[id]})}
-function cycleStatus(id){const t=find(id);if(!t)return;const order=["ns","on","wait"];const i=order.indexOf(t.status);t.status=order[(i+1)%order.length];save();render()}
+function cycleStatus(id){const t=find(id);if(!t)return;const order=["ns","on"];const i=order.indexOf(t.status);t.status=order[(i+1)%order.length];save();render()}
 function addUpdate(id,text,date){const t=find(id);if(!t||!String(text).trim())return false;t.updates=t.updates||[];t.updates.push({id:uid(),date:date||todayKey(),text:String(text).trim(),at:new Date().toISOString()});
   if(t.status==="ns")t.status="on";save();return true}
 
@@ -918,7 +919,7 @@ function renderMeet(){
       ["week","Later this week","var(--p3)",t=>t.target>tm&&t.target<=wEnd],["next","Next week","var(--p3)",t=>t.target>wEnd&&t.target<=nwEnd&&t.target>tm],["later","Later","var(--p4)",t=>t.target>nwEnd&&t.target>tm],["none","No target date","var(--line-2)",t=>!t.target]];
     const used=new Set();groups=B.map(([k,l,c,f])=>{const items=list.filter(t=>!used.has(t.id)&&f(t));items.forEach(t=>used.add(t.id));const sub=items.length&&k!=="none"&&k!=="over"?items.map(t=>t.target).sort()[0]:null;return {k,t:l,dot:c,sub:k==="week"||k==="next"||k==="later"?(sub?"from "+fmt(sub,{weekday:"short",day:"numeric",month:"short"}):""):"",items}})}
   else if(S.group==="prio")groups=[1,2,3,4].map(p=>({k:"p"+p,t:PRIO[p].l,sub:PRIO[p].s,dot:`var(--p${p})`,items:list.filter(t=>t.prio===p)}));
-  else if(S.group==="status")groups=["wait","on","ns"].map(s=>({k:s,t:STATUS[s],items:list.filter(t=>t.status===s)}));
+  else if(S.group==="status")groups=["on","ns"].map(s=>({k:s,t:STATUS[s],items:list.filter(t=>t.status===s)}));
   else if(S.group==="person"){const names=[...new Set(list.flatMap(ownersOf))].sort(byName);groups=names.map(n=>({k:n,t:n,av:n,items:list.filter(t=>ownersOf(t).includes(n))}))}
   else{const names=[...new Set(list.map(t=>t.partner||"No partner"))].sort((a,b)=>(a==="No partner")-(b==="No partner")||byName(a,b));groups=names.map(n=>({k:n,t:n,items:list.filter(t=>(t.partner||"No partner")===n)}))}
   h+=groups.filter(g=>g.items.length).map(g=>`<section class="group"><div class="ghead">${g.dot?`<span class="dot" style="background:${g.dot}"></span>`:""}${g.av?av(g.av):""}<h3>${esc(g.t)}</h3><span class="count">${g.items.length}${g.sub?" · "+esc(g.sub):""}</span></div>
@@ -1106,7 +1107,7 @@ function fu(t){
       <button class="icon" data-open="${t.id}" title="Open the task">${IC.note}</button></div>
     ${u?`<div class="fu-last"><time>${esc(fmt(u.date))}</time><span>${esc(u.text)}</span>${n>1&&!o?`<em>+${n-1} earlier</em>`:""}</div>`:`<div class="fu-last"><span class="hint">No updates yet</span></div>`}
     ${o?"":`<div class="fu-act"><input class="inp" id="fb-${t.id}" placeholder="Feedback from ${esc(ownersOf(t)[0])}… (Enter saves it as an update)" autocomplete="off">
-      <div class="fu-btns"><button class="btn sm" data-act="fb-upd" data-id="${t.id}">${IC.note}Save update</button><button class="btn ok sm" data-act="fb-done" data-id="${t.id}">${IC.check}Done</button><button class="btn ghost sm" data-act="fb-wait" data-id="${t.id}">Waiting</button><button class="btn ghost sm" data-act="fb-same" data-id="${t.id}">No change</button>
+      <div class="fu-btns"><button class="btn sm" data-act="fb-upd" data-id="${t.id}">${IC.note}Save update</button><button class="btn ok sm" data-act="fb-done" data-id="${t.id}">${IC.check}Done</button><button class="btn ghost sm" data-act="fb-same" data-id="${t.id}">No change</button>
       <span class="push"><span class="hint">Push date:</span>${[["+1d",1],["+3d",3],["+1w",5]].map(([l,k])=>`<button data-act="fb-push" data-n="${k}" data-id="${t.id}">${l}</button>`).join("")}</span></div></div>`}
   </article>`;
 }
@@ -1163,7 +1164,7 @@ function renderDrawer(){
         <div class="row2"><input class="inp" type="date" id="d-newud" value="${esc(E.newUDate)}" style="width:auto"><button class="btn sm" data-d="addu">${IC.plus}Add update</button><span class="hint">Dated and kept in order, newest first</span></div></div>
       <div class="tl" style="margin-top:6px">${ups.map(u=>`<div class="u"><time>${esc(fmt(u.date,{day:"numeric",month:"short"}))}</time><p>${esc(u.text)}</p><span class="ux"><button class="x" data-d="editu" data-uid="${u.id}" title="Edit this update">✎</button><button class="x" data-d="delu" data-uid="${u.id}" title="Delete this update">×</button></span></div>`).join("")||`<p class="hint" style="margin:6px 0">No updates yet.</p>`}</div></div>`:""}
     <div><span class="lbl">Priority</span><div class="opts">${[1,2,3,4].map(p=>`<button class="opt p${p}" data-d="prio" data-v="${p}" aria-pressed="${t.prio===p}"><span class="sw"></span>${PRIO[p].s}<small style="color:var(--muted);font-weight:500">· ${PRIO[p].l}</small></button>`).join("")}</div></div>
-    <div><span class="lbl">Status</span><div class="opts">${["ns","on","wait"].map(s=>`<button class="opt" data-d="status" data-v="${s}" aria-pressed="${t.status===s}">${STATUS[s]}</button>`).join("")}</div></div>
+    <div><span class="lbl">Status</span><div class="opts">${["ns","on"].map(s=>`<button class="opt" data-d="status" data-v="${s}" aria-pressed="${t.status===s}">${STATUS[s]}</button>`).join("")}</div></div>
     <div><span class="lbl">Responsible <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· tap to choose one or more people, tap again to remove</span></span>
       <div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}${t.owners.includes(n)?" ✓":""}</button>`).join("")}</div>
       <p class="hint" style="margin:6px 0 0">${t.owners.length?"Responsible: <b>"+t.owners.map(esc).join(" + ")+"</b>":"No one chosen yet"}</p>
@@ -1308,7 +1309,7 @@ function download(name,data,type){const blob=data instanceof Blob?data:new Blob(
 function stamp(){const d=new Date();return key(d)+" "+pad(d.getHours())+"."+pad(d.getMinutes())}
 function backup(){D.lastBackup=new Date().toISOString();save();download("Minerva priorities backup "+stamp()+".json",JSON.stringify({app:"minerva-tracker",v:1,saved:D.lastBackup,data:D},null,1),"application/json");toast("Backup downloaded");render()}
 function restore(file){const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);const d=o&&o.data;if(!d||!Array.isArray(d.tasks))throw 0;
-  confirmBox("Restore this backup?",`It has <b>${d.tasks.filter(t=>t.status!=="done").length}</b> open and <b>${d.tasks.filter(t=>t.status==="done").length}</b> finished tasks, saved ${esc(new Date(o.saved||d.created).toLocaleString("en-GB"))}. It replaces what's on this computer now.`,"Restore",()=>{const prev=D;D={...blank(),...d};save();S.tab="meet";S.anim=true;render();toast("Backup restored",()=>{D=prev})})}catch(e){toast("That file isn't a backup from this app.")}};r.readAsText(file)}
+  confirmBox("Restore this backup?",`It has <b>${d.tasks.filter(t=>t.status!=="done").length}</b> open and <b>${d.tasks.filter(t=>t.status==="done").length}</b> finished tasks, saved ${esc(new Date(o.saved||d.created).toLocaleString("en-GB"))}. It replaces what's on this computer now.`,"Restore",()=>{const prev=D;D=noWait({...blank(),...d});save();S.tab="meet";S.anim=true;render();toast("Backup restored",()=>{D=prev})})}catch(e){toast("That file isn't a backup from this app.")}};r.readAsText(file)}
 function showSnaps(){let s=[];try{s=JSON.parse(localStorage.getItem(SNAP)||"[]")}catch(e){}
   modal(`<div class="mh"><h2>Daily snapshots</h2></div><div class="mb"><p class="hint" style="margin:0">The app keeps a copy of the list from each of the last 14 days you used it, on this computer.</p>${s.length?s.slice().reverse().map((x,i)=>`<div style="display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:8px"><b style="flex:1">${esc(fmt(x.d,{weekday:"short",day:"numeric",month:"short"}))}</b><span class="hint">${x.data.tasks.filter(t=>t.status!=="done").length} open</span><button class="btn ghost sm" data-snap="${s.length-1-i}">Restore</button></div>`).join(""):'<p>No snapshots yet.</p>'}</div><div class="mf"><button class="btn ghost" data-m="close">Close</button></div>`,e=>{
     const b=e.target.closest("[data-snap]");if(!b)return;const x=s[+b.dataset.snap];closeModal();const prev=D;D={...blank(),...JSON.parse(JSON.stringify(x.data))};save();render();toast("Restored the list from "+fmt(x.d),()=>{D=prev})})}
@@ -1331,7 +1332,7 @@ function splitNotes(text,baseKey){
     const body=text.slice(k.end,j+1<marks.length?marks[j+1].i:text.length).replace(/^[;,.\s-]+|[;,\s]+$/g,"").trim();if(body)out.push({date:d,text:body})});
   return out}
 function splitOwners(s){return String(s||"").split(/\s*(?:\/|,|&|\band\b|\+)\s*/i).map(normName).filter(Boolean)}
-function mapStatus(s){s=String(s||"").toLowerCase();if(/complete|done|closed/.test(s))return "done";if(/hold|defer|wait|pending/.test(s))return "wait";if(/progress|ongoing|started(?!.*not)/.test(s)&&!/not started/.test(s))return "on";return "ns"}
+function mapStatus(s){s=String(s||"").toLowerCase();if(/complete|done|closed/.test(s))return "done";if(/hold|defer|wait|pending/.test(s))return "on";if(/progress|ongoing|started(?!.*not)/.test(s)&&!/not started/.test(s))return "on";return "ns"}
 function mapPrio(num,txt){const n=parseInt(num,10);if(n>=1&&n<=4)return n;txt=String(txt||"").toLowerCase();if(!txt)return 2;const imp=!/not important/.test(txt),urg=!/not urgent/.test(txt)&&/urgent/.test(txt);return imp&&urg?1:imp?2:urg?3:4}
 async function importExcel(file){
   toast("Reading "+file.name+"…");
@@ -1405,7 +1406,7 @@ async function exportExcel(){
     const pf=PF[t.prio];const pc=row.getCell(6);pc.fill=solid(pf[0]);pc.font={size:10,bold:true,color:{argb:pf[1]}};
     const sf=SF[st]||SF["Not Started"];const sc=row.getCell(8);sc.fill=solid(sf[0]);sc.font={size:10,bold:true,color:{argb:sf[1]}};
     const dc=row.getCell(11);dc.font={size:10,bold:true,color:{argb:due.over?"FFB42318":due.c==="today"?"FF8A5A00":INK}};
-    row.getCell(8).dataValidation={type:"list",allowBlank:true,formulae:['"Not Started,Ongoing,Waiting,Completed"']};
+    row.getCell(8).dataValidation={type:"list",allowBlank:true,formulae:['"Not Started,Ongoing,Completed"']};
     row.getCell(6).dataValidation={type:"list",allowBlank:true,formulae:['"Important and Urgent,Important and Not Urgent,Not Important but Urgent,Not Important, Not Urgent"']};
   });
   if(op.length){ws.autoFilter={from:{row:4,column:1},to:{row:4+op.length,column:COLS.length}};
