@@ -663,7 +663,11 @@ const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
 function blank(){return {v:1,tasks:[],away:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
-function noWait(o){(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on"});return o}
+function noWait(o){const seen=new Set();(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on";
+  let id=t.id==null||t.id===""?"":String(t.id);if(!id||seen.has(id))id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);t.id=id;seen.add(id);
+  if(!Array.isArray(t.owners))t.owners=t.owners?String(t.owners).split(/\s*[\/,&+]\s*/).filter(Boolean):[];
+  if(!Array.isArray(t.updates))t.updates=[];t.title=String(t.title==null?"":t.title)});
+  if(o&&!Array.isArray(o.staff))o.staff=[];return o}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return noWait({...blank(),...o})}}catch(e){}return blank()}
 let saveT=null, storageOk=true;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
@@ -866,7 +870,8 @@ function closeModal(){const m=document.getElementById("modal");m.hidden=true;m.i
 function confirmBox(title,text,okLabel,fn,danger){modal(`<div class="mh"><h2>${esc(title)}</h2></div><div class="mb"><p style="margin:0">${text}</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn ${danger?"danger":""}" data-m="ok">${esc(okLabel)}</button></div>`,e=>{if(e.target.closest("[data-m=ok]")){closeModal();fn()}})}
 
 /* ================= task actions ================= */
-const find=id=>D.tasks.find(t=>t.id===id);
+window.addEventListener("error",ev=>{try{toast("Something went wrong: "+(ev.message||"unknown error")+". Send Claude a screenshot of this.")}catch(_){}});
+const find=id=>D.tasks.find(t=>String(t.id)===String(id));
 function markDone(id){const t=find(id);if(!t||t.status==="done")return;const prev=JSON.parse(JSON.stringify(t));
   const el=view.querySelector(`.row[data-id="${id}"]`);
   const go=()=>{t.status="done";t.doneAt=todayKey();t.doneHow="completed";save();render();toast("“"+t.title+"” moved to Completed",()=>Object.assign(t,prev))};
@@ -1182,6 +1187,7 @@ function renderWrap(){
 /* ================= drawer (task editor) ================= */
 const drawer=document.getElementById("drawer"), scrim=document.getElementById("scrim");
 function openTask(id,focusUpdate){
+  if(id&&!find(id)){toast("Couldn't find that task. Reload the page and try again.");return}
   const t=id?JSON.parse(JSON.stringify(find(id))):{id:null,title:"",partner:"",endUser:"",country:"",bdm:"",owners:S.focus&&S.focus!=="Unassigned"?[S.focus]:[],prio:1,status:"ns",start:todayKey(),target:addWork(todayKey(),3),updates:[]};
   S.edit={t,isNew:!id,newU:"",newUDate:todayKey()};renderDrawer();scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add("on");drawer.classList.add("on");drawer.setAttribute("aria-hidden","false");
   setTimeout(()=>{const x=document.getElementById(focusUpdate?"d-newu":id?"d-newu":"d-title");x&&x.focus()},60);
