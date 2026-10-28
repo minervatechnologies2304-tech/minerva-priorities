@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v15</title>
+<title>Minerva Priorities · v16</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -488,7 +488,7 @@ td.awc .awchip{display:flex;margin-bottom:4px;flex-direction:column;align-items:
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v15</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v16</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -871,13 +871,6 @@ function confirmBox(title,text,okLabel,fn,danger){modal(`<div class="mh"><h2>${e
 
 /* ================= task actions ================= */
 window.addEventListener("error",ev=>{window.__lastErr=(ev.message||"")+" @"+(ev.lineno||"?")+":"+(ev.colno||"?")+" "+(ev.error&&ev.error.stack?String(ev.error.stack).split("\n").slice(0,3).join(" | "):"");try{toast("Something went wrong: "+(ev.message||"unknown error")+". Send Claude a screenshot of this.")}catch(_){}});
-window.addEventListener("click",e=>{const b=e.target&&e.target.closest&&e.target.closest("[data-open],[data-act=mail]");if(!b)return;
-  const id=b.dataset.open||b.dataset.id,t0=Date.now(),info={tag:e.target.tagName,cls:String(e.target.className&&e.target.className.baseVal!=null?e.target.className.baseVal:e.target.className),btn:b.dataset.open?"pencil":"email",id,found:!!find(id),tasks:D.tasks.length,ids:D.tasks.slice(0,3).map(t=>typeof t.id+":"+t.id).join(", ")};
-  setTimeout(()=>{if(drawer.classList.contains("on")||!document.getElementById("modal").hidden)return;
-    let el=document.getElementById("diag");if(!el){el=document.createElement("div");el.id="diag";document.body.appendChild(el)}
-    el.style.cssText="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:9999;background:#B42318;color:#fff;padding:12px 16px;border-radius:12px;font:13px/1.45 system-ui;max-width:92vw;box-shadow:0 8px 30px rgba(0,0,0,.4)";
-    el.innerHTML="<b>Diagnostic for Claude</b> (screenshot this)<br>button: "+info.btn+" · clicked: "+esc(info.tag+" "+info.cls)+"<br>task id: "+esc(String(info.id))+" · found: "+info.found+" · tasks: "+info.tasks+"<br>view handler ran: "+((window.__vc||0)>=t0)+"<br>error: "+esc(window.__lastErr||"none")+"<br>edit state: "+(S.edit?"open":"none")+" · drawer: "+esc(drawer.className)+" · sample ids: "+esc(info.ids)+"<br><small>Click this box to close</small>";
-    el.onclick=()=>el.remove()},450)},true);
 const find=id=>D.tasks.find(t=>String(t.id)===String(id));
 function markDone(id){const t=find(id);if(!t||t.status==="done")return;const prev=JSON.parse(JSON.stringify(t));
   const el=view.querySelector(`.row[data-id="${id}"]`);
@@ -1279,7 +1272,7 @@ document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on))});
 document.getElementById("presentBtn").setAttribute("aria-pressed",String(document.documentElement.classList.contains("present")));
 view.addEventListener("input",e=>{const id=e.target.id;if(id==="gurl"){window.__gurlDraft=e.target.value;return}if(id==="q"){S.q=e.target.value;render()}else if(id==="dq"){S.doneQ=e.target.value;render()}});
-view.addEventListener("click",e=>{window.__vc=Date.now();
+view.addEventListener("click",e=>{
   const stg=e.target.closest("[data-stage]");if(stg){S.run.stage=stg.dataset.stage;S.run.person=null;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
   const rp=e.target.closest("[data-rperson]");if(rp){S.run.person=rp.dataset.rperson;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
   const np=e.target.closest("[data-np]");if(np){S.run.np=+np.dataset.np;const nd={1:0,2:3,3:1,4:5}[S.run.np];S.run.nd=nd;render();const x=document.getElementById("na-title");x&&x.focus();return}
@@ -1288,7 +1281,7 @@ view.addEventListener("click",e=>{window.__vc=Date.now();
   const g=e.target.closest("[data-group]");if(g){S.group=g.dataset.group;try{localStorage.setItem("minerva-tracker:group",S.group)}catch(_){}S.anim=true;render();return}
   const f=e.target.closest("[data-focus]");if(f){S.focus=f.dataset.focus||null;S.anim=true;render();return}
   const sf=e.target.closest("[data-sfocus]");if(sf){S.tab="meet";S.focus=sf.dataset.sfocus;S.quick=sf.dataset.squick||null;S.anim=true;render();window.scrollTo({top:0});return}
-  const th=e.target.closest("[data-theme]");if(th){const v=th.dataset.theme;try{v==="auto"?localStorage.removeItem("minerva-tracker:theme"):localStorage.setItem("minerva-tracker:theme",v)}catch(_){}applyTheme();render();return}
+  const th=e.target.closest("button[data-theme]");if(th){const v=th.dataset.theme;try{v==="auto"?localStorage.removeItem("minerva-tracker:theme"):localStorage.setItem("minerva-tracker:theme",v)}catch(_){}applyTheme();render();return}
   const op=e.target.closest("[data-open]");if(op){openTask(op.dataset.open);return}
   const b=e.target.closest("[data-act]");
   if(b){const id=b.dataset.id;switch(b.dataset.act){
