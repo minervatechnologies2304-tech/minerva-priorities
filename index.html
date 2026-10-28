@@ -225,6 +225,7 @@ td.bad{color:var(--bad);font-weight:700}
 .tl .u p{margin:0;font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}
 .tl .u .x{border:0;background:none;color:var(--faint);padding:0 2px;font-size:18px;line-height:1}
 .tl .u .x:hover{color:var(--bad)}
+.tl .u .ux{display:flex;gap:2px}.tl .u .x[data-d="editu"]{font-size:15px}.tl .u .x[data-d="editu"]:hover{color:var(--accent)}
 .addu{display:flex;flex-direction:column;gap:8px;background:var(--surface-2);border-radius:12px;padding:10px}
 .addu .row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .addu .row2 .inp{width:auto}
@@ -915,7 +916,7 @@ function row(t){
       <span class="due ${d.c}">${esc(d.l)}</span>
       <button class="pill st-${t.status}" data-act="cycle" data-id="${t.id}" title="Tap to change status">${STATUS[t.status]}</button>
       <span class="owners">${ownersOf(t).map(av).join("")}</span>
-      <span class="qa"><button class="icon" data-act="upd" data-id="${t.id}" title="Add an update">${IC.note}</button><button class="icon okh" data-act="done" data-id="${t.id}" title="Mark completed">${IC.check}</button></span>
+      <span class="qa"><button class="icon" data-open="${t.id}" title="Edit task (name, owner, priority, dates, updates)">${IC.note}</button><button class="icon okh" data-act="done" data-id="${t.id}" title="Mark completed">${IC.check}</button></span>
     </div>
     ${u?`<div class="last"><time>${esc(fmt(u.date))}</time><span>${esc(u.text)}</span>${n>1?`<em>+${n-1} earlier</em>`:""}</div>`:""}
     ${S.quickU===t.id?`<div class="last" style="display:block"><div class="quick"><input class="inp" id="qu-${t.id}" placeholder="Today's update for this task, then press Enter" autocomplete="off"><button class="btn sm" data-act="qusave" data-id="${t.id}">Add</button><button class="btn ghost sm" data-act="qucancel">Cancel</button></div></div>`:""}
@@ -1079,7 +1080,7 @@ function renderDrawer(){
     ${!E.isNew?`<div><span class="lbl">Updates</span>
       <div class="addu"><textarea class="inp" id="d-newu" rows="2" placeholder="What's the latest? (Ctrl + Enter to add)">${esc(E.newU)}</textarea>
         <div class="row2"><input class="inp" type="date" id="d-newud" value="${esc(E.newUDate)}" style="width:auto"><button class="btn sm" data-d="addu">${IC.plus}Add update</button><span class="hint">Dated and kept in order, newest first</span></div></div>
-      <div class="tl" style="margin-top:6px">${ups.map(u=>`<div class="u"><time>${esc(fmt(u.date,{day:"numeric",month:"short"}))}</time><p>${esc(u.text)}</p><button class="x" data-d="delu" data-uid="${u.id}" title="Delete this update">×</button></div>`).join("")||`<p class="hint" style="margin:6px 0">No updates yet.</p>`}</div></div>`:""}
+      <div class="tl" style="margin-top:6px">${ups.map(u=>`<div class="u"><time>${esc(fmt(u.date,{day:"numeric",month:"short"}))}</time><p>${esc(u.text)}</p><span class="ux"><button class="x" data-d="editu" data-uid="${u.id}" title="Edit this update">✎</button><button class="x" data-d="delu" data-uid="${u.id}" title="Delete this update">×</button></span></div>`).join("")||`<p class="hint" style="margin:6px 0">No updates yet.</p>`}</div></div>`:""}
     <div><span class="lbl">Priority</span><div class="opts">${[1,2,3,4].map(p=>`<button class="opt p${p}" data-d="prio" data-v="${p}" aria-pressed="${t.prio===p}"><span class="sw"></span>${PRIO[p].s}<small style="color:var(--muted);font-weight:500">· ${PRIO[p].l}</small></button>`).join("")}</div></div>
     <div><span class="lbl">Status</span><div class="opts">${["ns","on","wait"].map(s=>`<button class="opt" data-d="status" data-v="${s}" aria-pressed="${t.status===s}">${STATUS[s]}</button>`).join("")}</div></div>
     <div><span class="lbl">Responsible</span><div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}</button>`).join("")}</div></div>
@@ -1117,6 +1118,11 @@ drawer.addEventListener("click",e=>{
   else if(k==="due"){const n=+b.dataset.n;t.target=n<0?"":n===0?todayKey():addWork(todayKey(),n)}
   else if(k==="addu"){if(!E.newU.trim()){document.getElementById("d-newu").focus();return}const real=find(t.id);t.updates.push({id:uid(),date:E.newUDate||todayKey(),text:E.newU.trim(),at:new Date().toISOString()});if(t.status==="ns")t.status="on";
     if(real){real.updates=t.updates.slice();real.status=t.status}E.newU="";save();render();toast("Update added")}
+  else if(k==="editu"){const u=t.updates.find(x=>x.id===b.dataset.uid);if(!u)return;
+    modal(`<div class="mh"><h2>Edit update</h2></div><div class="mb"><label class="lbl" for="eu-d">Date</label><input class="inp" type="date" id="eu-d" value="${esc(u.date)}"><label class="lbl" for="eu-t">Update</label><textarea class="inp" id="eu-t" rows="4">${esc(u.text)}</textarea></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Save</button></div>`,ev=>{
+      if(!ev.target.closest("[data-m=ok]"))return;const txt=document.getElementById("eu-t").value.trim(),dt=document.getElementById("eu-d").value;if(!txt){toast("The update can't be empty. Use × to delete it.");return}
+      u.text=txt;if(dt)u.date=dt;closeModal();const real=find(t.id);if(real){real.updates=t.updates.slice();save();render()}renderDrawer();toast("Update saved")});
+    setTimeout(()=>{const x=document.getElementById("eu-t");if(x){x.focus();x.setSelectionRange(x.value.length,x.value.length)}},30);return}
   else if(k==="delu"){t.updates=t.updates.filter(u=>u.id!==b.dataset.uid);const real=find(t.id);if(real){real.updates=t.updates.slice();save();render()}}
   else if(k==="save"){saveDrawer(true);return}
   else if(k==="done"){if(!saveDrawer(false))return;const id=t.id;closeDrawer();markDone(id);return}
