@@ -244,6 +244,9 @@ td.bad{color:var(--bad);font-weight:700}
 .staff{list-style:none;margin:8px 0 0;padding:0}
 .staff li{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
 .staff li:first-child{border-top:0}
+.staff .inp.em{width:250px;max-width:40%;padding:7px 10px;font-size:13px}
+.btn.mail{background:var(--bads,#FDECEC);color:var(--bad)}.btn.mail:hover{background:var(--bad);color:#fff}
+.icon.mail{color:var(--bad)}
 .staff li>span:not(.av){flex:1;font-weight:600}
 .addrow{display:flex;gap:8px}
 .drop{border:2px dashed var(--line-2);border-radius:14px;padding:18px;text-align:center;color:var(--muted);background:var(--surface-2)}
@@ -716,6 +719,7 @@ const IC={
   search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
   dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
   up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
   undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>'
 };
 
@@ -751,6 +755,7 @@ function mergeState(L,R){
   (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));tasks.push({...t,updates:[...ups.values()]});rm.delete(t.id)}else tasks.push(t)});
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
+  out.emails={...(R.emails||{}),...(L.emails||{})};
   out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;return noWait(out)}
 async function gPush(expect,force){const w=await gPost({action:"save",state:gState0(),expect,force:!!force});
   if(w.ok){Object.assign(G,{v:w.v,last:w.saved,open:w.open,total:w.total,sheet:w.url||G.sheet,pending:false});gSave();gConflict=null;gStatus("ok");return "ok"}
@@ -936,7 +941,7 @@ function row(t){
       <span class="due ${d.c}">${esc(d.l)}</span>
       <button class="pill st-${t.status}" data-act="cycle" data-id="${t.id}" title="Tap to change status">${STATUS[t.status]}</button>
       <span class="owners">${ownersOf(t).map(av).join("")}</span>
-      <span class="qa"><button class="icon" data-open="${t.id}" title="Edit task (name, owner, priority, dates, updates)">${IC.note}</button><button class="icon okh" data-act="done" data-id="${t.id}" title="Mark completed">${IC.check}</button></span>
+      <span class="qa">${t.prio===1&&t.status!=="done"?`<button class="icon mail" data-act="mail" data-id="${t.id}" title="Email ${esc(ownersOf(t).join(" and "))} about this urgent task">${IC.mail}</button>`:""}<button class="icon" data-open="${t.id}" title="Edit task (name, owner, priority, dates, updates)">${IC.note}</button><button class="icon okh" data-act="done" data-id="${t.id}" title="Mark completed">${IC.check}</button></span>
     </div>
     ${u?`<div class="last"><time>${esc(fmt(u.date))}</time><span>${esc(u.text)}</span>${n>1?`<em>+${n-1} earlier</em>`:""}</div>`:""}
     ${S.quickU===t.id?`<div class="last" style="display:block"><div class="quick"><input class="inp" id="qu-${t.id}" placeholder="Today's update for this task, then press Enter" autocomplete="off"><button class="btn sm" data-act="qusave" data-id="${t.id}">Add</button><button class="btn ghost sm" data-act="qucancel">Cancel</button></div></div>`:""}
@@ -989,11 +994,24 @@ function renderSet(){
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="backup">${IC.dl}Download backup</button><label class="btn ghost" style="cursor:pointer">${IC.up}Restore a backup<input type="file" id="bkfile" accept=".json" hidden></label><button class="btn ghost" data-act="snaps">Daily snapshots</button></div></div>
     <div class="panel"><h3>Team</h3><p class="sub">People who can own tasks. Names you pick from here always match, so the summary counts are right.</p>
       <form class="addrow" id="staffForm" autocomplete="off"><input class="inp" id="staffName" placeholder="Add a person, e.g. Byron" maxlength="40"><button class="btn" type="submit">${IC.plus}Add</button></form>
-      <ul class="staff">${staff.map(n=>{const k=open().filter(t=>ownersOf(t).includes(n)).length;return `<li>${av(n)}<span>${esc(n)}</span><small style="color:var(--muted)">${k} open</small><button class="btn ghost sm" data-act="rename" data-name="${esc(n)}">Rename</button><button class="btn ghost sm" data-act="rmstaff" data-name="${esc(n)}">Remove</button></li>`}).join("")}</ul></div>
+      <ul class="staff">${staff.map(n=>{const k=open().filter(t=>ownersOf(t).includes(n)).length;return `<li>${av(n)}<span>${esc(n)}</span><input class="inp em" type="email" data-email="${esc(n)}" value="${esc((D.emails||{})[n]||"")}" placeholder="Email (for urgent-task emails)" autocomplete="off"><small style="color:var(--muted)">${k} open</small><button class="btn ghost sm" data-act="rename" data-name="${esc(n)}">Rename</button><button class="btn ghost sm" data-act="rmstaff" data-name="${esc(n)}">Remove</button></li>`}).join("")}</ul></div>
     <div class="panel"><h3>Appearance</h3><p class="sub">Present mode makes the text bigger for screen sharing.</p>
       <div class="seg">${[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${(localStorage.getItem("minerva-tracker:theme")||"auto")===k}">${l}</button>`).join("")}</div></div>
     <div class="panel"><h3>Start again</h3><p class="sub">Removes every task from this computer. Download a backup first.</p><button class="btn danger" data-act="wipe">Delete all tasks</button></div>
   </div>`;
+}
+
+/* ================= one-click urgent email ================= */
+function mailTask(t){
+  const who=ownersOf(t).filter(n=>n!=="Unassigned"),em=D.emails||{},to=who.map(n=>em[n]).filter(Boolean),miss=who.filter(n=>!em[n]);
+  const first=who.length===1?who[0].split(" ")[0]:"all",u=lastUpdate(t),dI=t.target?dueInfo(t).l:"";
+  const L=["Hi "+first+",","","This task is marked urgent (Important and Urgent) on our daily priorities list:","",t.title];
+  const det=[t.partner&&"Partner: "+t.partner,t.endUser&&"End user: "+t.endUser,t.country&&"Country: "+t.country,t.target&&"Target date: "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"})+(dI?" ("+dI+")":""),u&&"Latest update ("+fmt(u.date)+"): "+u.text].filter(Boolean);
+  if(det.length)L.push("",...det);
+  L.push("","Please treat it as a priority and let me know if you need anything to move it forward.","","Thanks,");
+  const url="mailto:"+to.map(encodeURIComponent).join(",")+"?subject="+encodeURIComponent("Urgent: "+t.title)+"&body="+encodeURIComponent(L.join("\r\n"));
+  const a=document.createElement("a");a.href=url;a.style.display="none";document.body.appendChild(a);a.click();a.remove();
+  toast(miss.length?"Email opened. Add "+miss.join(" and ")+"'s email in Data & settings to fill in the To line next time.":"Email opened in your mail app. Check it and press Send.");
 }
 
 /* ================= availability (who is out, and when) ================= */
@@ -1107,7 +1125,7 @@ function fu(t){
       <button class="icon" data-open="${t.id}" title="Open the task">${IC.note}</button></div>
     ${u?`<div class="fu-last"><time>${esc(fmt(u.date))}</time><span>${esc(u.text)}</span>${n>1&&!o?`<em>+${n-1} earlier</em>`:""}</div>`:`<div class="fu-last"><span class="hint">No updates yet</span></div>`}
     ${o?"":`<div class="fu-act"><input class="inp" id="fb-${t.id}" placeholder="Feedback from ${esc(ownersOf(t)[0])}… (Enter saves it as an update)" autocomplete="off">
-      <div class="fu-btns"><button class="btn sm" data-act="fb-upd" data-id="${t.id}">${IC.note}Save update</button><button class="btn ok sm" data-act="fb-done" data-id="${t.id}">${IC.check}Done</button><button class="btn ghost sm" data-act="fb-same" data-id="${t.id}">No change</button>
+      <div class="fu-btns"><button class="btn sm" data-act="fb-upd" data-id="${t.id}">${IC.note}Save update</button><button class="btn ok sm" data-act="fb-done" data-id="${t.id}">${IC.check}Done</button><button class="btn ghost sm" data-act="fb-same" data-id="${t.id}">No change</button>${t.prio===1?`<button class="btn sm mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}Email</button>`:""}
       <span class="push"><span class="hint">Push date:</span>${[["+1d",1],["+3d",3],["+1w",5]].map(([l,k])=>`<button data-act="fb-push" data-n="${k}" data-id="${t.id}">${l}</button>`).join("")}</span></div></div>`}
   </article>`;
 }
@@ -1179,7 +1197,7 @@ function renderDrawer(){
     <datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist><datalist id="dl-end">${L.endUser.map(x=>`<option value="${esc(x)}">`).join("")}</datalist><datalist id="dl-country">${L.country.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
     ${E.isNew?`<div><label class="lbl" for="d-newu">First note (optional)</label><textarea class="inp" id="d-newu" rows="2" placeholder="Background or first step">${esc(E.newU)}</textarea></div>`:""}
   </div>
-  <div class="dfoot"><button class="btn" data-d="save">${E.isNew?IC.plus+"Add task":"Save"}</button>${!E.isNew?`<button class="btn ok" data-d="done">${IC.check}Mark completed</button><span class="spacer"></span><button class="btn ghost sm" data-d="remove" title="Take it off the list without completing it">Remove from list</button><button class="btn danger sm" data-d="delete">Delete</button>`:`<button class="btn ghost" data-d="close">Cancel</button>`}</div>`;
+  <div class="dfoot"><button class="btn" data-d="save">${E.isNew?IC.plus+"Add task":"Save"}</button>${!E.isNew?`<button class="btn ok" data-d="done">${IC.check}Mark completed</button>${t.prio===1?`<button class="btn mail" data-d="mail" title="Email the people responsible about this urgent task" aria-label="Email about this urgent task" style="padding-left:11px;padding-right:11px">${IC.mail}</button>`:""}<span class="spacer"></span><button class="btn ghost sm" data-d="remove" title="Take it off the list without completing it">Remove from list</button><button class="btn danger sm" data-d="delete">Delete</button>`:`<button class="btn ghost" data-d="close">Cancel</button>`}</div>`;
 }
 function readDrawer(){const E=S.edit,t=E.t,v=id=>{const x=document.getElementById(id);return x?x.value:null};
   const g=(id,k)=>{const x=v(id);if(x!=null)t[k]=x.trim()};g("d-title","title");g("d-partner","partner");g("d-end","endUser");g("d-country","country");g("d-bdm","bdm");g("d-start","start");g("d-target","target");
@@ -1202,6 +1220,7 @@ drawer.addEventListener("click",e=>{
   else if(k==="addp"){const x=document.getElementById("d-newp"),nm=normName(String(x.value).replace(/\s+/g," ").trim());if(!nm){x.focus();return}
     const ex=D.staff.find(s=>s.toLowerCase()===nm.toLowerCase())||t.owners.find(s=>s.toLowerCase()===nm.toLowerCase());const name=ex||nm;
     if(!D.staff.some(s=>s.toLowerCase()===name.toLowerCase())){D.staff.push(name);save()}if(!t.owners.includes(name))t.owners.push(name);toast(name+(ex?" chosen":" added to the team"))}
+  else if(k==="mail"){mailTask(t);return}
   else if(k==="owner"){const n=b.dataset.v,i=t.owners.indexOf(n);if(i>=0)t.owners.splice(i,1);else t.owners.push(n)}
   else if(k==="due"){const n=+b.dataset.n;t.target=n<0?"":n===0?todayKey():addWork(todayKey(),n)}
   else if(k==="addu"){if(!E.newU.trim()){document.getElementById("d-newu").focus();return}const real=find(t.id);t.updates.push({id:uid(),date:E.newUDate||todayKey(),text:E.newU.trim(),at:new Date().toISOString()});if(t.status==="ns")t.status="on";
@@ -1243,6 +1262,7 @@ view.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");
   if(b){const id=b.dataset.id;switch(b.dataset.act){
     case "done":markDone(id);break;
+    case "mail":{const t=find(id);if(t)mailTask(t);break}
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
     case "fb-undo":{const m=M();delete m.f[id];const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
@@ -1266,7 +1286,7 @@ view.addEventListener("click",e=>{
     case "wipe":confirmBox("Delete all tasks?","Every task on this computer will be removed. Download a backup first if you might need them.","Delete everything",()=>{const prev=D;D={...blank(),staff:D.staff};save();render();toast("All tasks deleted",()=>{D=prev})},true);break;
     case "rmstaff":{const n=b.dataset.name;D.staff=D.staff.filter(x=>x!==n);save();render();toast(n+" removed from the team list")}break;
     case "rename":{const n=b.dataset.name;modal(`<div class="mh"><h2>Rename ${esc(n)}</h2></div><div class="mb"><input class="inp" id="rn" value="${esc(n)}" maxlength="40"><p class="hint" style="margin:0">Their tasks are updated too.</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Rename</button></div>`,ev=>{
-      if(!ev.target.closest("[data-m=ok]"))return;const nn=document.getElementById("rn").value.trim();if(!nn)return;closeModal();D.staff=D.staff.map(x=>x===n?nn:x);D.tasks.forEach(t=>{t.owners=(t.owners||[]).map(o=>o===n?nn:o);if(t.bdm===n)t.bdm=nn});save();render();toast("Renamed to "+nn)});setTimeout(()=>{const x=document.getElementById("rn");x&&x.select()},30);break}
+      if(!ev.target.closest("[data-m=ok]"))return;const nn=document.getElementById("rn").value.trim();if(!nn)return;closeModal();D.staff=D.staff.map(x=>x===n?nn:x);if(D.emails&&D.emails[n]){D.emails[nn]=D.emails[n];delete D.emails[n]}D.tasks.forEach(t=>{t.owners=(t.owners||[]).map(o=>o===n?nn:o);if(t.bdm===n)t.bdm=nn});save();render();toast("Renamed to "+nn)});setTimeout(()=>{const x=document.getElementById("rn");x&&x.select()},30);break}
   }return}
   if(e.target.closest("button,input,a,label,select,textarea"))return;
   const r=e.target.closest(".row[data-id],.card[data-id]");if(r)openTask(r.dataset.id);
@@ -1280,7 +1300,7 @@ view.addEventListener("submit",e=>{e.preventDefault();
   if(e.target.id==="addPrio"){const x=document.getElementById("na-title"),title=x.value.trim();if(!title){x.focus();return}const R=S.run;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:R.person&&R.person!=="Unassigned"?[R.person]:[],prio:R.np,status:"ns",start:todayKey(),target:R.nd===0?todayKey():addWork(todayKey(),R.nd),updates:[],created:new Date().toISOString()};
     D.tasks.push(t);M().added.push(t.id);save();render();toast("Added to "+PRIO[t.prio].s+" for "+(R.person||"the team"),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("na-title");y&&y.focus()},0);return}if(e.target.id==="staffForm"){const n=normName(document.getElementById("staffName").value);if(!n)return;if(!D.staff.some(s=>s.toLowerCase()===n.toLowerCase()))D.staff.push(n);save();render();toast(n+" added");setTimeout(()=>{const x=document.getElementById("staffName");x&&x.focus()},0)}});
-view.addEventListener("change",e=>{if(e.target.id==="xlfile"&&e.target.files[0])importExcel(e.target.files[0]);if(e.target.id==="bkfile"&&e.target.files[0])restore(e.target.files[0])});
+view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.email!=null){const n=e.target.dataset.email,v=e.target.value.trim();D.emails=D.emails||{};if(v)D.emails[n]=v;else delete D.emails[n];save();toast(v?"Email saved for "+n:"Email removed for "+n);return}if(e.target.id==="xlfile"&&e.target.files[0])importExcel(e.target.files[0]);if(e.target.id==="bkfile"&&e.target.files[0])restore(e.target.files[0])});
 view.addEventListener("dragover",e=>{const dz=e.target.closest("#dropzone");if(dz){e.preventDefault();dz.classList.add("on")}const q=e.target.closest(".quad");if(q&&dragId){e.preventDefault();q.classList.add("drag")}});
 view.addEventListener("dragleave",e=>{const dz=e.target.closest("#dropzone");dz&&dz.classList.remove("on");const q=e.target.closest(".quad");q&&q.classList.remove("drag")});
 view.addEventListener("drop",e=>{const dz=e.target.closest("#dropzone");if(dz){e.preventDefault();dz.classList.remove("on");const f=e.dataTransfer.files[0];if(f)importExcel(f);return}
