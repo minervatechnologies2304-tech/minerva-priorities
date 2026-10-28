@@ -667,7 +667,7 @@ function gPanel(){
     <ol class="gsteps"><li>Create a new Google Sheet: <a class="btn ghost sm" href="https://sheets.new" target="_blank" rel="noopener">Open a new sheet</a> and name it <b>Minerva Priorities Backup</b>.</li>
       <li>In the sheet go to <b>Extensions › Apps Script</b>, delete what's there and paste this script: <button class="btn sm" data-g="copy">Copy script</button></li>
       <li>Click <b>Save</b>, then <b>Deploy › New deployment</b>. Click the gear next to “Select type” and choose <b>Web app</b>. Set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b> and allow access (if Google says “unverified”, click <b>Advanced › Go to project</b>, it's your own script).</li>
-      <li>Copy the <b>Web app URL</b> (it ends with /exec) and paste it here:<div class="gdi"><input class="inp" id="gurl" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn" data-g="connect">Connect</button></div><div id="gmsg" class="gmsg" hidden></div></li></ol></div>`;
+      <li>Copy the <b>Web app URL</b> (it ends with /exec) and paste it here:<div class="gdi"><input class="inp" id="gurl" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(window.__gurlDraft||"")}"><button class="btn" data-g="connect">Connect</button></div><div id="gmsg" class="gmsg" hidden></div></li></ol></div>`;
   const col={ok:"var(--ok)",busy:"var(--navy2)",wait:"var(--warn)",err:"var(--bad)",off:"var(--muted)"}[gState];
   const head={ok:"Backed up"+(G.last?" at "+fmtT(G.last):""),busy:"Saving to Google…",wait:"Changes waiting to save",err:"Backup needs attention",off:"Connected"}[gState];
   return `<div class="panel gp"><h3>Google Sheet backup</h3>
@@ -681,12 +681,15 @@ function gPanel(){
 }
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-g]");if(!b)return;const a=b.dataset.g;
   if(a==="copy")copyText(gScript(),"Script copied. Paste it into Apps Script");
-  else if(a==="connect"){const u=(document.getElementById("gurl").value||"").trim().replace(/\?.*$/,"");
+  else if(a==="connect"){let u=(document.getElementById("gurl").value||"").trim()||(window.__gurlDraft||"").trim();
+    if(!u){try{const c=(await navigator.clipboard.readText()||"").trim();if(GURL_RE.test(c)){u=c;document.getElementById("gurl").value=c}}catch(_){}}
+    u=u.replace(/\?.*$/,"");
     if(!u){gMsgSet("<b>Paste the Web app URL first.</b> It's in the box Google shows after Deploy, and ends with /exec.","err");document.getElementById("gurl").focus();return}
     if(/\/edit|script\.google\.com\/home|\/dev$/.test(u)){gMsgSet("<b>That's the editor link, not the Web app URL.</b> In Apps Script go to <b>Deploy › Manage deployments</b> and copy the <b>Web app URL</b> (it ends with /exec).","err");return}
     if(!GURL_RE.test(u)){gMsgSet("<b>That doesn't look like a Web app URL.</b> It should start with https://script.google.com/ and end with /exec.","err");return}
     b.disabled=true;b.textContent="Connecting…";const ok=await gConnect(u,G.key);b.disabled=false;b.textContent="Connect";if(ok){render();gLoadSnaps()}}
-  else if(a==="code"){const o=gParse(document.getElementById("gcode").value);if(!o){toast("That setup code isn't valid");return}const ok=await gConnect(o.u,o.k);if(ok){render();gLoadSnaps()}}
+  else if(a==="code"){const raw=(document.getElementById("gcode").value||"").trim();if(GURL_RE.test(raw)){const ok=await gConnect(raw.replace(/\?.*$/,""),G.key);if(ok){render();gLoadSnaps()}return}
+    const o=gParse(raw);if(!o){toast("That setup code isn't valid");return}const ok=await gConnect(o.u,o.k);if(ok){render();gLoadSnaps()}}
   else if(a==="now"){G.pending=true;gSave();gSync()}
   else if(a==="take")gTakeSheet();
   else if(a==="day"){const d=document.getElementById("gday").value;if(!d){toast("Choose a day first");return}gTakeSheet(d)}
@@ -998,7 +1001,7 @@ document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.cl
 document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on))});
 document.getElementById("presentBtn").setAttribute("aria-pressed",String(document.documentElement.classList.contains("present")));
-view.addEventListener("input",e=>{const id=e.target.id;if(id==="q"){S.q=e.target.value;render()}else if(id==="dq"){S.doneQ=e.target.value;render()}});
+view.addEventListener("input",e=>{const id=e.target.id;if(id==="gurl"){window.__gurlDraft=e.target.value;return}if(id==="q"){S.q=e.target.value;render()}else if(id==="dq"){S.doneQ=e.target.value;render()}});
 view.addEventListener("click",e=>{
   const stg=e.target.closest("[data-stage]");if(stg){S.run.stage=stg.dataset.stage;S.run.person=null;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
   const rp=e.target.closest("[data-rperson]");if(rp){S.run.person=rp.dataset.rperson;S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50);return}
