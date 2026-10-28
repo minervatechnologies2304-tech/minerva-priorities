@@ -482,7 +482,7 @@ td.awc .awchip{display:flex;margin-bottom:4px;flex-direction:column;align-items:
 </head>
 <body>
 <div id="splash" aria-hidden="true"><img src="logo-white.png" alt=""></div>
-<script>document.documentElement.classList.add("spl");requestAnimationFrame(function(){requestAnimationFrame(function(){var s=document.getElementById("splash");if(s)s.classList.add("in")})})</script>
+<script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
     <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker</small></div></div>
@@ -1146,7 +1146,7 @@ function renderWrap(){
 const drawer=document.getElementById("drawer"), scrim=document.getElementById("scrim");
 function openTask(id,focusUpdate){
   const t=id?JSON.parse(JSON.stringify(find(id))):{id:null,title:"",partner:"",endUser:"",country:"",bdm:"",owners:S.focus&&S.focus!=="Unassigned"?[S.focus]:[],prio:1,status:"ns",start:todayKey(),target:addWork(todayKey(),3),updates:[]};
-  S.edit={t,isNew:!id,newU:"",newUDate:todayKey()};renderDrawer();scrim.hidden=false;requestAnimationFrame(()=>{scrim.classList.add("on");drawer.classList.add("on")});drawer.setAttribute("aria-hidden","false");
+  S.edit={t,isNew:!id,newU:"",newUDate:todayKey()};renderDrawer();scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add("on");drawer.classList.add("on");drawer.setAttribute("aria-hidden","false");
   setTimeout(()=>{const x=document.getElementById(focusUpdate?"d-newu":id?"d-newu":"d-title");x&&x.focus()},60);
 }
 function closeDrawer(){S.edit=null;scrim.classList.remove("on");drawer.classList.remove("on");drawer.setAttribute("aria-hidden","true");setTimeout(()=>{if(!S.edit){scrim.hidden=true;drawer.innerHTML=""}},280)}
@@ -1164,7 +1164,10 @@ function renderDrawer(){
       <div class="tl" style="margin-top:6px">${ups.map(u=>`<div class="u"><time>${esc(fmt(u.date,{day:"numeric",month:"short"}))}</time><p>${esc(u.text)}</p><span class="ux"><button class="x" data-d="editu" data-uid="${u.id}" title="Edit this update">✎</button><button class="x" data-d="delu" data-uid="${u.id}" title="Delete this update">×</button></span></div>`).join("")||`<p class="hint" style="margin:6px 0">No updates yet.</p>`}</div></div>`:""}
     <div><span class="lbl">Priority</span><div class="opts">${[1,2,3,4].map(p=>`<button class="opt p${p}" data-d="prio" data-v="${p}" aria-pressed="${t.prio===p}"><span class="sw"></span>${PRIO[p].s}<small style="color:var(--muted);font-weight:500">· ${PRIO[p].l}</small></button>`).join("")}</div></div>
     <div><span class="lbl">Status</span><div class="opts">${["ns","on","wait"].map(s=>`<button class="opt" data-d="status" data-v="${s}" aria-pressed="${t.status===s}">${STATUS[s]}</button>`).join("")}</div></div>
-    <div><span class="lbl">Responsible</span><div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}</button>`).join("")}</div></div>
+    <div><span class="lbl">Responsible <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· tap to choose one or more people, tap again to remove</span></span>
+      <div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}${t.owners.includes(n)?" ✓":""}</button>`).join("")}</div>
+      <p class="hint" style="margin:6px 0 0">${t.owners.length?"Responsible: <b>"+t.owners.map(esc).join(" + ")+"</b>":"No one chosen yet"}</p>
+      <div class="addrow" style="margin-top:8px"><input class="inp" id="d-newp" placeholder="Add a new person, e.g. Byron" maxlength="40" autocomplete="off"><button class="btn ghost sm" data-d="addp">${IC.plus}Add</button></div></div>
     <div class="g2"><div><label class="lbl" for="d-start">Start date</label><input class="inp" type="date" id="d-start" value="${esc(t.start||"")}"></div>
       <div><label class="lbl" for="d-target">Target date</label><input class="inp" type="date" id="d-target" value="${esc(t.target||"")}">
         <div class="quickdue">${[["Today",0],["+1 day",1],["+3 days",3],["+1 week",5],["+2 weeks",10]].map(([l,n])=>`<button data-d="due" data-n="${n}">${l}</button>`).join("")}<button data-d="due" data-n="-1">Clear</button></div></div></div>
@@ -1195,6 +1198,9 @@ drawer.addEventListener("click",e=>{
   readDrawer();
   if(k==="prio"){t.prio=+b.dataset.v}
   else if(k==="status"){t.status=b.dataset.v}
+  else if(k==="addp"){const x=document.getElementById("d-newp"),nm=normName(String(x.value).replace(/\s+/g," ").trim());if(!nm){x.focus();return}
+    const ex=D.staff.find(s=>s.toLowerCase()===nm.toLowerCase())||t.owners.find(s=>s.toLowerCase()===nm.toLowerCase());const name=ex||nm;
+    if(!D.staff.some(s=>s.toLowerCase()===name.toLowerCase())){D.staff.push(name);save()}if(!t.owners.includes(name))t.owners.push(name);toast(name+(ex?" chosen":" added to the team"))}
   else if(k==="owner"){const n=b.dataset.v,i=t.owners.indexOf(n);if(i>=0)t.owners.splice(i,1);else t.owners.push(n)}
   else if(k==="due"){const n=+b.dataset.n;t.target=n<0?"":n===0?todayKey():addWork(todayKey(),n)}
   else if(k==="addu"){if(!E.newU.trim()){document.getElementById("d-newu").focus();return}const real=find(t.id);t.updates.push({id:uid(),date:E.newUDate||todayKey(),text:E.newU.trim(),at:new Date().toISOString()});if(t.status==="ns")t.status="on";
@@ -1213,7 +1219,7 @@ drawer.addEventListener("click",e=>{
   else if(k==="delete"){const id=t.id;confirmBox("Delete this task?","“"+esc(t.title)+"” and all its updates will be deleted. This can't be undone (except from a backup).","Delete",()=>{D.tasks=D.tasks.filter(x=>x.id!==id);save();closeDrawer();render();toast("Task deleted")},true);return}
   renderDrawer();
 });
-drawer.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(S.edit&&!S.edit.isNew&&e.target.id==="d-newu"){drawer.querySelector('[data-d="addu"]').click()}else saveDrawer(true)}});
+drawer.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="d-newp"){e.preventDefault();drawer.querySelector('[data-d="addp"]').click();return}if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(S.edit&&!S.edit.isNew&&e.target.id==="d-newu"){drawer.querySelector('[data-d="addu"]').click()}else saveDrawer(true)}});
 scrim.addEventListener("click",()=>{if(S.edit){readDrawer();const E=S.edit;const orig=E.t.id&&find(E.t.id);const dirty=E.isNew?E.t.title:orig&&JSON.stringify({...orig,updates:0})!==JSON.stringify({...E.t,updates:0});if(dirty){saveDrawer(true)}else closeDrawer()}});
 
 /* ================= events ================= */
@@ -1437,7 +1443,7 @@ render();
 let day=todayKey();setInterval(()=>{if(todayKey()!==day){day=todayKey();snapshot();if(!S.edit)render()}},60000);
 window.__D=()=>D;
 (function(){const sp=document.getElementById("splash");if(!sp)return;let done=false;const H=document.documentElement;
-  const go=()=>{if(done)return;done=true;H.classList.add("spl-go");void sp.offsetWidth;requestAnimationFrame(()=>{H.classList.remove("spl");sp.classList.add("out")});setTimeout(()=>{sp.remove();H.classList.remove("spl-go")},1700)};
+  const go=()=>{if(done)return;done=true;H.classList.add("spl-go");void sp.offsetWidth;H.classList.remove("spl");sp.classList.add("out");setTimeout(()=>{sp.remove();H.classList.remove("spl-go")},1700)};
   const wait=()=>setTimeout(go,Math.max(0,2500-performance.now()));
   if(document.readyState==="complete")wait();else addEventListener("load",wait);setTimeout(go,5000)})();
 if(/^https?:$/.test(location.protocol)&&"serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
