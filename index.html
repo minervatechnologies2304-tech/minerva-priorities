@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v17</title>
+<title>Minerva Priorities · v18</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -504,6 +504,8 @@ table.ptab select[data-pf=status]{min-width:118px}.c-act{white-space:nowrap}.c-a
 td .ce.dt{width:146px}td .due{display:inline-block;margin:2px 0 0 6px;font-size:11.5px}
 .ownb{display:flex;flex-direction:column;gap:3px;border:1px solid transparent;background:transparent;border-radius:8px;padding:4px 6px;text-align:left;color:inherit;font:inherit;cursor:pointer;width:100%}
 .ownb:hover{border-color:var(--line);background:var(--surface)}.ownb .oc{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap}.ownb .av{width:22px;height:22px;font-size:9.5px}
+tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;border-bottom:1px solid var(--line)}tr.grp .qdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}tr.grp .count{color:var(--muted);margin-left:6px}
+.padd.top{padding:12px;margin:0 0 12px;border-top:0}.padd #pa-prio{flex:0 1 260px}
 .padd{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px 6px;border-top:1px dashed var(--line);margin-top:4px}.padd #pa-title{flex:1 1 280px}.padd select{flex:0 1 180px}.padd input[type=date]{flex:0 0 150px}
 </style>
 </head>
@@ -512,7 +514,7 @@ td .ce.dt{width:146px}td .due{display:inline-block;margin:2px 0 0 6px;font-size:
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v17</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v18</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1134,15 +1136,15 @@ function renderRun(){
   const tk=todayKey(), R=S.run, m=M();
   if(!D.tasks.length)return `<div class="empty"><h2>No tasks yet</h2><p>Import your Excel sheet first, then run the meeting from here.</p><div style="margin-top:12px"><button class="btn" data-act="goimport">${IC.up}Import the Excel sheet</button></div></div>`;
   const fp=followPeople(), allF=D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id]))), fDone=allF.filter(handled).length;
-  const byP=R.by!=="person";if(byP&&R.stage==="today")R.stage="follow";
-  const allP=D.tasks.filter(t=>t.status!=="done"||(t.doneAt===tk&&m.f[t.id])),pDisc=allP.filter(pDiscussed).length;
-  const steps=byP?[["follow","1","Go through priorities",`${pDisc} of ${allP.length} discussed`],["wrap","2","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
+  const byP=R.by!=="person";
+  const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
+  const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${tdy.length} added`],["wrap","3","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
   let h=`<div class="runhead"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))} · Morning meeting</div>
     <div class="seg runby" style="margin-top:8px"><span class="lbl" style="margin:0 6px 0 4px">Go through by</span><button data-act="runby" data-v="prio" aria-pressed="${byP}">Priority</button><button data-act="runby" data-v="person" aria-pressed="${!byP}">Person</button></div></div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   h+=awTodayBox();
   if(R.stage==="wrap")return h+renderWrap();
-  if(byP)return h+renderPrioRun();
+  if(byP)return h+(R.stage==="today"?renderTodayShared():renderPrioRun());
   const people=R.stage==="follow"?fp:todayPeople();
   if(!people.length)return h+`<div class="empty"><h2>${R.stage==="follow"?"Nothing to follow up":"No one on the team yet"}</h2><p>${R.stage==="follow"?"There are no open tasks from before today.":"Add people in Data & settings."}</p>${R.stage==="follow"?`<button class="btn" data-stage="today" style="margin-top:10px">Go to today's priorities ›</button>`:""}</div>`;
   if(!R.person||!people.includes(R.person)){R.person=R.stage==="follow"?(people.find(p=>followTasks(p).some(t=>!handled(t)))||people[0]):people[0]}
@@ -1169,26 +1171,44 @@ function renderRun(){
 }
 /* ---------- meeting by priority: editable table, like the old sheet ---------- */
 const pDiscussed=t=>!!M().f[t.id]||seenToday(t)||t.status==="done";
-function prioTasks(p){const tk=todayKey(),m=M();return D.tasks.filter(t=>t.prio===p&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))
-  .sort((a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]))}
+const isToday=t=>M().added.includes(t.id)||t.start===todayKey();
+function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t)&&carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))}
+function todayAll(){const tk=todayKey();return D.tasks.filter(t=>isToday(t)&&(t.status!=="done"||t.doneAt===tk))}
+const prioSort=(a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]);
+function prioTasks(p){return pendAll().filter(t=>t.prio===p).sort(prioSort)}
 function renderPrioRun(){
   const R=S.run,m=M(),p=R.pq||1,list=prioTasks(p),left=q=>prioTasks(q).filter(t=>!pDiscussed(t)).length,L=lists();
   const staff=[...new Set(D.staff)].filter(Boolean).sort(byName);
   let h=`<div class="pqbar" role="tablist">${[1,2,3,4].map(q=>{const n=prioTasks(q).length,l=left(q);return `<button class="pq${q===p?" on":""}${n&&!l?" fin":""}" data-rprio="${q}" style="--qc:var(--p${q})"><span class="qdot"></span><span class="pqt"><b>${PRIO[q].s}</b><small>${PRIO[q].l}</small></span>${n?(l?`<i>${l} to go</i>`:'<i class="ok">✓ done</i>'):'<i class="g">empty</i>'}</button>`}).join("")}</div><div>`;
-  h+=`<div class="phead"><span class="qbig" style="background:var(--p${p})"></span><div style="flex:1;min-width:0"><h2>${PRIO[p].s} <span style="font-weight:500;color:var(--muted);font-size:.7em">· ${PRIO[p].l}</span></h2><p>${list.length} task${list.length===1?"":"s"} · ${list.filter(pDiscussed).length} discussed · type in any box to change it, it saves as you go</p></div>
+  h+=`<div class="phead"><span class="qbig" style="background:var(--p${p})"></span><div style="flex:1;min-width:0"><h2>${PRIO[p].s} <span style="font-weight:500;color:var(--muted);font-size:.7em">· ${PRIO[p].l}</span></h2><p>Pending from before today · ${list.length} task${list.length===1?"":"s"} · ${list.filter(pDiscussed).length} dealt with · type in any box to change it, it saves as you go</p></div>
     <button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>
-    ${p<4?`<button class="btn sm${list.length&&!left(p)?" ok glow":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button>`}</div>`;
+    ${p<4?`<button class="btn sm${list.length&&!left(p)?" ok glow":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
   h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task · partner · end user</th><th>Responsible</th><th>Status</th><th>Target date</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
-    ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing in ${PRIO[p].s} right now. Add one below.</td></tr>`}</tbody></table>
-    <form class="padd" id="paddForm" autocomplete="off"><input class="inp" id="pa-title" placeholder="Add a new ${PRIO[p].s} task… (Enter to add)" maxlength="160"><select class="inp" id="pa-who"><option value="">Responsible…</option>${staff.map(n=>`<option${n===R.paWho?" selected":""}>${esc(n)}</option>`).join("")}</select><input class="inp" type="date" id="pa-due" value="${esc(R.paDue||addWork(todayKey(),1))}" title="Target date"><button class="btn" type="submit">${IC.plus}Add</button></form></div>`;
+    ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
+    </div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
+}
+function renderTodayShared(){
+  const R=S.run,list=todayAll(),L=lists(),staff=[...new Set(D.staff)].filter(Boolean).sort(byName),np=R.np||1;
+  const left=pendAll().filter(t=>!pDiscussed(t)).length;
+  let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities <span style="font-weight:500;color:var(--muted);font-size:.7em">· everyone</span></h2><p>${list.length} added today · one shared list, grouped by priority · type in any box to change it${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
+    <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button></div>`;
+  h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
+  h+=`<form class="padd top panel" id="paddForm" autocomplete="off"><input class="inp" id="pa-title" placeholder="What's the priority? (Enter to add)" maxlength="160">
+    <select class="inp" id="pa-who" title="Responsible"><option value="">Responsible…</option>${staff.map(n=>`<option${n===R.paWho?" selected":""}>${esc(n)}</option>`).join("")}</select>
+    <select class="inp" id="pa-prio" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===np?" selected":""}>${PRIO[q].s} · ${PRIO[q].l}</option>`).join("")}</select>
+    <input class="inp" type="date" id="pa-due" value="${esc(R.paDue||todayKey())}" title="Target date"><button class="btn" type="submit">${IC.plus}Add</button></form>`;
+  h+=`<div class="panel scroll ptwrap" style="--pc:var(--accent)"><table class="t ptab"><thead><tr><th>Task · partner · end user</th><th>Responsible</th><th>Status</th><th>Target date</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
+    ${list.length?[1,2,3,4].map(q=>{const it=list.filter(t=>t.prio===q).sort(prioSort);return it.length?`<tr class="grp"><td colspan="7"><span class="qdot" style="background:var(--p${q})"></span><b>${PRIO[q].s}</b> · ${PRIO[q].l} <span class="count">${it.length}</span></td></tr>`+it.map(prow).join(""):""}).join(""):`<tr><td colspan="7" style="text-align:center;padding:22px;color:var(--muted)">Nothing added yet. Type each person's priority for today in the box above.</td></tr>`}</tbody></table></div>
+    <p class="hint" style="margin:8px 2px">Everything added here goes into each person's list. From tomorrow it shows under Pending priorities.</p>`;
+  return h;
 }
 function prow(t){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
   const sub=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
-    <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}><div class="pp"><input class="ce sm" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span>→</span><input class="ce sm" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>${sub?`<small>${esc(sub)}</small>`:""}${o||disc?`<small class="dtag">${done?"✓ Completed today":o==="upd"?"✓ Updated today":o==="same"?"✓ No change":"✓ Discussed"}${o?` · <button type="button" class="link" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</small>`:""}</td>
+    <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}><div class="pp"><input class="ce sm" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span>→</span><input class="ce sm" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>${sub?`<small>${esc(sub)}</small>`:""}${o||disc?`<small class="dtag">${done?"✓ Completed today":o==="upd"?"✓ Updated today":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"}${o?` · <button type="button" class="link" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</small>`:""}</td>
     <td class="c-own"><button type="button" class="ownb" data-act="pown" data-id="${t.id}" title="Change who is responsible">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</button></td>
     <td>${done?`<span class="pill st-done">Completed</span>`:`<select class="ce" data-pf="status" data-id="${t.id}">${["ns","on"].map(k=>`<option value="${k}"${t.status===k?" selected":""}>${STATUS[k]}</option>`).join("")}</select>`}</td>
     <td class="c-dt"><input class="ce dt" type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}" title="Target date"><span class="due ${d.c}">${esc(d.l)}</span><label class="st">Start <input class="ce dt sm" type="date" data-pf="start" data-id="${t.id}" value="${esc(t.start||"")}"></label></td>
@@ -1242,6 +1262,7 @@ function minutes(){
   if(upd.length||wait.length){L.push("Updates ("+(upd.length+wait.length)+")");[...upd,...wait].forEach(t=>{const u=lastUpdate(t);L.push(line(t)+(t.status==="wait"?" [Waiting]":"")+(u&&u.date===tk?": "+u.text:""))});L.push("")}
   if(added.length){L.push("New priorities ("+added.length+")");added.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push("  • "+ownersOf(t).join(", ")+": "+t.title+" ["+PRIO[t.prio].s+(t.target?", due "+fmt(t.target,{day:"numeric",month:"short"}):"")+"]"));L.push("")}
   const over=open().filter(isOver);if(over.length){L.push("Still overdue ("+over.length+")");over.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" – "+dueInfo(t).l));L.push("")}
+  if(S.run.by!=="person"){const nd=pendAll().filter(t=>!pDiscussed(t));if(nd.length){L.push("Pending, not discussed ("+nd.length+")");nd.sort((a,b)=>a.prio-b.prio||byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" ["+PRIO[t.prio].s+"]"));L.push("")}}
   const ab=m.skip.filter(x=>x.startsWith("follow:")).map(x=>x.slice(7));if(ab.length){L.push("Absent: "+ab.join(", "));L.push("")}
   L.push("Open tasks after the meeting: "+open().length);
   return L.join("\n");
@@ -1395,8 +1416,8 @@ view.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
 view.addEventListener("submit",e=>{e.preventDefault();
-  if(e.target.id==="paddForm"){const x=document.getElementById("pa-title"),title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}const R=S.run,who=document.getElementById("pa-who").value,due=document.getElementById("pa-due").value;R.paWho=who;R.paDue=due;
-    const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:who?[who]:[],prio:R.pq||1,status:"ns",start:todayKey(),target:due||"",updates:[],created:new Date().toISOString()};
+  if(e.target.id==="paddForm"){const x=document.getElementById("pa-title"),title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}const R=S.run,who=document.getElementById("pa-who").value,due=document.getElementById("pa-due").value,pe=document.getElementById("pa-prio");R.paWho=who;R.paDue=due;if(pe)R.np=+pe.value;
+    const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:who?[who]:[],prio:pe?+pe.value:(R.pq||1),status:"ns",start:todayKey(),target:due||"",updates:[],created:new Date().toISOString()};
     D.tasks.push(t);M().added.push(t.id);D.seen[t.id]=todayKey();save();render();toast("Added to "+PRIO[t.prio].s+(who?" for "+who:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("pa-title");y&&y.focus()},0);return}
   if(e.target.id==="addPrio"){const x=document.getElementById("na-title"),title=x.value.trim();if(!title){x.focus();return}const R=S.run;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:R.person&&R.person!=="Unassigned"?[R.person]:[],prio:R.np,status:"ns",start:todayKey(),target:R.nd===0?todayKey():addWork(todayKey(),R.nd),updates:[],created:new Date().toISOString()};
