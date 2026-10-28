@@ -1009,9 +1009,27 @@ function mailTask(t){
   const det=[t.partner&&"Partner: "+t.partner,t.endUser&&"End user: "+t.endUser,t.country&&"Country: "+t.country,t.target&&"Target date: "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"})+(dI?" ("+dI+")":""),u&&"Latest update ("+fmt(u.date)+"): "+u.text].filter(Boolean);
   if(det.length)L.push("",...det);
   L.push("","Please treat it as a priority and let me know if you need anything to move it forward.","","Thanks,");
-  const url="mailto:"+to.map(encodeURIComponent).join(",")+"?subject="+encodeURIComponent("Urgent: "+t.title)+"&body="+encodeURIComponent(L.join("\r\n"));
-  const a=document.createElement("a");a.href=url;a.style.display="none";document.body.appendChild(a);a.click();a.remove();
-  toast(miss.length?"Email opened. Add "+miss.join(" and ")+"'s email in Data & settings to fill in the To line next time.":"Email opened in your mail app. Check it and press Send.");
+  const subj="Urgent: "+t.title, body=L.join("\n"), toS=to.join(";");
+  const q=(k,v)=>k+"="+encodeURIComponent(v);
+  const web="https://outlook.office.com/mail/deeplink/compose?"+[q("to",toS),q("subject",subj),q("body",body)].join("&");
+  const app="mailto:"+to.map(encodeURIComponent).join(",")+"?"+[q("subject",subj),q("body",body.replace(/\n/g,"\r\n"))].join("&");
+  modal(`<div class="mh"><h2>Email about an urgent task</h2></div><div class="mb">
+    <div><span class="lbl">To</span><div class="inp" style="min-height:40px">${to.length?esc(to.join("; ")):'<span style="color:var(--muted)">No email saved</span>'}</div>
+      ${miss.length?`<p class="hint" style="margin:6px 0 0">No email saved for <b>${miss.map(esc).join(", ")}</b>. Add it in Data &amp; settings → Team, or type it in the email.</p>`:""}</div>
+    <div><span class="lbl">Subject</span><div class="inp">${esc(subj)}</div></div>
+    <div><span class="lbl">Message</span><textarea class="inp" id="mailBody" rows="8" style="font:inherit;resize:vertical">${esc(body)}</textarea></div>
+  </div><div class="mf" style="flex-wrap:wrap"><button class="btn ghost" data-m="copy" style="margin-right:auto">Copy email</button>
+    <a class="btn ghost" style="text-decoration:none" id="mailApp" href="${esc(app)}">Outlook app</a>
+    <a class="btn" style="text-decoration:none" id="mailWeb" href="${esc(web)}" target="_blank" rel="noopener">${IC.mail}Open in Outlook web</a></div>`,ev=>{
+    const cur=()=>document.getElementById("mailBody").value;
+    const w=ev.target.closest("#mailWeb"),ap=ev.target.closest("#mailApp");
+    if(w){w.href="https://outlook.office.com/mail/deeplink/compose?"+[q("to",toS),q("subject",subj),q("body",cur())].join("&");setTimeout(closeModal,300);return}
+    if(ap){ap.href="mailto:"+to.map(encodeURIComponent).join(",")+"?"+[q("subject",subj),q("body",cur().replace(/\n/g,"\r\n"))].join("&");setTimeout(()=>{closeModal();toast("If your mail app didn't open, use Outlook web or Copy email.")},300);return}
+    if(ev.target.closest("[data-m=copy]")){const txt=(to.length?"To: "+to.join("; ")+"\n":"")+"Subject: "+subj+"\n\n"+cur();
+      const done=()=>toast("Copied. Paste it into a new email.");
+      if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(done,()=>fallback());else fallback();
+      function fallback(){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){toast("Couldn't copy. Select the message and copy it by hand.")}ta.remove()}}
+  });
 }
 
 /* ================= availability (who is out, and when) ================= */
