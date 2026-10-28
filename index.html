@@ -327,6 +327,8 @@ td.bad{color:var(--bad);font-weight:700}
 :root[data-theme="dark"] .gd summary{color:var(--cyan)}
 .gstat{border-left:4px solid var(--gc);background:var(--surface-2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font-size:14px;margin:6px 0 10px}
 .gstat span{color:var(--muted)}
+.gmsg{margin-top:8px;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;background:var(--surface-2);border-left:4px solid var(--navy2)}
+.gmsg.err{background:var(--bads);border-color:var(--bad);color:var(--ink)}.gmsg.ok{background:var(--oks);border-color:var(--ok)}.gmsg.busy{border-color:var(--cyan)}
 .gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 @media (max-width:640px){.meet .mtxt{white-space:normal}.meet .mtxt small{display:none}.tools .eyebrow{display:none}.tools .seg{overflow-x:auto;max-width:100%}.search{max-width:none}
   .today h1{font-size:23px}.kpi{min-width:0;flex:1 1 30%;padding:7px 10px}.kpi b{font-size:20px}.focushead h2{font-size:20px}.focushead{flex-wrap:wrap}}
@@ -587,10 +589,10 @@ function gStatus(st,msg){gState=st;gMsg=msg||"";const b=document.getElementById(
   const alert='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg>';
   const L={off:[alert,"Not backed up"],ok:[cloud,"Saved "+fmtT(G.last)],busy:[cloud,"Saving…"],wait:[cloud,"Saving soon"],err:[alert,"Backup problem"]}[st];
   b.innerHTML=L[0]+'<span class="sl">'+esc(L[1])+'</span>';b.dataset.st=st;b.title=st==="off"?"Set up the Google Sheet backup":gMsg||("Google Sheet backup · last saved "+fmtDT(G.last));
-  if(typeof S!=="undefined"&&S.tab==="set"&&!S.edit&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)))render()}
+  if(G.url&&typeof S!=="undefined"&&S.tab==="set"&&!S.edit&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)))render()}
 window.gChanged=function(){if(!G.url)return;G.pending=true;gSave();if(gState!=="busy"&&gState!=="err")gStatus("wait");clearTimeout(gTimer);gTimer=setTimeout(gSync,Math.max(4000,20000-(Date.now()-gLastTry)))};
-async function gPost(body){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),body.action==="ping"?45000:180000);let r,t;
-  try{r=await fetch(G.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:G.key,...body}),redirect:"follow",signal:ac.signal});t=await r.text()}
+async function gPost(body,url,key){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),body.action==="ping"?45000:180000);let r,t;
+  try{r=await fetch(url||G.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:key||G.key,...body}),redirect:"follow",signal:ac.signal});t=await r.text()}
   catch(e){throw new TypeError(e.name==="AbortError"?"timeout":"network")}finally{clearTimeout(tm)}
   try{return JSON.parse(t)}catch(e){const er=new Error(/<html/i.test(t)?"access":"bad");throw er}}
 function gState0(){return JSON.parse(JSON.stringify(D))}
@@ -627,12 +629,26 @@ async function gSync(){
     if(e.message!=="key"&&e.message!=="access")gTimer=setTimeout(()=>{if(gState==="err")gState="wait";gSync()},60000);
   }finally{gBusy=false}
 }
-async function gConnect(u,k){const oldU=G.url,oldK=G.key;G.url=u;G.key=k||G.key;gStatus("busy");
-  try{const j=await gPost({action:"ping"});if(!j.ok){G.url=oldU;G.key=oldK;gSave();gStatus(G.url?"ok":"off");toast(j.error==="key"?"That key doesn't match the script. Copy the script again, or use the setup code.":"The script answered with an error.");return false}
-    G.sheet=j.url||"";G.v=-1;G.pending=!!D.tasks.length;gSave();
-    if(!j.total&&D.tasks.length){await gPush(j.v,true)}else{await gSync()}
-    toast(j.total?"Connected. Tasks combined with your Google Sheet":"Connected. Your tasks now back up automatically");return true}
-  catch(e){G.url=oldU;G.key=oldK;gSave();gStatus(G.url?"ok":"off");toast(e.message==="access"?"Google refused. Set “Who has access” to Anyone and deploy again":"Couldn't reach that link");return false}}
+const GURL_RE=/^https:\/\/script\.google\.com\/(?:a\/macros\/[^\/\s]+|macros)\/s\/[\w-]+\/exec/;
+function gMsgSet(txt,kind){const el=document.getElementById("gmsg");if(!el)return;el.hidden=!txt;el.className="gmsg "+(kind||"");el.innerHTML=txt||""}
+async function gConnect(u,k){
+  k=k||G.key;gMsgSet("Contacting your Google Sheet… the first time can take up to 30 seconds.","busy");
+  let j;
+  try{j=await gPost({action:"ping"},u,k)}
+  catch(e){
+    gMsgSet(e.message==="access"?"<b>Google sent back a sign-in page instead of the backup.</b> In Apps Script go to <b>Deploy › Manage deployments › ✏️ Edit</b>, set <b>Who has access: Anyone</b> (not “Anyone with Google account” or “Only myself”), click <b>Deploy</b>, then Connect again.":
+      e.message==="timeout"?"<b>Google didn't answer in time.</b> Click Connect again. If it keeps happening, open the /exec link in a new tab: it should say “Minerva Daily Priorities backup is running.”":
+      e instanceof TypeError?"<b>The browser couldn't read Google's answer.</b> This almost always means the web app isn't shared with <b>Anyone</b>. In Apps Script: <b>Deploy › Manage deployments › ✏️ Edit › Who has access: Anyone › Deploy</b>. If “Anyone” isn't in the list, you're using a company Google account that blocks it: use a personal Gmail account for the backup sheet instead.":
+      "<b>Google answered with something unexpected.</b> Open the /exec link in a new tab: it should say “Minerva Daily Priorities backup is running.” If it shows an error, send me a screenshot.","err");
+    return false}
+  if(!j.ok){
+    gMsgSet(j.error==="key"?"<b>Connected to Google, but the key doesn't match.</b> Click <b>Copy script</b> again, paste it over everything in Apps Script, <b>Save</b>, then <b>Deploy › Manage deployments › ✏️ Edit › Version: New version › Deploy</b>, and click Connect again.":
+      /permission|authori/i.test(j.error||"")?"<b>The script needs permission.</b> In Apps Script choose <b>setup</b> in the function list at the top, click <b>Run</b> and allow access. Then <b>Deploy › Manage deployments › ✏️ Edit › Version: New version › Deploy</b>, and click Connect again.":
+      "<b>The script reported an error:</b> "+esc(j.error||"unknown"),"err");
+    return false}
+  G.url=u;G.key=k;G.sheet=j.url||"";G.v=-1;G.pending=!!D.tasks.length;gSave();gMsgSet("<b>Connected.</b> Saving your tasks to the Google Sheet…","ok");gStatus("busy");
+  try{if(!j.total&&D.tasks.length){await gPush(j.v,true)}else{await gSync()}}catch(e){gStatus("err","Connected, but the first save failed. It will retry automatically.")}
+  toast(j.total?"Connected. Tasks combined with your Google Sheet":"Connected. Your tasks now back up automatically");return true}
 const b64u=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const ub64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
 const gCode=()=>"MP1."+b64u(JSON.stringify({u:G.url,k:G.key}));
@@ -651,7 +667,7 @@ function gPanel(){
     <ol class="gsteps"><li>Create a new Google Sheet: <a class="btn ghost sm" href="https://sheets.new" target="_blank" rel="noopener">Open a new sheet</a> and name it <b>Minerva Priorities Backup</b>.</li>
       <li>In the sheet go to <b>Extensions › Apps Script</b>, delete what's there and paste this script: <button class="btn sm" data-g="copy">Copy script</button></li>
       <li>Click <b>Save</b>, then <b>Deploy › New deployment</b>. Click the gear next to “Select type” and choose <b>Web app</b>. Set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>, then <b>Deploy</b> and allow access (if Google says “unverified”, click <b>Advanced › Go to project</b>, it's your own script).</li>
-      <li>Copy the <b>Web app URL</b> (it ends with /exec) and paste it here:<div class="gdi"><input class="inp" id="gurl" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn" data-g="connect">Connect</button></div></li></ol></div>`;
+      <li>Copy the <b>Web app URL</b> (it ends with /exec) and paste it here:<div class="gdi"><input class="inp" id="gurl" placeholder="https://script.google.com/macros/s/…/exec"><button class="btn" data-g="connect">Connect</button></div><div id="gmsg" class="gmsg" hidden></div></li></ol></div>`;
   const col={ok:"var(--ok)",busy:"var(--navy2)",wait:"var(--warn)",err:"var(--bad)",off:"var(--muted)"}[gState];
   const head={ok:"Backed up"+(G.last?" at "+fmtT(G.last):""),busy:"Saving to Google…",wait:"Changes waiting to save",err:"Backup needs attention",off:"Connected"}[gState];
   return `<div class="panel gp"><h3>Google Sheet backup</h3>
@@ -665,8 +681,12 @@ function gPanel(){
 }
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-g]");if(!b)return;const a=b.dataset.g;
   if(a==="copy")copyText(gScript(),"Script copied. Paste it into Apps Script");
-  else if(a==="connect"){const u=(document.getElementById("gurl").value||"").trim();if(!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec/.test(u)){toast("Paste the Web app URL. It ends with /exec");return}b.disabled=true;b.textContent="Connecting…";await gConnect(u,G.key);render();gLoadSnaps()}
-  else if(a==="code"){const o=gParse(document.getElementById("gcode").value);if(!o){toast("That setup code isn't valid");return}await gConnect(o.u,o.k);render();gLoadSnaps()}
+  else if(a==="connect"){const u=(document.getElementById("gurl").value||"").trim().replace(/\?.*$/,"");
+    if(!u){gMsgSet("<b>Paste the Web app URL first.</b> It's in the box Google shows after Deploy, and ends with /exec.","err");document.getElementById("gurl").focus();return}
+    if(/\/edit|script\.google\.com\/home|\/dev$/.test(u)){gMsgSet("<b>That's the editor link, not the Web app URL.</b> In Apps Script go to <b>Deploy › Manage deployments</b> and copy the <b>Web app URL</b> (it ends with /exec).","err");return}
+    if(!GURL_RE.test(u)){gMsgSet("<b>That doesn't look like a Web app URL.</b> It should start with https://script.google.com/ and end with /exec.","err");return}
+    b.disabled=true;b.textContent="Connecting…";const ok=await gConnect(u,G.key);b.disabled=false;b.textContent="Connect";if(ok){render();gLoadSnaps()}}
+  else if(a==="code"){const o=gParse(document.getElementById("gcode").value);if(!o){toast("That setup code isn't valid");return}const ok=await gConnect(o.u,o.k);if(ok){render();gLoadSnaps()}}
   else if(a==="now"){G.pending=true;gSave();gSync()}
   else if(a==="take")gTakeSheet();
   else if(a==="day"){const d=document.getElementById("gday").value;if(!d){toast("Choose a day first");return}gTakeSheet(d)}
