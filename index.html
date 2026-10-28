@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v18</title>
+<title>Minerva Priorities · v19</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -506,6 +506,16 @@ td .ce.dt{width:146px}td .due{display:inline-block;margin:2px 0 0 6px;font-size:
 .ownb:hover{border-color:var(--line);background:var(--surface)}.ownb .oc{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap}.ownb .av{width:22px;height:22px;font-size:9.5px}
 tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;border-bottom:1px solid var(--line)}tr.grp .qdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:0}tr.grp .count{color:var(--muted);margin-left:6px}
 .padd.top{padding:12px;margin:0 0 12px;border-top:0}.padd #pa-prio{flex:0 1 260px}
+.round{display:flex;flex-direction:column;gap:8px}
+.rperson{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:inset 4px 0 0 var(--line)}
+.rperson.asked{box-shadow:inset 4px 0 0 var(--ok)}.rperson:focus-within{border-color:var(--accent)}
+.rph{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.rph b{font-size:15.5px}.rph .awchip{font-size:12px;padding:3px 8px}
+.rst{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--muted)}.rperson.asked .rst{color:var(--ok)}
+.ritems{display:flex;flex-direction:column;gap:4px;margin:8px 0 2px 34px}
+.ritem{display:flex;align-items:center;gap:6px;border-radius:10px;background:var(--fill);padding:2px 4px 2px 8px;box-shadow:inset 3px 0 0 var(--qc)}
+.ritem .ct{flex:1}.ritem select{width:auto}.ritem .dt{width:140px}.ritem .due{font-size:11.5px;white-space:nowrap}
+.radd{display:flex;gap:8px;margin:8px 0 0 34px;flex-wrap:wrap}.radd .inp:first-child{flex:1 1 300px}.radd select{flex:0 0 130px}
+.rnone{margin:6px 0 0 34px;color:var(--muted);font-size:13px}
 .padd{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px 6px;border-top:1px dashed var(--line);margin-top:4px}.padd #pa-title{flex:1 1 280px}.padd select{flex:0 1 180px}.padd input[type=date]{flex:0 0 150px}
 </style>
 </head>
@@ -514,7 +524,7 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v18</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v19</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1138,7 +1148,7 @@ function renderRun(){
   const fp=followPeople(), allF=D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id]))), fDone=allF.filter(handled).length;
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
-  const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${tdy.length} added`],["wrap","3","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
+  const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`],["wrap","3","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
   let h=`<div class="runhead"><div><div class="eyebrow">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))} · Morning meeting</div>
     <div class="seg runby" style="margin-top:8px"><span class="lbl" style="margin:0 6px 0 4px">Go through by</span><button data-act="runby" data-v="prio" aria-pressed="${byP}">Priority</button><button data-act="runby" data-v="person" aria-pressed="${!byP}">Person</button></div></div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
@@ -1189,21 +1199,36 @@ function renderPrioRun(){
     </div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
 }
+/* step 2: go round everyone's name, "anything needed from your side?", write it down */
+const roundPeople=()=>[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned").sort(byName);
+const saidNone=n=>M().skip.includes("none:"+n);
+const addedFor=n=>{const m=M();return D.tasks.filter(t=>m.added.includes(t.id)&&ownersOf(t).includes(n))};
+const asked=n=>saidNone(n)||addedFor(n).length>0;
 function renderTodayShared(){
-  const R=S.run,list=todayAll(),L=lists(),staff=[...new Set(D.staff)].filter(Boolean).sort(byName),np=R.np||1;
-  const left=pendAll().filter(t=>!pDiscussed(t)).length;
-  let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities <span style="font-weight:500;color:var(--muted);font-size:.7em">· everyone</span></h2><p>${list.length} added today · one shared list, grouped by priority · type in any box to change it${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
-    <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button></div>`;
-  h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
-  h+=`<form class="padd top panel" id="paddForm" autocomplete="off"><input class="inp" id="pa-title" placeholder="What's the priority? (Enter to add)" maxlength="160">
-    <select class="inp" id="pa-who" title="Responsible"><option value="">Responsible…</option>${staff.map(n=>`<option${n===R.paWho?" selected":""}>${esc(n)}</option>`).join("")}</select>
-    <select class="inp" id="pa-prio" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===np?" selected":""}>${PRIO[q].s} · ${PRIO[q].l}</option>`).join("")}</select>
-    <input class="inp" type="date" id="pa-due" value="${esc(R.paDue||todayKey())}" title="Target date"><button class="btn" type="submit">${IC.plus}Add</button></form>`;
-  h+=`<div class="panel scroll ptwrap" style="--pc:var(--accent)"><table class="t ptab"><thead><tr><th>Task · partner · end user</th><th>Responsible</th><th>Status</th><th>Target date</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
-    ${list.length?[1,2,3,4].map(q=>{const it=list.filter(t=>t.prio===q).sort(prioSort);return it.length?`<tr class="grp"><td colspan="7"><span class="qdot" style="background:var(--p${q})"></span><b>${PRIO[q].s}</b> · ${PRIO[q].l} <span class="count">${it.length}</span></td></tr>`+it.map(prow).join(""):""}).join(""):`<tr><td colspan="7" style="text-align:center;padding:22px;color:var(--muted)">Nothing added yet. Type each person's priority for today in the box above.</td></tr>`}</tbody></table></div>
-    <p class="hint" style="margin:8px 2px">Everything added here goes into each person's list. From tomorrow it shows under Pending priorities.</p>`;
+  const R=S.run,ppl=roundPeople(),done=ppl.filter(asked).length,left=pendAll().filter(t=>!pDiscussed(t)).length,tk=todayKey();
+  let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>Go down the names: “Is there anything needed from your side?” Type it and press Enter, or click Nothing today. ${done} of ${ppl.length} asked${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
+    <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok glow":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
+  if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
+  h+=`<div class="round">${ppl.map((n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
+    return `<section class="rperson${items.length||none?" asked":""}" data-person="${esc(n)}">
+      <div class="rph">${av(n)}<b>${esc(n)}</b>${aw.map(a=>awChip(a,tk,false)).join("")}<span class="rst">${none?"✓ Nothing needed":items.length?`✓ ${items.length} added`:"Not asked yet"}</span></div>
+      ${items.length?`<div class="ritems">${items.map(t=>{const d=dueInfo(t);return `<div class="ritem" style="--qc:var(--p${t.prio})"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
+        <select class="ce sm" data-pf="prio" data-id="${t.id}">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
+        <input class="ce dt sm" type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}" title="Target date"><span class="due ${d.c}">${esc(d.l)}</span>
+        <button class="icon" data-open="${t.id}" title="Add details (partner, country, updates)">${IC.note}</button><button class="icon" data-act="tdel" data-id="${t.id}" title="Remove this">${IC.x}</button></div>`}).join("")}</div>`:""}
+      ${none?`<div class="rnone">Nothing needed today · <button type="button" class="link" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="Anything needed from ${esc(n)}'s side? (Enter to add)" maxlength="160" autocomplete="off">
+        <select class="inp" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
+        <button class="btn sm" data-act="tpadd" data-i="${i}">${IC.plus}Add</button>${items.length?"":`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>`}
+    </section>`}).join("")}</div>
+    <p class="hint" style="margin:8px 2px">Each item goes into that person's list with a target date of today (change it if needed). From tomorrow it shows under Pending priorities.</p>`;
   return h;
 }
+function addForPerson(i){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
+  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1;
+  const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};
+  const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);save();render();
+  toast("Added for "+n+" · "+PRIO[prio].s,()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
+  setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 function prow(t){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
   const sub=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
@@ -1262,6 +1287,7 @@ function minutes(){
   if(upd.length||wait.length){L.push("Updates ("+(upd.length+wait.length)+")");[...upd,...wait].forEach(t=>{const u=lastUpdate(t);L.push(line(t)+(t.status==="wait"?" [Waiting]":"")+(u&&u.date===tk?": "+u.text:""))});L.push("")}
   if(added.length){L.push("New priorities ("+added.length+")");added.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push("  • "+ownersOf(t).join(", ")+": "+t.title+" ["+PRIO[t.prio].s+(t.target?", due "+fmt(t.target,{day:"numeric",month:"short"}):"")+"]"));L.push("")}
   const over=open().filter(isOver);if(over.length){L.push("Still overdue ("+over.length+")");over.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" – "+dueInfo(t).l));L.push("")}
+  if(S.run.by!=="person"){const nn=roundPeople().filter(saidNone);if(nn.length){L.push("Nothing needed today: "+nn.join(", "));L.push("")}const na=roundPeople().filter(n=>!asked(n));if(na.length){L.push("Not asked today: "+na.join(", "));L.push("")}}
   if(S.run.by!=="person"){const nd=pendAll().filter(t=>!pDiscussed(t));if(nd.length){L.push("Pending, not discussed ("+nd.length+")");nd.sort((a,b)=>a.prio-b.prio||byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" ["+PRIO[t.prio].s+"]"));L.push("")}}
   const ab=m.skip.filter(x=>x.startsWith("follow:")).map(x=>x.slice(7));if(ab.length){L.push("Absent: "+ab.join(", "));L.push("")}
   L.push("Open tasks after the meeting: "+open().length);
@@ -1385,6 +1411,9 @@ view.addEventListener("click",e=>{
     case "runby":{S.run.by=b.dataset.v;try{localStorage.setItem("minerva-tracker:runby",S.run.by)}catch(_){}if(S.run.stage==="today"&&S.run.by==="prio")S.run.stage="follow";S.anim=true;render();break}
     case "pnext":case "pprev":{S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
     case "pown":openOwners(id);break;
+    case "tpadd":addForPerson(b.dataset.i);break;
+    case "tpnone":{const m=M(),k="none:"+b.dataset.person,j=m.skip.indexOf(k);if(j>=0)m.skip.splice(j,1);else m.skip.push(k);save();render();if(j<0){const nx=view.querySelector(".rperson:not(.asked) [data-tp]");nx&&nx.focus({preventScroll:false})}break}
+    case "tdel":{const t=find(id);if(!t)break;const m=M(),i=D.tasks.indexOf(t);D.tasks.splice(i,1);m.added=m.added.filter(z=>z!==id);save();render();toast("Removed",()=>{D.tasks.splice(i,0,t);M().added.push(id)});break}
     case "rnext":case "rprev":{const people=S.run.stage==="follow"?followPeople():todayPeople();const i=people.indexOf(S.run.person);const j=b.dataset.act==="rnext"?i+1:i-1;if(people[j]){S.run.person=people[j];S.anim=true;render();window.scrollTo({top:0});setTimeout(()=>{const x=view.querySelector(".fu:not(.handled) .inp")||document.getElementById("na-title");x&&x.focus({preventScroll:true})},50)}break}
     case "rskip":{const m=M(),k=S.run.stage+":"+S.run.person,i=m.skip.indexOf(k);if(i>=0)m.skip.splice(i,1);else m.skip.push(k);save();if(i<0&&S.run.stage==="follow"){const people=followPeople();const j=people.indexOf(S.run.person);if(people[j+1])S.run.person=people[j+1]}render();break}
     case "copymin":{const t=document.getElementById("minutes");try{navigator.clipboard.writeText(t.value).then(()=>toast("Minutes copied. Paste them into your email or Teams."),()=>{t.select();toast("Press Ctrl+C to copy")})}catch(_){t.select();toast("Press Ctrl+C to copy")}break}
@@ -1411,6 +1440,7 @@ view.addEventListener("click",e=>{
   const r=e.target.closest(".row[data-id],.card[data-id]");if(r)openTask(r.dataset.id);
 });
 view.addEventListener("keydown",e=>{
+  if(e.target.dataset&&e.target.dataset.tp!=null&&e.key==="Enter"){e.preventDefault();addForPerson(e.target.id.slice(3));return}
   if(e.target.id&&e.target.id.startsWith("fb-")&&e.key==="Enter"){e.preventDefault();const id=e.target.id.slice(3);feedback(id,e.target.value.trim()?"upd":"same");return}
   if(e.target.id&&e.target.id.startsWith("qu-")){if(e.key==="Enter"){e.preventDefault();view.querySelector(`[data-act=qusave][data-id="${e.target.id.slice(3)}"]`).click()}else if(e.key==="Escape"){S.quickU=null;render()}return}
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
