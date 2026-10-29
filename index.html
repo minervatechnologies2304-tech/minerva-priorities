@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v24</title>
+<title>Minerva Priorities · v25</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -510,6 +510,32 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 .inp,.ce.upd,.radd .inp,.search input{box-shadow:var(--inset)}
 .inp:focus,.ce.upd:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .card{box-shadow:var(--elev)}
+/* ===== navigation + meeting hover polish ===== */
+.runwrap .phead,#view>div>.phead,.phead{position:sticky;top:calc(var(--hh,60px) + 6px);z-index:15;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border-radius:14px;padding:8px 10px;margin-left:-10px;margin-right:-10px}
+.pfoot{display:flex;justify-content:flex-end;gap:8px;margin:12px 0 4px}
+/* rows: soft accent bar grows in, extras slide in, focused row is spotlit */
+table.ptab tr.pr td:first-child{box-shadow:inset 0 0 0 transparent;transition:box-shadow .35s var(--spring),background-color .25s ease}
+table.ptab tr.pr:hover td:first-child{box-shadow:inset 3px 0 0 color-mix(in srgb,var(--pc,var(--accent)) 70%,transparent)}
+table.ptab tr.pr:focus-within td:first-child{box-shadow:inset 4px 0 0 var(--pc,var(--accent))}
+table.ptab tr.pr td{transition:background-color .25s ease,opacity .35s ease,filter .35s ease}
+table.ptab tr.pr:focus-within td{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+table.ptab tbody:has(tr.pr:focus-within) tr.pr:not(:focus-within) td{opacity:.5;filter:saturate(.7)}
+.hov{transform:translateX(6px);transition:opacity .25s ease,transform .4s var(--spring)}.pr:hover .hov,.pr:focus-within .hov{transform:none}
+.c-act .okh{transition:transform .35s var(--spring),background-color .2s ease,color .2s ease}
+.pr:hover .c-act .okh{background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--ok)}
+.c-act .okh:hover{transform:scale(1.08)}
+.ownb .av{transition:transform .35s var(--spring)}.ownb:hover .av{transform:scale(1.12)}
+.spill,.dpick{transition:background-color .2s ease,transform .3s var(--spring)}.spill:hover,.dpick:hover{transform:translateY(-1px)}
+.ce.upd{transition:background-color .2s ease,box-shadow .3s ease,border-color .2s ease}
+.pq{transition:transform .4s var(--spring),box-shadow .3s ease,border-color .2s ease}.pq:hover{transform:translateY(-2px)}.pq:active{transform:scale(.98)}
+.step:hover{transform:translateY(-1px)}
+/* round of names: same spotlight */
+.round .rperson{transition:background-color .25s ease,opacity .35s ease,box-shadow .35s var(--spring)}
+.round:has(.rperson:focus-within) .rperson:not(:focus-within){opacity:.5}
+.round .rperson:hover{background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.round .rperson:focus-within{box-shadow:inset 4px 0 0 var(--accent)!important;background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.round .rperson .av{transition:transform .35s var(--spring)}.round .rperson:focus-within .av{transform:scale(1.15)}
+@media (prefers-reduced-motion:reduce){table.ptab tbody:has(tr.pr:focus-within) tr.pr:not(:focus-within) td,.round:has(.rperson:focus-within) .rperson:not(:focus-within){opacity:1}}
 /* ===== help ===== */
 .mbox:has(.help){width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column}
 .mbox:has(.help) .mh{display:flex;align-items:center;justify-content:space-between}
@@ -536,7 +562,7 @@ table.ptab tr.handled td{background:color-mix(in srgb,var(--ok) 7%,transparent)}
 .c-task{min-width:260px;width:30%}
 .ppx{display:flex;align-items:center;gap:0;flex-wrap:wrap}.ppx .ce{padding:1px 6px;font-size:13px;color:var(--muted);width:auto;field-sizing:content;min-width:4ch;max-width:100%}.ppx .arr{font-size:12px;opacity:.6}
 .ppx .blank{display:none}.pr:hover .ppx .blank,.pr:focus-within .ppx .blank{display:inline-block}
-.ppx.empty{display:none}.pr:hover .ppx.empty,.pr:focus-within .ppx.empty{display:flex}
+.ppx.noval{display:none}.pr:hover .ppx.noval,.pr:focus-within .ppx.noval{display:flex}
 .mline{display:flex;flex-wrap:wrap;gap:10px;padding:2px 6px 0;font-size:12.5px;color:var(--muted)}
 .mline .dtag{color:var(--ok);font-weight:650}.link.xs{font-size:12px;padding:0}
 .ownb .oc{font-size:14px}
@@ -636,7 +662,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v24</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v25</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1084,7 +1110,8 @@ function render(){
     let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<14){el.classList.add("cas");el.style.setProperty("--i",i++)}});
     view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},900)}
   else if(old&&old.size)morph(old,nums);
-  lastPos=pos;placeSegPills(pageChange?null:segs);
+  lastPos=pos;placeSegPills(pageChange?null:segs);try{localStorage.setItem("minerva-tracker:tab",S.tab)}catch(e){}
+  const hd=document.querySelector("header");if(hd)document.documentElement.style.setProperty("--hh",hd.offsetHeight+"px");
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(s0!=null)el.setSelectionRange(s0,s1)}catch(e){}}}
 }
 function counts(list){const tk=todayKey();return {open:list.length,over:list.filter(isOver).length,today:list.filter(t=>t.target===tk).length,stale:list.filter(t=>staleDays(t)>=2).length,seen:list.filter(seenToday).length}}
@@ -1238,6 +1265,7 @@ const HELP=[
  {q:"How do I find a task?",k:"search find look task where",a:"Use the search box in All tasks.",s:["Open All tasks.","Type part of the task, partner, person or an update in Search."],go:{tab:"meet"}},
  {q:"Can I go through the meeting person by person instead?",k:"person by person style instead order change meeting way",a:"Yes. Data & settings → Morning meeting → Person by person.",s:["Go to Data & settings.","Under Morning meeting, choose Person by person."],go:{tab:"set"}},
  {q:"How do I get back yesterday's data?",k:"restore recover snapshot yesterday lost deleted gone data back",a:"Use Daily snapshots or Restore a backup in Data & settings.",s:["Go to Data & settings.","Click Daily snapshots to pick a day, or Restore a backup to load a backup file you downloaded."],go:{tab:"set"}},
+ {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 7 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Availability, 4 Priority board, 5 Summary, 6 Completed, 7 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
  {q:"A button isn't working, what do I do?",k:"not working broken error wrong nothing happens bug stuck problem",a:"Close the app and open it again so it loads the latest version.",s:["Close the app window and open it again (or press Ctrl + Shift + R in Chrome).","Try again.","If a \"Something went wrong\" message appears at the bottom, send Byron a screenshot."]}
 ];
 const HSYN={remove:"delete",delete:"remove",change:"edit",edit:"change",modify:"edit",done:"complete",complete:"done",completed:"done",finish:"done",finished:"done",tick:"done",owner:"responsible",assign:"responsible",responsible:"owner",due:"date",deadline:"due",date:"due",away:"out",leave:"away",absent:"away",holiday:"away",vacation:"leave",backup:"google",save:"backup",saved:"backup",sync:"backup",export:"excel",spreadsheet:"excel",xlsx:"excel",mail:"email",outlook:"email",fullscreen:"present",projector:"present",theme:"dark",new:"add",create:"add",people:"person",staff:"person",team:"person",colleague:"person",mistake:"undo",revert:"undo",note:"update",feedback:"update",comment:"update",upcoming:"future",later:"future",pc:"computer",laptop:"computer",recover:"restore",lost:"restore",summary:"minutes",recap:"minutes",search:"find",look:"find",error:"working",broken:"working",urgent:"priority"};
@@ -1249,7 +1277,7 @@ function hAnswer(i){const h=HELP[i];return `<div class="hans"><h3>${esc(h.q)}</h
 function hResults(t){const r=hSearch(t);if(!t.trim())return "";if(!r.length)return `<div class="hans"><p><b>No answer for that yet.</b> Try other words, like “due date”, “backup” or “add a person”, or pick a question below. Still stuck? Ask Byron.</p></div>`;
   return hAnswer(r[0].i)+(r.length>1?`<div class="hmore"><span>Also:</span>${r.slice(1,4).map(x=>`<button class="chip" data-hq="${x.i}">${esc(HELP[x.i].q)}</button>`).join("")}</div>`:"")}
 function openHelp(){
-  const pop=[0,1,3,4,5,12,14,17].map(i=>`<button class="chip" data-hq="${i}">${esc(HELP[i].q)}</button>`).join("");
+  const pop=[0,1,3,4,5,12,14,17,HELP.findIndex(h=>/shortcut/i.test(h.q))].map(i=>`<button class="chip" data-hq="${i}">${esc(HELP[i].q)}</button>`).join("");
   modal(`<div class="mh"><h2>Help</h2><button class="icon" data-m="close" title="Close (Esc)">${IC.x}</button></div><div class="mb help">
     <div class="hask">${IC.search}<input class="inp" id="hq" placeholder="Ask a question, e.g. how do I change a due date?" autocomplete="off"></div>
     <div id="hres"></div>
@@ -1423,7 +1451,7 @@ function renderPrioRun(){
   h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
     ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
-    </div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
+    </div><div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm${list.length&&!left(p)?" ok":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
 }
 /* step 2: go round everyone's name, "anything needed from your side?", write it down */
@@ -1449,7 +1477,7 @@ function renderTodayShared(){
       </div>
       <div class="rend">${none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
     </section>`}).join("")}</div>
-`;
+    <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   return h;
 }
 function addForPerson(i){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
@@ -1465,7 +1493,7 @@ function prow(t){
   const tag=o||disc?(done?"✓ Completed":o==="upd"?"✓ Updated":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"):"";
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
     <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}>
-      <div class="ppx${t.partner||t.endUser?"":" empty"}"><input class="ce sm${t.partner?"":" blank"}" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span class="arr${t.partner&&t.endUser?"":" blank"}">→</span><input class="ce sm${t.endUser?"":" blank"}" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>
+      <div class="ppx${t.partner||t.endUser?"":" noval"}"><input class="ce sm${t.partner?"":" blank"}" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span class="arr${t.partner&&t.endUser?"":" blank"}">→</span><input class="ce sm${t.endUser?"":" blank"}" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>
       ${meta||tag?`<div class="mline">${meta?`<span>${esc(meta)}</span>`:""}${tag?`<span class="dtag">${tag}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div>`:""}</td>
     <td class="c-own"><button type="button" class="ownb" data-act="pown" data-id="${t.id}" title="Change who is responsible">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</button></td>
     <td class="c-st">${done?`<span class="spill done">Completed</span>`:`<select class="spill ${t.status}" data-pf="status" data-id="${t.id}" title="Change status">${["ns","on"].map(k=>`<option value="${k}"${t.status===k?" selected":""}>${STATUS[k]}</option>`).join("")}</select>`}</td>
@@ -1706,7 +1734,11 @@ document.addEventListener("keydown",e=>{
   const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;if(S.edit||!document.getElementById("modal").hidden||e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==="n"||e.key==="N"){e.preventDefault();openTask(null)}
   else if(e.key==="/"){e.preventDefault();const q=document.getElementById("q");q&&q.focus()}
-  else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="run"){const b=view.querySelector(e.key==="ArrowRight"?'[data-act=rnext],.phead [data-stage]':'[data-act=rprev]');b&&!b.disabled&&b.click()}
+  else if(/^[1-7]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;render();window.scrollTo({top:0})}}
+  else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="run"){e.preventDefault();
+    if(S.run.stage==="wrap"){if(e.key==="ArrowLeft"){S.run.stage="today";S.anim=true;render()}return}
+    const b=view.querySelector(e.key==="ArrowRight"?'.phead [data-act=rnext],.phead [data-act=pnext],.phead .btn[data-stage="today"],.phead .btn[data-stage="wrap"]':'.phead [data-act=rprev],.phead [data-act=pprev],.phead .btn[data-stage="follow"]');
+    if(b&&!b.disabled)b.click();else if(e.key==="ArrowLeft"&&S.run.stage==="follow"&&S.run.by!=="person"&&(S.run.pq||1)===1)return}
   else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="meet"){const ppl=[...new Set(open().flatMap(ownersOf))].sort(byName);if(!ppl.length)return;const i=S.focus?ppl.indexOf(S.focus):-1;const j=e.key==="ArrowRight"?i+1:i-1;S.focus=j<0?null:ppl[Math.min(j,ppl.length-1)];S.anim=true;render()}
 });
 function curTheme(){let t=null;try{t=localStorage.getItem("minerva-tracker:theme")}catch(e){}return t==="light"||t==="dark"?t:"auto"}
@@ -1716,7 +1748,7 @@ function applyTheme(){const t=curTheme();if(t!=="auto")document.documentElement.
 document.getElementById("themeBtn").addEventListener("click",()=>{const next=isDark()?"light":"dark";try{localStorage.setItem("minerva-tracker:theme",next)}catch(e){}applyTheme();if(S.tab==="set")render()});
 try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",applyTheme)}catch(e){}
 applyTheme();
-if(D.tasks.length)S.tab="run";
+if(D.tasks.length)S.tab="run";try{const lt=localStorage.getItem("minerva-tracker:tab");if(lt&&TABS.includes(lt)&&(D.tasks.length||lt==="set"))S.tab=lt}catch(e){}
 
 /* ================= backup ================= */
 function download(name,data,type){const blob=data instanceof Blob?data:new Blob([data],{type});const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
