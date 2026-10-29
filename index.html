@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v28</title>
+<title>Minerva Priorities · v29</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -317,7 +317,7 @@ td.bad{color:var(--bad);font-weight:700}
 #syncBtn .sl{font-size:13.5px}
 #syncBtn[data-st="off"],#syncBtn[data-st="err"]{background:#FDE7E4;color:#B42318;border-color:transparent}
 #syncBtn[data-st="wait"],#syncBtn[data-st="busy"]{color:#FFE7B0}
-@media (max-width:1500px){#presentBtn .pl{display:none}#presentBtn{padding:7px 9px}.brand .div,.brand>div{display:none}}
+@media (max-width:1720px){#presentBtn .pl{display:none}#presentBtn{padding:7px 9px}.brand .div,.brand>div{display:none}}
 @media (max-width:1180px){#syncBtn .sl{display:none}}
 .gp{grid-column:1/-1}
 .gsteps{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:14.5px}
@@ -545,6 +545,29 @@ table.ptab tbody:has(tr.pr:focus-within) tr.pr:not(:focus-within) td{opacity:.5;
 .mt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;cursor:pointer}.mt:hover{background:var(--surface-2)}
 .mt input{width:17px;height:17px;accent-color:var(--accent);flex:none}.mt .qdot{width:9px;height:9px;border-radius:3px;flex:none}.mtt{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mt .due{font-size:11.5px;white-space:nowrap}
 .mtsub{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 8px 2px}
+/* ===== attendance ===== */
+.attpill{margin-top:8px;border:0;border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;font-weight:650;background:var(--oks);color:var(--ok);cursor:pointer;box-shadow:var(--elev)}
+.attpill.none{background:var(--accent);color:var(--onacc,#fff)}.attpill:hover{filter:brightness(.97);transform:translateY(-1px)}
+.attreg{display:flex;flex-direction:column}
+.atrow{display:grid;grid-template-columns:minmax(150px,220px) auto 1fr;gap:12px;align-items:center;padding:8px 6px;border-bottom:1px solid var(--line);transition:background-color .25s ease}
+.atrow:last-child{border-bottom:0}.atrow.s-absent{background:color-mix(in srgb,var(--bad) 5%,transparent)}.atrow.s-late{background:color-mix(in srgb,var(--warn) 6%,transparent)}
+.atn{display:flex;align-items:center;gap:8px;min-width:0}.atn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.atauto{font-size:11px;color:var(--muted);background:var(--surface-2);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.atseg{display:inline-flex;background:var(--surface-2);border-radius:10px;padding:2px;gap:2px}
+.ats{border:0;background:transparent;border-radius:8px;padding:5px 12px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.ats[aria-pressed=true].present{background:var(--ok);color:#fff}.ats[aria-pressed=true].late{background:var(--warn);color:#fff}.ats[aria-pressed=true].absent{background:var(--bad);color:#fff}
+.atwhy{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-width:0}
+.atr{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}.atr[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--onacc,#fff)}
+.atnote{flex:1 1 160px;padding:5px 10px;font-size:13px;min-width:120px}
+.atfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 6px 2px;flex-wrap:wrap}
+.mbox:has(.attm){width:min(980px,96vw);max-height:88vh;display:flex;flex-direction:column}.mbox:has(.attm) .mh{display:flex;justify-content:space-between;align-items:center}.mb.attm{overflow:auto}
+.atmh{display:flex;justify-content:space-between;align-items:center;gap:10px}.atmh h3{margin:0}
+table.atgrid th,table.atgrid td{text-align:center;padding:6px 4px}table.atgrid th:first-child,table.atgrid td:first-child{text-align:left;padding-left:8px}
+table.atgrid th small{display:block;font-size:10px;color:var(--muted);font-weight:500}
+table.atgrid th[data-atgo],table.atgrid td.atc{cursor:pointer}table.atgrid .sel{background:color-mix(in srgb,var(--accent) 9%,transparent)}table.atgrid th.tod{color:var(--accent)}
+.atc .m{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:7px;font-style:normal;font-size:12px;font-weight:800}
+.m.present{background:var(--oks);color:var(--ok)}.m.late{background:var(--warns);color:var(--warn)}.m.absent{background:var(--bads);color:var(--bad)}
+.round .rperson.absent{opacity:.6}.rst.abs{color:var(--bad)}
+@media (max-width:760px){.atrow{grid-template-columns:1fr}}
 /* ===== help ===== */
 .mbox:has(.help){width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column}
 .mbox:has(.help) .mh{display:flex;align-items:center;justify-content:space-between}
@@ -671,10 +694,11 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v28</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v29</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
+      <button data-tab="att" aria-selected="false">Attendance</button>
       <button data-tab="away" aria-selected="false">Availability</button>
       <button data-tab="board" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/></svg>Priority board</button>
       <button data-tab="sum" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 20V11M12 20V5M19 20v-6"/></svg>Summary</button>
@@ -846,7 +870,7 @@ const PRIO={1:{k:"p1",l:"Important and Urgent",s:"Do now"},2:{k:"p2",l:"Importan
 const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
-function blank(){return {v:1,tasks:[],away:[],staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
+function blank(){return {v:1,tasks:[],away:[],att:{},staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
 function noWait(o){if(o&&o.gone){const lim=new Date();lim.setDate(lim.getDate()-90);const lk=lim.getFullYear()+"-"+String(lim.getMonth()+1).padStart(2,"0")+"-"+String(lim.getDate()).padStart(2,"0");Object.keys(o.gone).forEach(k=>{if(o.gone[k]<lk)delete o.gone[k]})}const seen=new Set();(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on";
   let id=t.id==null||t.id===""?"":String(t.id);if(!id||seen.has(id))id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);t.id=id;seen.add(id);
   if(!Array.isArray(t.owners))t.owners=t.owners?String(t.owners).split(/\s*[\/,&+]\s*/).filter(Boolean):[];
@@ -946,6 +970,7 @@ function mergeState(L,R){
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
   out.emails={...(R.emails||{}),...(L.emails||{})};
+  {const at={};[R.att||{},L.att||{}].forEach(src=>Object.entries(src).forEach(([d,m])=>{at[d]=at[d]||{};Object.entries(m||{}).forEach(([n,r])=>{const o=at[d][n];if(!o||String(r.at||"")>=String(o.at||""))at[d][n]=r})}));out.att=at}
   out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;
   const gone={...(R.gone||{}),...(L.gone||{})},lst=new Set(L.staff||[]),lt=new Set((L.tasks||[]).map(t=>t.id)),la=new Set((L.away||[]).map(a=>a.id));
   out.gone=gone;out.tasks=out.tasks.filter(t=>lt.has(t.id)||!gone[t.id]);out.away=(out.away||[]).filter(a=>la.has(a.id)||!gone[a.id]);out.staff=out.staff.filter(n=>lst.has(n)||!gone["staff:"+n]);
@@ -1073,7 +1098,7 @@ function addUpdate(id,text,date){const t=find(id);if(!t||!String(text).trim())re
 
 /* ================= views ================= */
 const RM=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
-const TABS=["run","meet","away","board","sum","done","set"];
+const TABS=["run","meet","att","away","board","sum","done","set"];
 function pagePos(){const r=S.run||{};return TABS.indexOf(S.tab)*1000+(S.tab==="run"?(["follow","today","wrap"].indexOf(r.stage)+1)*100+(r.by!=="person"&&r.stage==="follow"?(r.pq||1)*10:0):0)+(S.tab==="away"?(S.aw||0)*10:0)}
 let lastPos=null;
 const FSEL=".row[data-id],tr.pr[data-id],.card[data-id],.fu[data-fid],.rperson[data-person],.ritem,.group,.quad[data-prio],.kpi,.pq,.step,.awchip[data-aw],.u,.staff li";
@@ -1112,7 +1137,7 @@ function render(){
   const anim=!RM(),pageChange=S.anim,old=anim&&!pageChange?snapView():null,nums=anim&&!pageChange?snapNums():{m:new Map()},segs=snapSegs();
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));placeTabPill(false);
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
-  view.innerHTML=S.tab==="run"?renderRun():S.tab==="meet"?renderMeet():S.tab==="away"?renderAway():S.tab==="board"?renderBoard():S.tab==="sum"?renderSum():S.tab==="done"?renderDone():renderSet();
+  view.innerHTML=S.tab==="run"?renderRun():S.tab==="meet"?renderMeet():S.tab==="away"?renderAway():S.tab==="att"?renderAtt():S.tab==="board"?renderBoard():S.tab==="sum"?renderSum():S.tab==="done"?renderDone():renderSet();
   const pos=pagePos();
   if(S.anim){const dir=lastPos==null||pos===lastPos?0:(pos>lastPos?1:-1);view.style.setProperty("--dx",dir*36+"px");view.style.setProperty("--dy",dir?"0px":"8px");
     view.classList.remove("enter");void view.offsetWidth;
@@ -1274,7 +1299,9 @@ const HELP=[
  {q:"How do I find a task?",k:"search find look task where",a:"Use the search box in All tasks.",s:["Open All tasks.","Type part of the task, partner, person or an update in Search."],go:{tab:"meet"}},
  {q:"Can I go through the meeting person by person instead?",k:"person by person style instead order change meeting way",a:"Yes. Data & settings → Morning meeting → Person by person.",s:["Go to Data & settings.","Under Morning meeting, choose Person by person."],go:{tab:"set"}},
  {q:"How do I get back yesterday's data?",k:"restore recover snapshot yesterday lost deleted gone data back",a:"Use Daily snapshots or Restore a backup in Data & settings.",s:["Go to Data & settings.","Click Daily snapshots to pick a day, or Restore a backup to load a backup file you downloaded."],go:{tab:"set"}},
- {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 7 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Availability, 4 Priority board, 5 Summary, 6 Completed, 7 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
+ {q:"How do I take attendance for the meeting?",k:"attendance attend absent present late register who missed reason roll call",a:"Use the Attendance button on the meeting screen, or the Attendance tab.",s:["In Run meeting, click Take attendance under the date (or open the Attendance tab).","Click Present, Late or Absent for each person. For Late or Absent, pick a reason and add a note if needed.","Click Mark everyone else present to finish. Anyone logged as out all day in Availability is pre-filled as absent."],go:{tab:"att"}},
+ {q:"How do I see someone's attendance record?",k:"attendance history record month percentage how often missed",a:"The Attendance tab shows the whole month for everyone, with an attendance %.",s:["Open the Attendance tab.","Scroll to the month grid: ✓ present, L late, ✕ absent. Hover a mark for the reason.","Use ‹ › to change month. Download Excel also includes an Attendance sheet."],go:{tab:"att"}},
+ {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 8 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Attendance, 4 Availability, 5 Priority board, 6 Summary, 7 Completed, 8 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
  {q:"A button isn't working, what do I do?",k:"not working broken error wrong nothing happens bug stuck problem",a:"Close the app and open it again so it loads the latest version.",s:["Close the app window and open it again (or press Ctrl + Shift + R in Chrome).","Try again.","If a \"Something went wrong\" message appears at the bottom, send Byron a screenshot."]}
 ];
 const HSYN={remove:"delete",delete:"remove",change:"edit",edit:"change",modify:"edit",done:"complete",complete:"done",completed:"done",finish:"done",finished:"done",tick:"done",owner:"responsible",assign:"responsible",responsible:"owner",due:"date",deadline:"due",date:"due",away:"out",leave:"away",absent:"away",holiday:"away",vacation:"leave",backup:"google",save:"backup",saved:"backup",sync:"backup",export:"excel",spreadsheet:"excel",xlsx:"excel",mail:"email",outlook:"email",fullscreen:"present",projector:"present",theme:"dark",new:"add",create:"add",people:"person",staff:"person",team:"person",colleague:"person",mistake:"undo",revert:"undo",note:"update",feedback:"update",comment:"update",upcoming:"future",later:"future",pc:"computer",laptop:"computer",recover:"restore",lost:"restore",summary:"minutes",recap:"minutes",search:"find",look:"find",error:"working",broken:"working",urgent:"priority"};
@@ -1286,7 +1313,7 @@ function hAnswer(i){const h=HELP[i];return `<div class="hans"><h3>${esc(h.q)}</h
 function hResults(t){const r=hSearch(t);if(!t.trim())return "";if(!r.length)return `<div class="hans"><p><b>No answer for that yet.</b> Try other words, like “due date”, “backup” or “add a person”, or pick a question below. Still stuck? Ask Byron.</p></div>`;
   return hAnswer(r[0].i)+(r.length>1?`<div class="hmore"><span>Also:</span>${r.slice(1,4).map(x=>`<button class="chip" data-hq="${x.i}">${esc(HELP[x.i].q)}</button>`).join("")}</div>`:"")}
 function openHelp(){
-  const pop=[0,1,3,4,5,12,14,17,HELP.findIndex(h=>/shortcut/i.test(h.q))].map(i=>`<button class="chip" data-hq="${i}">${esc(HELP[i].q)}</button>`).join("");
+  const pop=[0,1,3,4,5,12,14,17,HELP.findIndex(h=>/attendance for the meeting/.test(h.q)),HELP.findIndex(h=>/shortcut/i.test(h.q))].map(i=>`<button class="chip" data-hq="${i}">${esc(HELP[i].q)}</button>`).join("");
   modal(`<div class="mh"><h2>Help</h2><button class="icon" data-m="close" title="Close (Esc)">${IC.x}</button></div><div class="mb help">
     <div class="hask">${IC.search}<input class="inp" id="hq" placeholder="Ask a question, e.g. how do I change a due date?" autocomplete="off"></div>
     <div id="hres"></div>
@@ -1306,6 +1333,55 @@ function openHelp(){
 }
 document.getElementById("helpBtn").addEventListener("click",openHelp);
 document.addEventListener("keydown",e=>{if(e.key==="?"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")&&document.getElementById("modal").hidden&&!S.edit){e.preventDefault();openHelp()}});
+
+/* ================= meeting attendance ================= */
+const ATS={present:["Present","var(--ok)"],late:["Late","var(--warn)"],absent:["Absent","var(--bad)"]};
+const ATR={leave:"Leave",sick:"Sick",client:"Client meeting",site:"Site visit",travel:"Travel",training:"Training",other:"Other"};
+const AW2R={leave:"leave",meeting:"client",site:"site",travel:"travel",training:"training",other:"other"};
+const attPeople=()=>[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned").sort(byName);
+function attGet(day,n){const r=((D.att||{})[day]||{})[n];if(r&&r.s)return r;
+  {const a=awOn(day).find(x=>x.person===n&&(x.allDay||!x.from));if(a)return {s:"absent",r:AW2R[a.type]||"other",n:a.note||"",auto:true}}return null}
+function attSet(day,n,patch){D.att=D.att||{};const d=D.att[day]=D.att[day]||{};const cur=attGet(day,n)||{};d[n]={...cur,...patch,auto:undefined,at:new Date().toISOString()};if(d[n].s==="present"){delete d[n].r;delete d[n].n}delete d[n].auto;save()}
+const attAbsent=(day,n)=>{const r=attGet(day,n);return r&&r.s==="absent"?r:null};
+function attStats(day){const ppl=attPeople(),recs=ppl.map(n=>attGet(day,n));return {n:ppl.length,here:recs.filter(r=>r&&r.s!=="absent").length,late:recs.filter(r=>r&&r.s==="late").length,abs:recs.filter(r=>r&&r.s==="absent").length,unmarked:recs.filter(r=>!r).length}}
+function attRegister(day){const ppl=attPeople(),st=attStats(day);
+  return `<div class="attreg">${ppl.map(n=>{const r=attGet(day,n),s=r&&r.s;
+    return `<div class="atrow${s?" s-"+s:""}"><div class="atn">${av(n)}<b>${esc(n)}</b>${r&&r.auto?'<span class="atauto" title="From Availability">from Availability</span>':""}</div>
+      <div class="atseg">${Object.entries(ATS).map(([k,[l]])=>`<button type="button" class="ats ${k}" data-at="${k}" data-p="${esc(n)}" data-d="${day}" aria-pressed="${s===k}">${l}</button>`).join("")}</div>
+      <div class="atwhy">${s==="absent"||s==="late"?`${Object.entries(ATR).map(([k,l])=>`<button type="button" class="atr" data-ar="${k}" data-p="${esc(n)}" data-d="${day}" aria-pressed="${r.r===k}">${l}</button>`).join("")}<input class="inp atnote" data-an="${esc(n)}" data-d="${day}" value="${esc(r.n||"")}" placeholder="Note (optional)" maxlength="120">`:""}</div></div>`}).join("")}</div>
+    <div class="atfoot"><span class="hint">${st.here} here${st.late?` (${st.late} late)`:""} · ${st.abs} absent${st.unmarked?` · ${st.unmarked} not marked`:""}</span>${st.unmarked?`<button class="btn sm" data-atall="${day}">Mark everyone else present</button>`:""}</div>`}
+function attClick(e){
+  const b=e.target.closest("[data-at]");if(b){const {p,d}=b.dataset,k=b.dataset.at,cur=attGet(d,p);if(cur&&cur.s===k&&!cur.auto){D.att[d][p]={s:"",at:new Date().toISOString()};save()}else attSet(d,p,{s:k});return true}
+  const r=e.target.closest("[data-ar]");if(r){const {p,d}=r.dataset;const cur=attGet(d,p);attSet(d,p,{s:cur&&cur.s||"absent",r:cur&&cur.r===r.dataset.ar&&!cur.auto?"":r.dataset.ar});return true}
+  const all=e.target.closest("[data-atall]");if(all){const d=all.dataset.atall;attPeople().forEach(n=>{if(!attGet(d,n))attSet(d,n,{s:"present"})});toast("Everyone else marked present");return true}
+  return false}
+function attNote(e){const x=e.target.closest("[data-an]");if(!x)return false;attSet(x.dataset.d,x.dataset.an,{n:x.value.trim()});toast("Note saved");return true}
+function openAttModal(){const draw=()=>{const day=todayKey(),st=attStats(day);
+  modal(`<div class="mh"><h2>Attendance · ${esc(dateOf(day).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h2><button class="icon" data-m="close" title="Close">${IC.x}</button></div><div class="mb attm">${attRegister(day)}</div>`,ev=>{if(attClick(ev)){draw();if(S.tab==="run")render()}});
+  const m=document.getElementById("modal");m.onchange=ev=>{if(attNote(ev)&&S.tab==="run")render()}};draw()}
+function renderAtt(){
+  S.attDay=S.attDay||todayKey();const day=S.attDay,tk=todayKey(),off=S.attM||0;
+  const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+off);const y=base.getFullYear(),mo=base.getMonth();
+  const days=[];for(let d=new Date(y,mo,1);d.getMonth()===mo;d.setDate(d.getDate()+1)){if(isWork(d))days.push(key(d))}
+  const ppl=attPeople(),past=days.filter(k=>k<=tk);
+  let h=`<div class="today"><div><div class="eyebrow">Meeting attendance</div><h1>${esc(dateOf(day).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1></div>
+    <div class="awnav"><button class="btn ghost sm" data-atday="-1">‹</button><button class="btn ghost sm" data-atday="0"${day===tk?" disabled":""}>Today</button><button class="btn ghost sm" data-atday="1">›</button></div></div>`;
+  if(!ppl.length)return h+`<div class="empty"><h2>No team yet</h2><p>Add people in Data &amp; settings first.</p></div>`;
+  h+=`<div class="panel">${attRegister(day)}</div>`;
+  h+=`<div class="panel" style="margin-top:14px"><div class="atmh"><h3>${esc(base.toLocaleDateString("en-GB",{month:"long",year:"numeric"}))}</h3><div class="awnav"><button class="btn ghost sm" data-atm="-1">‹</button>${off?`<button class="btn ghost sm" data-atm="0">This month</button>`:""}<button class="btn ghost sm" data-atm="1">›</button></div></div>
+    <p class="sub">Click a day to open its register. Hover a mark to see the reason.</p>
+    <div class="scroll"><table class="t atgrid"><thead><tr><th>Person</th>${days.map(k=>`<th class="${k===day?"sel":""}${k===tk?" tod":""}" data-atgo="${k}">${dateOf(k).getDate()}<small>${esc(dateOf(k).toLocaleDateString("en-GB",{weekday:"narrow"}))}</small></th>`).join("")}<th class="n">Attended</th><th class="n">Absent</th></tr></thead><tbody>
+    ${ppl.map(n=>{let here=0,ab=0,marked=0;const cells=days.map(k=>{const r=k<=tk?attGet(k,n):null;if(r){marked++;if(r.s==="absent")ab++;else here++}
+      const tip=r?ATS[r.s][0]+(r.r?" · "+(ATR[r.r]||r.r):"")+(r.n?" · "+r.n:""):"";return `<td class="atc${k===day?" sel":""}" data-atgo="${k}" title="${esc(tip)}">${r?`<i class="m ${r.s}">${r.s==="present"?"✓":r.s==="late"?"L":"✕"}</i>`:""}</td>`}).join("");
+      return `<tr><td><span class="person">${av(n)}${esc(n)}</span></td>${cells}<td class="n"><b>${marked?Math.round(here/marked*100)+"%":"—"}</b></td><td class="n">${ab||"—"}</td></tr>`}).join("")}</tbody></table></div>
+    <p class="hint" style="margin:8px 0 0">✓ present · L late · ✕ absent. Attended % counts only the meetings marked.</p></div>`;
+  return h}
+document.addEventListener("click",e=>{if(S.tab!=="att"||!view.contains(e.target))return;
+  if(attClick(e)){render();return}
+  const dn=e.target.closest("[data-atday]");if(dn){const v=+dn.dataset.atday;if(v===0)S.attDay=todayKey();else{const d=dateOf(S.attDay||todayKey());do{d.setDate(d.getDate()+v)}while(!isWork(d));S.attDay=key(d)}const m=dateOf(S.attDay),n=new Date();S.attM=(m.getFullYear()-n.getFullYear())*12+m.getMonth()-n.getMonth();S.anim=true;render();return}
+  const mm=e.target.closest("[data-atm]");if(mm){const v=+mm.dataset.atm;S.attM=v===0?0:(S.attM||0)+v;S.anim=true;render();return}
+  const g=e.target.closest("[data-atgo]");if(g){S.attDay=g.dataset.atgo;render();window.scrollTo({top:0});return}});
+view.addEventListener("change",e=>{if(S.tab==="att"&&attNote(e))render()});
 
 /* ================= one-click urgent email ================= */
 function mailTask(t){
@@ -1426,7 +1502,7 @@ function renderRun(){
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
   const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`],["wrap","3","Wrap-up","Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up","Minutes"]];
-  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1></div>
+  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   if(awOn(tk).length)h+=awTodayBox();
   if(R.stage==="wrap")return h+renderWrap();
@@ -1479,14 +1555,14 @@ function renderPrioRun(){
 const roundPeople=()=>[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned").sort(byName);
 const saidNone=n=>M().skip.includes("none:"+n);
 const addedFor=n=>{const m=M();return D.tasks.filter(t=>m.added.includes(t.id)&&ownersOf(t).includes(n))};
-const asked=n=>saidNone(n)||addedFor(n).length>0;
+const asked=n=>saidNone(n)||addedFor(n).length>0||!!attAbsent(todayKey(),n);
 function renderTodayShared(){
   const R=S.run,ppl=roundPeople(),done=ppl.filter(asked).length,left=pendAll().filter(t=>!pDiscussed(t)).length,tk=todayKey();
   let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>${done} of ${ppl.length} asked · type and press Enter, or click Nothing today${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
     <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok glow":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
   h+=`<div class="round">${ppl.map((n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
-    return `<section class="rperson${items.length||none?" asked":""}" data-person="${esc(n)}">
+    return `<section class="rperson${items.length||none?" asked":""}${attAbsent(tk,n)&&!items.length&&!none?" absent":""}" data-person="${esc(n)}">
       <div class="rph">${av(n)}<b>${esc(n)}</b>${aw.length?`<span class="rout" title="${esc(aw.map(a=>(AWT[a.type]||AWT.other)[0]+" "+awTime(a,tk)).join(", "))}">${esc((AWT[aw[0].type]||AWT.other)[0])}</span>`:""}</div>
       <div class="rmid">
       ${items.map(t=>`<div class="ritem" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
@@ -1496,7 +1572,7 @@ function renderTodayShared(){
       ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else? (Enter to add)":"Anything needed from "+esc(n)+"? (Enter to add)"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
         <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
       </div>
-      <div class="rend">${none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
+      <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
     </section>`}).join("")}</div>
     <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   return h;
@@ -1570,6 +1646,8 @@ function minutes(){
   if(upd.length||wait.length){L.push("Updates ("+(upd.length+wait.length)+")");[...upd,...wait].forEach(t=>{const u=lastUpdate(t);L.push(line(t)+(t.status==="wait"?" [Waiting]":"")+(u&&u.date===tk?": "+u.text:""))});L.push("")}
   if(added.length){L.push("New priorities ("+added.length+")");added.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push("  • "+ownersOf(t).join(", ")+": "+t.title+" ["+PRIO[t.prio].s+(t.target?", due "+fmt(t.target,{day:"numeric",month:"short"}):"")+"]"));L.push("")}
   const over=open().filter(isOver);if(over.length){L.push("Still overdue ("+over.length+")");over.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" – "+dueInfo(t).l));L.push("")}
+  {const ab=attPeople().map(n=>[n,attAbsent(tk,n)]).filter(x=>x[1]),late=attPeople().filter(n=>{const r=attGet(tk,n);return r&&r.s==="late"});const st=attStats(tk);
+    if(st.n-st.unmarked>0){L.push("Attendance: "+st.here+" of "+st.n+" present"+(late.length?" (late: "+late.join(", ")+")":""));if(ab.length)L.push("Absent: "+ab.map(([n,r])=>n+(r.r?" ("+(ATR[r.r]||r.r)+(r.n?", "+r.n:"")+")":"")).join("; "));L.push("")}}
   if(S.run.by!=="person"){const nn=roundPeople().filter(saidNone);if(nn.length){L.push("Nothing needed today: "+nn.join(", "));L.push("")}const na=roundPeople().filter(n=>!asked(n));if(na.length){L.push("Not asked today: "+na.join(", "));L.push("")}}
   if(S.run.by!=="person"){const nd=pendAll().filter(t=>!pDiscussed(t));if(nd.length){L.push("Pending, not discussed ("+nd.length+")");nd.sort((a,b)=>a.prio-b.prio||byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" ["+PRIO[t.prio].s+"]"));L.push("")}}
   const ab=m.skip.filter(x=>x.startsWith("follow:")).map(x=>x.slice(7));if(ab.length){L.push("Absent: "+ab.join(", "));L.push("")}
@@ -1696,6 +1774,7 @@ view.addEventListener("click",e=>{
     case "runby":{S.run.by=b.dataset.v;try{localStorage.setItem("minerva-tracker:runby",S.run.by)}catch(_){}if(S.run.stage==="today"&&S.run.by==="prio")S.run.stage="follow";S.anim=true;render();break}
     case "pnext":case "pprev":{S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
     case "pown":openOwners(id);break;
+    case "attopen":openAttModal();break;
     case "tpadd":addForPerson(b.dataset.i);break;
     case "tpnone":{const m=M(),k="none:"+b.dataset.person,j=m.skip.indexOf(k);if(j>=0)m.skip.splice(j,1);else m.skip.push(k);save();render();if(j<0){const nx=view.querySelector(".rperson:not(.asked) [data-tp]");nx&&nx.focus({preventScroll:false})}break}
     case "tdel":{const t=find(id);if(!t)break;const m=M(),i=D.tasks.indexOf(t);D.tasks.splice(i,1);m.added=m.added.filter(z=>z!==id);bury(id);save();render();toast("Removed",()=>{D.tasks.splice(i,0,t);M().added.push(id);unbury(id)});break}
@@ -1759,7 +1838,7 @@ document.addEventListener("keydown",e=>{
   const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;if(S.edit||!document.getElementById("modal").hidden||e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==="n"||e.key==="N"){e.preventDefault();openTask(null)}
   else if(e.key==="/"){e.preventDefault();const q=document.getElementById("q");q&&q.focus()}
-  else if(/^[1-7]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;render();window.scrollTo({top:0})}}
+  else if(/^[1-8]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;render();window.scrollTo({top:0})}}
   else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="run"){e.preventDefault();
     if(S.run.stage==="wrap"){if(e.key==="ArrowLeft"){S.run.stage="today";S.anim=true;render()}return}
     const b=view.querySelector(e.key==="ArrowRight"?'.phead [data-act=rnext],.phead [data-act=pnext],.phead .btn[data-stage="today"],.phead .btn[data-stage="wrap"]':'.phead [data-act=rprev],.phead [data-act=pprev],.phead .btn[data-stage="follow"]');
@@ -1895,6 +1974,10 @@ async function exportExcel(){
   names.forEach((n,i)=>{const m=all.filter(t=>ownersOf(t).includes(n)),row=wsS.getRow(5+i);[n,m.length,m.filter(isOver).length,...[1,2,3,4].map(p=>m.filter(t=>t.prio===p).length),m.filter(t=>staleDays(t)>=2).length].forEach((v,j)=>{const c=row.getCell(j+1);c.value=v;c.border=box;c.alignment={horizontal:j?"center":"left",vertical:"middle"};c.font={size:10.5,bold:j===0,color:{argb:j===2&&v?"FFB42318":INK}};if(i%2)c.fill=solid(ZEBRA)})});
   const tr=wsS.getRow(5+names.length);["Total tasks",all.length,all.filter(isOver).length,...[1,2,3,4].map(p=>all.filter(t=>t.prio===p).length),all.filter(t=>staleDays(t)>=2).length].forEach((v,j)=>{const c=tr.getCell(j+1);c.value=v;c.font={bold:true,color:{argb:NAVY2}};c.fill=solid("FFE3F6FD");c.alignment={horizontal:j?"center":"left"};c.border={top:{style:"medium",color:{argb:NAVY2}}}});
   const n2=wsS.getCell(7+names.length,1);n2.value="Shared tasks count once for each person responsible, so the person rows can add up to more than the total.";n2.font={size:9,italic:true,color:{argb:MUTED}};
+  {const AC=[["Date",14,"center"],["Person",22],["Status",12,"center"],["Reason",18],["Note",48]];const wa=wb.addWorksheet("Attendance",{views:[{state:"frozen",ySplit:4,showGridLines:false}]});head(wa,"Daily Priorities · Meeting attendance",AC.length);tableHeader(wa,4,AC);
+    const rows=[];Object.keys(D.att||{}).sort().reverse().forEach(d=>attPeople().slice().sort(byName).forEach(n=>{const r=((D.att||{})[d]||{})[n];if(r&&r.s)rows.push([dateOf(d),n,ATS[r.s][0],r.r?ATR[r.r]||r.r:"",r.n||""])}));
+    rows.forEach((v,i)=>{const row=wa.getRow(5+i);v.forEach((x,j)=>{const c=row.getCell(j+1);c.value=x;c.border=box;c.font={size:10,color:{argb:INK},bold:j===2&&x!=="Present"};c.alignment={vertical:"top",horizontal:AC[j][2]||"left",wrapText:j===4};if(i%2)c.fill=solid(ZEBRA);if(j===0)c.numFmt="dd mmm yyyy"});
+      const sc=row.getCell(3);if(v[2]==="Absent")sc.font={size:10,bold:true,color:{argb:"FFB42318"}};else if(v[2]==="Late")sc.font={size:10,bold:true,color:{argb:"FF8A5A00"}};else sc.font={size:10,color:{argb:"FF0E7A50"}}})}
   wb.views=[{activeTab:0}];
   const buf=await wb.xlsx.writeBuffer();document.getElementById("toast").hidden=true;
   download("Minerva Daily Priorities "+stamp()+".xlsx",new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
