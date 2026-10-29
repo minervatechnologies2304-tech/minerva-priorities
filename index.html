@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v26</title>
+<title>Minerva Priorities · v27</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -536,6 +536,11 @@ table.ptab tbody:has(tr.pr:focus-within) tr.pr:not(:focus-within) td{opacity:.5;
 .round .rperson:focus-within{box-shadow:inset 4px 0 0 var(--accent)!important;background:color-mix(in srgb,var(--accent) 7%,transparent)}
 .round .rperson .av{transition:transform .35s var(--spring)}.round .rperson:focus-within .av{transform:scale(1.15)}
 @media (prefers-reduced-motion:reduce){table.ptab tbody:has(tr.pr:focus-within) tr.pr:not(:focus-within) td,.round:has(.rperson:focus-within) .rperson:not(:focus-within){opacity:1}}
+.savew{position:relative;flex:1;min-width:0}.savew>input{width:100%;padding-right:78px!important}
+.savebtn{position:absolute;right:5px;top:50%;transform:translateY(-50%) scale(1);border:0;border-radius:8px;background:var(--accent);color:var(--onacc,#fff);font:inherit;font-size:12.5px;font-weight:650;padding:4px 10px;cursor:pointer;transition:opacity .2s ease,transform .3s var(--spring)}
+.savew>input:placeholder-shown+.savebtn{opacity:0;pointer-events:none;transform:translateY(-50%) scale(.85)}
+.savebtn:active{transform:translateY(-50%) scale(.94)}
+.round .radd .savew{flex:1}
 /* ===== help ===== */
 .mbox:has(.help){width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column}
 .mbox:has(.help) .mh{display:flex;align-items:center;justify-content:space-between}
@@ -662,7 +667,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v26</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v27</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1472,7 +1477,7 @@ function renderTodayShared(){
         <select class="spill p" data-pf="prio" data-id="${t.id}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
         <label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>
         <span class="hov"><button class="icon" data-open="${t.id}" title="Add details (partner, country, updates)">${IC.note}</button><button class="icon" data-act="tdel" data-id="${t.id}" title="Remove this">${IC.x}</button></span></div>`).join("")}
-      ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else?":"Anything needed from "+esc(n)+"?"}" maxlength="160" autocomplete="off">
+      ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else? (Enter to add)":"Anything needed from "+esc(n)+"? (Enter to add)"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
         <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
       </div>
       <div class="rend">${none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
@@ -1480,12 +1485,12 @@ function renderTodayShared(){
     <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   return h;
 }
-function addForPerson(i){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
+function addForPerson(i,stay){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
   const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1;
   const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};
   const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);save();render();
   toast("Added for "+n+" · "+PRIO[prio].s,()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
-  setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
+  if(!stay)setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 const dShort=k=>k?dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"";
 function prow(t){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
@@ -1500,7 +1505,7 @@ function prow(t){
     <td class="c-dt"><label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}
 </td>
     <td class="c-lu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}${n>1?` <em>+${n-1} earlier</em>`:""}`:'<span class="none">—</span>'}</td>
-    <td class="c-upd">${done?"":`<input class="ce upd" id="fb-${t.id}" placeholder="Add update…" autocomplete="off">`}</td>
+    <td class="c-upd">${done?"":`<div class="savew"><input class="ce upd" id="fb-${t.id}" placeholder="Add update… (Enter to save)" autocomplete="off"><button type="button" class="savebtn" data-act="fb-upd" data-id="${t.id}" tabindex="-1">Save ↵</button></div>`}</td>
     <td class="c-act">${done?"":`<button class="icon okh" data-act="fb-done" data-id="${t.id}" title="Mark completed">${IC.check}</button>`}<span class="hov">${t.prio===1&&!done?`<button class="icon mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}</button>`:""}<button class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button>
       <select class="ce mv" data-pf="prio" data-id="${t.id}" title="Move to another priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>Move to ${PRIO[q].s}</option>`).join("")}</select></span></td>
   </tr>`;
@@ -1524,12 +1529,12 @@ function fu(t){
       ${o?`<span class="pill ${OUT[o][1]}">${OUT[o][0]}</span><button class="link" data-act="fb-undo" data-id="${t.id}">Change</button>`:`<span class="due ${d.c}">${esc(d.l)}</span><span class="pill st-${t.status}">${STATUS[t.status]}</span>`}
       <button class="icon" data-open="${t.id}" title="Open the task">${IC.note}</button></div>
     ${u?`<div class="fu-last"><time>${esc(fmt(u.date))}</time><span>${esc(u.text)}</span>${n>1&&!o?`<em>+${n-1} earlier</em>`:""}</div>`:`<div class="fu-last"><span class="hint">No updates yet</span></div>`}
-    ${o?"":`<div class="fu-act"><input class="inp" id="fb-${t.id}" placeholder="Feedback from ${esc(ownersOf(t)[0])}… (Enter saves it as an update)" autocomplete="off">
+    ${o?"":`<div class="fu-act"><input class="inp" id="fb-${t.id}" placeholder="Feedback from ${esc(ownersOf(t)[0])}… (Enter to save)" autocomplete="off">
       <div class="fu-btns"><button class="btn sm" data-act="fb-upd" data-id="${t.id}">${IC.note}Save update</button><button class="btn ok sm" data-act="fb-done" data-id="${t.id}">${IC.check}Done</button><button class="btn ghost sm" data-act="fb-same" data-id="${t.id}">No change</button>${t.prio===1?`<button class="btn sm mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}Email</button>`:""}
       <span class="push"><span class="hint">Push date:</span>${[["+1d",1],["+3d",3],["+1w",5]].map(([l,k])=>`<button data-act="fb-push" data-n="${k}" data-id="${t.id}">${l}</button>`).join("")}</span></div></div>`}
   </article>`;
 }
-function feedback(id,kind){
+function feedback(id,kind,stay){
   const t=find(id);if(!t)return;const inp=document.getElementById("fb-"+id), text=inp?inp.value.trim():"";const m=M();const prev=JSON.parse(JSON.stringify(t)), prevO=m.f[id];
   if(kind==="upd"&&!text){toast("Type the feedback first, or choose No change.");inp&&inp.focus();return}
   if(text)addUpdate(id,text);
@@ -1537,7 +1542,7 @@ function feedback(id,kind){
   else if(kind==="wait"){t.status="wait"}
   else if(kind==="same"){D.seen[id]=todayKey()}
   m.f[id]=kind;save();render();
-  const nxt=view.querySelector(".fu:not(.handled) .inp, .pr:not(.handled) .upd");if(nxt)nxt.focus({preventScroll:false});
+  if(!stay){const nxt=view.querySelector(".fu:not(.handled) .inp, .pr:not(.handled) .upd");if(nxt)nxt.focus({preventScroll:false})}
   toast(kind==="done"?"Completed: moved to the Completed list":OUT[kind][0],()=>{Object.assign(t,prev);if(prevO)m.f[id]=prevO;else delete m.f[id]});
 }
 function minutes(){
@@ -1710,6 +1715,10 @@ view.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
 view.addEventListener("click",e=>{const l=e.target.closest(".dpick");if(!l)return;const i=l.querySelector("input[type=date]");if(i&&i.showPicker){e.preventDefault();try{i.showPicker()}catch(_){i.focus()}}});
+view.addEventListener("focusout",e=>{const t=e.target;if(!t||!t.id||!t.value||!t.value.trim())return;
+  const isU=t.id.startsWith("fb-"),isP=t.id.startsWith("tp-");if(!isU&&!isP)return;
+  const box=t.closest(".savew,tr,.fu,.rperson");if(e.relatedTarget&&box&&box.contains(e.relatedTarget))return;
+  setTimeout(()=>{const x=document.getElementById(t.id);if(!x||!x.value.trim())return;if(isU)feedback(t.id.slice(3),"upd",true);else addForPerson(t.id.slice(3),true)},0)});
 view.addEventListener("submit",e=>{e.preventDefault();
   if(e.target.id==="paddForm"){const x=document.getElementById("pa-title"),title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}const R=S.run,who=document.getElementById("pa-who").value,due=document.getElementById("pa-due").value,pe=document.getElementById("pa-prio");R.paWho=who;R.paDue=due;if(pe)R.np=+pe.value;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:who?[who]:[],prio:pe?+pe.value:(R.pq||1),status:"ns",start:todayKey(),target:due||"",updates:[],created:new Date().toISOString()};
