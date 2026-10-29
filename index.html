@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v29</title>
+<title>Minerva Priorities · v30</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -568,6 +568,14 @@ table.atgrid th[data-atgo],table.atgrid td.atc{cursor:pointer}table.atgrid .sel{
 .m.present{background:var(--oks);color:var(--ok)}.m.late{background:var(--warns);color:var(--warn)}.m.absent{background:var(--bads);color:var(--bad)}
 .round .rperson.absent{opacity:.6}.rst.abs{color:var(--bad)}
 @media (max-width:760px){.atrow{grid-template-columns:1fr}}
+/* ===== view only ===== */
+html.viewonly #newBtn,html.viewonly .savew,html.viewonly .c-act .okh,html.viewonly .c-act .hov,html.viewonly .radd,html.viewonly .rend .btn,html.viewonly .ritem .hov,html.viewonly .qa .okh,html.viewonly .row [data-act=done],
+html.viewonly .drawer .dfoot,html.viewonly .drawer [data-d=addu],html.viewonly .drawer .tlw,html.viewonly .awnav [data-awadd],html.viewonly [data-awadd],html.viewonly .atseg button:not([aria-pressed=true]),html.viewonly .atwhy .atr:not([aria-pressed=true]),html.viewonly .atfoot .btn,
+html.viewonly .wrapedit,html.viewonly .fu-act,html.viewonly [data-act=fb-undo],html.viewonly .ux{display:none!important}
+html.viewonly main input:not(#q),html.viewonly main select,html.viewonly .spill,html.viewonly .dpick,html.viewonly .ownb,html.viewonly .drawer input,html.viewonly .drawer textarea,html.viewonly .drawer select,html.viewonly .drawer .opt,html.viewonly .atnote{pointer-events:none}
+html.viewonly .spill{background:transparent!important}html.viewonly .ce:hover{background:transparent;border-color:transparent}
+html.viewonly .attpill{pointer-events:none}html.viewonly .attpill.none{display:none}html.viewonly table.ptab th:nth-child(6){color:transparent}
+html.viewonly #syncBtn{color:#BFF3D6}
 /* ===== help ===== */
 .mbox:has(.help){width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column}
 .mbox:has(.help) .mh{display:flex;align-items:center;justify-content:space-between}
@@ -694,7 +702,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v29</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v30</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -718,7 +726,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <div id="modal" class="modal" hidden></div>
 <div id="toast" class="toast" role="status" hidden></div>
 
-<script type="text/plain" id="gscript">/* Minerva Daily Priorities - Google Sheet backup (version 1)
+<script type="text/plain" id="gscript">/* Minerva Daily Priorities - Google Sheet backup (version 2: editor and view-only links)
    1. Paste into the Google Sheet: Extensions > Apps Script (replace everything) and Save.
    2. Deploy > New deployment > gear > Web app. Execute as "Me", Who has access "Anyone". Deploy, allow access.
    3. Copy the Web app URL (ends with /exec) into the app: Data & settings > Google Sheet backup.
@@ -726,7 +734,8 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
    The full backup is a file in your Google Drive (next to this sheet), with a daily snapshot for 30 days.
    The tabs "Open tasks", "Completed" and "Updates log" are readable copies, rebuilt on every save. */
 const KEY = '__KEY__';
-const SCRIPT_VERSION = 1;
+const VIEW_KEY = '__VKEY__';
+const SCRIPT_VERSION = 2;
 const KEEP_DAYS = 30;
 const BASE = 'minerva-priorities';
 const PRIO = { 1: 'Important and Urgent', 2: 'Important and Not Urgent', 3: 'Not Important but Urgent', 4: 'Not Important, Not Urgent' };
@@ -736,8 +745,10 @@ function doPost(e) {
   let res;
   try {
     const req = JSON.parse(e.postData.contents);
-    if (req.key !== KEY) res = { ok: false, error: 'key' };
-    else if (req.action === 'ping') res = Object.assign({ ok: true, script: SCRIPT_VERSION }, info_());
+    const view = req.key === VIEW_KEY && VIEW_KEY.length > 8;
+    if (req.key !== KEY && !view) res = { ok: false, error: 'key' };
+    else if (view && ['ping', 'restore', 'snapshots'].indexOf(req.action) < 0) res = { ok: false, error: 'viewonly' };
+    else if (req.action === 'ping') res = Object.assign({ ok: true, script: SCRIPT_VERSION, role: view ? 'view' : 'edit' }, info_());
     else if (req.action === 'restore') res = restore_(req.day);
     else if (req.action === 'snapshots') res = { ok: true, list: snapList_() };
     else if (req.action === 'save') res = locked_(function () { return save_(req); });
@@ -952,10 +963,10 @@ const fmtDT=t=>t?new Date(t).toLocaleString("en-GB",{day:"numeric",month:"short"
 function gStatus(st,msg){gState=st;gMsg=msg||"";const b=document.getElementById("syncBtn");if(!b)return;
   const cloud='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>';
   const alert='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></svg>';
-  const L={off:[alert,"Not backed up"],ok:[cloud,"Saved "+fmtT(G.last)],busy:[cloud,"Saving…"],wait:[cloud,"Saving soon"],err:[alert,"Backup problem"]}[st];
+  const L={off:[alert,"Not backed up"],ok:[cloud,(isView()?"View only · updated ":"Saved ")+fmtT(G.last)],busy:[cloud,"Saving…"],wait:[cloud,"Saving soon"],err:[alert,"Backup problem"]}[st];
   b.innerHTML=L[0]+'<span class="sl">'+esc(L[1])+'</span>';b.dataset.st=st;b.title=st==="off"?"Set up the Google Sheet backup":gMsg||("Google Sheet backup · last saved "+fmtDT(G.last));
   if(G.url&&typeof S!=="undefined"&&S.tab==="set"&&!S.edit&&!(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)))render()}
-window.gChanged=function(){if(!G.url)return;G.pending=true;gSave();if(gState!=="busy"&&gState!=="err")gStatus("wait");clearTimeout(gTimer);gTimer=setTimeout(gSync,Math.max(4000,20000-(Date.now()-gLastTry)))};
+window.gChanged=function(){if(!G.url||isView())return;G.pending=true;gSave();if(gState!=="busy"&&gState!=="err")gStatus("wait");clearTimeout(gTimer);gTimer=setTimeout(gSync,Math.max(4000,20000-(Date.now()-gLastTry)))};
 async function gPost(body,url,key){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),body.action==="ping"?45000:180000);let r,t;
   try{r=await fetch(url||G.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({key:key||G.key,...body}),redirect:"follow",signal:ac.signal});t=await r.text()}
   catch(e){throw new TypeError(e.name==="AbortError"?"timeout":"network")}finally{clearTimeout(tm)}
@@ -986,7 +997,8 @@ async function gSync(){
   clearTimeout(gTimer);gBusy=true;gLastTry=Date.now();if(G.pending)gStatus("busy");
   try{
     const p=await gPost({action:"ping"});if(!p.ok)throw new Error(p.error==="key"?"key":(p.error||"bad"));
-    G.sheet=p.url||G.sheet;
+    G.sheet=p.url||G.sheet;if(p.script)G.script=p.script;
+    if(isView()){G.pending=false;if(p.v!==G.v){const j=await gPost({action:"restore"});if(j.ok&&j.state){applyRemote(j.state,j.v);toast("Updated")}}G.last=Date.now();gSave();gStatus("ok");return}
     for(let i=0;i<3;i++){
       if(p.v===G.v){if(!G.pending){Object.assign(G,{open:p.open,total:p.total});gSave();if(!gConflict)gStatus("ok");return}
         const r=await gPush(G.v);if(r!=="stale")return;}
@@ -1004,7 +1016,7 @@ async function gSync(){
 }
 const GURL_RE=/^https:\/\/script\.google\.com\/(?:a\/macros\/[^\/\s]+|macros)\/s\/[\w-]+\/exec/;
 function gMsgSet(txt,kind){const el=document.getElementById("gmsg");if(!el)return;el.hidden=!txt;el.className="gmsg "+(kind||"");el.innerHTML=txt||""}
-async function gConnect(u,k){
+async function gConnect(u,k,role){
   k=k||G.key;gMsgSet("Contacting your Google Sheet… the first time can take up to 30 seconds.","busy");
   let j;
   try{j=await gPost({action:"ping"},u,k)}
@@ -1018,16 +1030,38 @@ async function gConnect(u,k){
     gMsgSet(j.error==="key"?"<b>Connected to Google, but the key doesn't match.</b> Click <b>Copy script</b> again, paste it over everything in Apps Script, <b>Save</b>, then <b>Deploy › Manage deployments › ✏️ Edit › Version: New version › Deploy</b>, and click Connect again.":
       /permission|authori/i.test(j.error||"")?"<b>The script needs permission.</b> In Apps Script choose <b>setup</b> in the function list at the top, click <b>Run</b> and allow access. Then <b>Deploy › Manage deployments › ✏️ Edit › Version: New version › Deploy</b>, and click Connect again.":
       "<b>The script reported an error:</b> "+esc(j.error||"unknown"),"err");
+    if(role==="view"&&j.error==="key")toast("This view-only link needs the updated Google script. Ask the person who sent it.");
     return false}
+  if(role==="view"||j.role==="view"){G.url=u;G.key=k;G.role="view";G.script=j.script||0;G.v=-1;G.pending=false;G.sheet="";gSave();document.documentElement.classList.add("viewonly");gStatus("busy");
+    try{await gSync()}catch(e){}toast("Connected as view only. The tracker updates by itself.");render();return true}
+  G.role="edit";G.script=j.script||0;G.vkey=await vkeyOf(k);
   G.url=u;G.key=k;G.sheet=j.url||"";G.v=-1;G.pending=!!D.tasks.length;gSave();gMsgSet("<b>Connected.</b> Saving your tasks to the Google Sheet…","ok");gStatus("busy");
   try{if(!j.total&&D.tasks.length){await gPush(j.v,true)}else{await gSync()}}catch(e){gStatus("err","Connected, but the first save failed. It will retry automatically.")}
   toast(j.total?"Connected. Tasks combined with your Google Sheet":"Connected. Your tasks now back up automatically");return true}
 const b64u=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const ub64=s=>decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
 const gCode=()=>"MP1."+b64u(JSON.stringify({u:G.url,k:G.key}));
+const gViewCode=()=>"MP1."+b64u(JSON.stringify({u:G.url,k:G.vkey,r:"view"}));
+const isView=()=>G.role==="view";
+if(isView())document.documentElement.classList.add("viewonly");
+/* view-only: allow looking around, block every change */
+(()=>{const OK='[data-tab],[data-stage],[data-rprio],[data-group],[data-focus],[data-sfocus],[data-quick],[data-atday],[data-atm],[data-atgo],[data-awk],[data-awday],[data-hq],[data-hgo],[data-m=close],[data-d=close],[data-open],[data-theme],[data-g=now],[data-g=disc],a[href],summary,details,.tabs,#helpBtn,#themeBtn,#presentBtn,#syncBtn,#q,#hq,#modal .mf a,#modal [data-m=copy]';
+  const OKACT=new Set(["pnext","pprev","rnext","rprev","fnext","fprev","copymin","mailmin","xlsx","print","runby","backup","mail","snaps"]);
+  let warned=0;const warn=()=>{if(Date.now()-warned>2500){warned=Date.now();toast("View only: ask an editor to make changes")}};
+  const allowed=t=>{if(!t||!t.closest)return true;if(t.closest(OK))return true;const a=t.closest("[data-act]");if(a&&OKACT.has(a.dataset.act))return true;
+    if(t.closest("[data-mt]"))return true;
+    return !t.closest("main button,main input,main select,main textarea,main label,main [data-act],main [data-id],.drawer button,.drawer input,.drawer select,.drawer textarea,#modal button,#modal input,#modal select,#modal textarea,#newBtn,[data-at],[data-ar],[data-atall]")};
+  document.addEventListener("click",e=>{if(!isView())return;if(e.target.closest&&e.target.closest("#newBtn")){e.preventDefault();e.stopPropagation();warn();return}if(!allowed(e.target)){e.preventDefault();e.stopImmediatePropagation();warn()}},true);
+  ["keydown","input","change","dragstart","drop","submit"].forEach(ev=>document.addEventListener(ev,e=>{if(!isView())return;const t=e.target;
+    if(ev==="keydown"){if((e.key==="n"||e.key==="N")&&!/^(INPUT|TEXTAREA)$/.test(t.tagName||"")){e.stopImmediatePropagation();return}if(!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||""))return}
+    if(t&&t.closest&&t.closest("#q,#hq,[data-mt],#mailBody"))return;if(ev==="keydown"&&e.key==="Escape")return;
+    if(t&&t.closest&&t.closest("main,.drawer,#modal")){e.preventDefault();e.stopImmediatePropagation();if(ev!=="input")warn()}},true));
+})();
+async function vkeyOf(k){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(k)+"|minerva-view"));return [...new Uint8Array(b)].slice(0,16).map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return ""}}
+(async()=>{if(G.key&&!isView()&&!G.vkey){G.vkey=await vkeyOf(G.key);gSave();if(typeof S!=="undefined"&&S.tab==="set")render()}})();
 function gParse(c){try{const m=String(c).trim().match(/MP1\.([\w-]+)/);if(!m)return null;const o=JSON.parse(ub64(m[1]));return o&&o.u&&o.k?o:null}catch(e){return null}}
 const appLink=()=>location.origin+location.pathname;
-const gScript=()=>document.getElementById("gscript").textContent.replace("__KEY__",G.key).trim();
+const gScript=()=>document.getElementById("gscript").textContent.replace("__KEY__",G.key).replace("__VKEY__",G.vkey||"").trim();
 async function copyText(t,msg){try{await navigator.clipboard.writeText(t);toast(msg)}catch(x){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}a.remove();toast(ok?msg:"Copy blocked. Select the text and press Ctrl+C")}}
 async function gLoadSnaps(){gSnaps=null;try{const j=await gPost({action:"snapshots"});gSnaps=j.ok?j.list:[]}catch(e){gSnaps=[]}if(S.tab==="set")render()}
 async function gTakeSheet(day){toast("Loading from your Google Sheet…");
@@ -1048,9 +1082,13 @@ function gPanel(){
     ${gConflict?`<div class="gbtns"><button class="btn" data-g="take">Load the Google Sheet onto this computer</button><button class="btn danger" data-g="force">Overwrite the sheet with this computer</button></div>`:""}
     <div class="gbtns">${G.sheet?`<a class="btn ghost sm" href="${esc(G.sheet)}" target="_blank" rel="noopener">Open Google Sheet</a>`:""}<button class="btn ghost sm" data-g="now">Back up now</button><button class="btn ghost sm" data-g="take">Load from the sheet</button></div>
     <div><span class="lbl">Restore an earlier day</span><div class="gdi"><select class="inp" id="gday"><option value="">${gSnaps?gSnaps.length?"Choose a day":"No snapshots yet":"Loading…"}</option>${(gSnaps||[]).map(x=>`<option value="${esc(x.day)}">${esc(fmt(x.day,{weekday:"short",day:"numeric",month:"short"}))} · ${esc(x.info)}</option>`).join("")}</select><button class="btn ghost sm" data-g="day">Restore</button></div></div>
-    <details class="gd"><summary>Use it on another computer</summary><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><p class="hint" style="margin:0">Open this link on the other computer and it connects to the same Google Sheet. Keep it private: anyone with it can read and change the backup.</p>
-      <div class="gdi"><input class="inp" readonly value="${esc(appLink()+"#pair="+gCode())}"><button class="btn sm" data-g="copylink">Copy link</button></div></div></details>
-    <details class="gd"><summary>Connection details</summary><p class="hint" style="overflow-wrap:anywhere">Web app: ${esc(G.url)}</p><div class="gbtns"><button class="btn ghost sm" data-g="copy">Copy script again</button><button class="btn danger sm" data-g="disc">Disconnect this computer</button></div></details></div>`;
+    <details class="gd" open><summary>Share it with the team</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+      <div><span class="lbl">Editor link · for the 2–3 people who run the meeting</span><p class="hint" style="margin:0 0 6px">Can change everything. Send it privately.</p>
+        <div class="gdi"><input class="inp" readonly value="${esc(appLink()+"#pair="+gCode())}"><button class="btn sm" data-g="copylink">Copy editor link</button></div></div>
+      <div><span class="lbl">View-only link · for everyone else</span><p class="hint" style="margin:0 0 6px">Can see everything and follow the meeting live, but can't change anything.</p>
+        ${(G.script||1)<2?`<div class="gmsg err" style="margin-bottom:6px"><b>One-time step to turn this on:</b> click <b>Copy script again</b> below, paste it over everything in Apps Script, click <b>Save</b>, then <b>Deploy › Manage deployments › ✏️ Edit › Version: New version › Deploy</b>. Then click <b>Back up now</b> here.</div>`:""}
+        <div class="gdi"><input class="inp" readonly value="${esc(G.vkey?appLink()+"#pair="+gViewCode():"")}"><button class="btn sm" data-g="copyview"${(G.script||1)<2||!G.vkey?" disabled":""}>Copy view-only link</button></div></div></div></details>
+    <details class="gd" id="gdetails"><summary>Connection details</summary><p class="hint" style="overflow-wrap:anywhere">Web app: ${esc(G.url)} · script version ${G.script||1}</p><div class="gbtns"><button class="btn ghost sm" data-g="copy">Copy script again</button><button class="btn danger sm" data-g="disc">Disconnect this computer</button></div></details></div>`;
 }
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-g]");if(!b)return;const a=b.dataset.g;
   if(a==="copy")copyText(gScript(),"Script copied. Paste it into Apps Script");
@@ -1067,12 +1105,13 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-g]")
   else if(a==="take")gTakeSheet();
   else if(a==="day"){const d=document.getElementById("gday").value;if(!d){toast("Choose a day first");return}gTakeSheet(d)}
   else if(a==="force")confirmBox("Overwrite the Google Sheet?","The sheet gets this computer's "+D.tasks.length+" tasks. Daily snapshots are kept, so earlier days can still be restored.","Overwrite",async()=>{try{await gPush(null,true)}catch(x){gStatus("err","Couldn't save to the Google Sheet. Try again.")}},true);
-  else if(a==="copylink")copyText(appLink()+"#pair="+gCode(),"Link copied. Open it on the other computer");
-  else if(a==="disc")confirmBox("Stop backing up this computer?","Your Google Sheet and everything in it stays as it is.","Disconnect",()=>{G.url="";G.pending=false;G.v=0;gSave();gConflict=null;gStatus("off");render()},true);
+  else if(a==="copylink")copyText(appLink()+"#pair="+gCode(),"Editor link copied. Send it privately");
+  else if(a==="copyview")copyText(appLink()+"#pair="+gViewCode(),"View-only link copied");
+  else if(a==="disc")confirmBox("Stop backing up this computer?","Your Google Sheet and everything in it stays as it is.","Disconnect",()=>{const wasView=isView();G.url="";G.pending=false;G.v=0;if(wasView){G.role="";G.key=rkey();G.vkey="";D=blank();try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}document.documentElement.classList.remove("viewonly")}gSave();gConflict=null;gStatus("off");render()},true);
 });
 window.addEventListener("online",()=>{if(G.url)gSync()});
 document.addEventListener("visibilitychange",()=>{if(!G.url||gBusy)return;if(document.visibilityState==="visible"&&Date.now()-gLastTry>20000)gSync();else if(document.visibilityState==="hidden"&&G.pending)gSync()});
-setInterval(()=>{if(G.url&&!gBusy&&document.visibilityState==="visible"&&gState!=="err"&&Date.now()-gLastTry>90000)gSync()},30000);
+setInterval(()=>{if(G.url&&!gBusy&&document.visibilityState==="visible"&&gState!=="err"&&Date.now()-gLastTry>(isView()?18000:90000))gSync()},isView()?6000:30000);
 window.addEventListener("beforeunload",e=>{if(G.url&&G.pending){e.preventDefault();e.returnValue=""}});
 
 /* ================= toast + modal ================= */
@@ -1245,6 +1284,11 @@ function renderDone(){
     ${all.map(t=>{const u=lastUpdate(t);return `<tr><td style="white-space:nowrap">${esc(fmt(t.doneAt,{day:"numeric",month:"short",year:"numeric"}))}${t.doneHow==="removed"?'<br><span class="pill st-wait nodot">Removed</span>':""}</td><td><b class="clickn" data-open="${t.id}">${esc(t.title)}</b></td><td>${esc([t.partner,t.endUser].filter(Boolean).join(" → "))}<br><small style="color:var(--muted)">${esc(t.country||"")}</small></td><td>${ownersOf(t).map(esc).join(", ")}</td><td style="max-width:340px;font-size:13.5px">${u?`<b>${esc(fmt(u.date))}</b> ${esc(u.text)}`:""}</td><td><button class="btn ghost sm" data-act="reopen" data-id="${t.id}">${IC.undo}Reopen</button></td></tr>`}).join("")}</tbody></table></div>`;
 }
 function renderSet(){
+  if(isView())return `<div class="today"><div><div class="eyebrow">Data &amp; settings</div><h1>View-only access</h1></div></div>
+  <div class="settings"><div class="panel"><h3>You're viewing the team's tracker</h3><p class="sub">It updates by itself every few seconds while it's open. Only the meeting editors can make changes.</p>
+    <div class="gbtns"><button class="btn ghost sm" data-g="now">Check for updates now</button><button class="btn ghost sm" data-act="xlsx">${IC.dl}Download Excel</button></div></div>
+    <div class="panel"><h3>Appearance</h3><div class="seg">${[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${curTheme()===k}">${l}</button>`).join("")}</div></div>
+    <div class="panel"><h3>Disconnect</h3><p class="sub">Removes the tracker from this computer. You can open the link again any time.</p><button class="btn danger sm" data-g="disc">Disconnect this computer</button></div></div>`;
   const staff=D.staff.slice().sort(byName), lb=D.lastBackup?new Date(D.lastBackup).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"never";
   return `<div class="today"><div><div class="eyebrow">Data &amp; settings</div><h1>Import, export and team</h1></div></div>
   <div class="settings">
@@ -1301,6 +1345,7 @@ const HELP=[
  {q:"How do I get back yesterday's data?",k:"restore recover snapshot yesterday lost deleted gone data back",a:"Use Daily snapshots or Restore a backup in Data & settings.",s:["Go to Data & settings.","Click Daily snapshots to pick a day, or Restore a backup to load a backup file you downloaded."],go:{tab:"set"}},
  {q:"How do I take attendance for the meeting?",k:"attendance attend absent present late register who missed reason roll call",a:"Use the Attendance button on the meeting screen, or the Attendance tab.",s:["In Run meeting, click Take attendance under the date (or open the Attendance tab).","Click Present, Late or Absent for each person. For Late or Absent, pick a reason and add a note if needed.","Click Mark everyone else present to finish. Anyone logged as out all day in Availability is pre-filled as absent."],go:{tab:"att"}},
  {q:"How do I see someone's attendance record?",k:"attendance history record month percentage how often missed",a:"The Attendance tab shows the whole month for everyone, with an attendance %.",s:["Open the Attendance tab.","Scroll to the month grid: ✓ present, L late, ✕ absent. Hover a mark for the reason.","Use ‹ › to change month. Download Excel also includes an Attendance sheet."],go:{tab:"att"}},
+ {q:"How do I give people view-only access?",k:"view only read only access share team everyone permission edit editors viewers link",a:"Send the view-only link to everyone and the editor link only to the 2–3 people who run the meeting.",s:["Go to Data & settings → Google Sheet backup → Share it with the team.","Copy view-only link and send it to the team. They can see everything, updated live, but can't change anything.","Copy editor link and send it privately to the 2–3 editors.","First time only: if the view-only link is greyed out, follow the one-time step shown there to update the Google script."],go:{tab:"set"}},
  {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 8 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Attendance, 4 Availability, 5 Priority board, 6 Summary, 7 Completed, 8 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
  {q:"A button isn't working, what do I do?",k:"not working broken error wrong nothing happens bug stuck problem",a:"Close the app and open it again so it loads the latest version.",s:["Close the app window and open it again (or press Ctrl + Shift + R in Chrome).","Try again.","If a \"Something went wrong\" message appears at the bottom, send Byron a screenshot."]}
 ];
@@ -1990,7 +2035,7 @@ document.getElementById("syncBtn").addEventListener("click",()=>{S.tab="set";S.a
 gStatus(gState);
 (async()=>{const m=location.hash.match(/^#pair=(.+)$/);
   if(m){history.replaceState(null,"",location.pathname+location.search);const o=gParse(m[1]);
-    if(o&&(o.u!==G.url||o.k!==G.key))confirmBox("Connect to the Google Sheet?","This computer will use the same Google Sheet backup. Tasks here are combined with the ones in the sheet.","Connect",async()=>{await gConnect(o.u,o.k);render()});else if(!o)toast("That setup link isn't valid");else setTimeout(()=>toast("This computer is already connected to this Google Sheet backup ✓"),2900)}
+    if(o&&(o.u!==G.url||o.k!==G.key))confirmBox(o.r==="view"?"Open the team's tracker (view only)?":"Connect to the Google Sheet?",o.r==="view"?"You'll see the team's daily priorities, meeting and attendance, updated live. Only editors can make changes.":"This computer will use the same Google Sheet backup. Tasks here are combined with the ones in the sheet.","Connect",async()=>{await gConnect(o.u,o.k,o.r);render()});else if(!o)toast("That setup link isn't valid");else setTimeout(()=>toast("This computer is already connected to this Google Sheet backup ✓"),2900)}
   if(G.url)setTimeout(gSync,1200)})();
 snapshot();
 render();
