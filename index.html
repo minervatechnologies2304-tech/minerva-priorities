@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v25</title>
+<title>Minerva Priorities · v26</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -662,7 +662,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v25</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v26</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1882,7 +1882,7 @@ document.getElementById("syncBtn").addEventListener("click",()=>{S.tab="set";S.a
 gStatus(gState);
 (async()=>{const m=location.hash.match(/^#pair=(.+)$/);
   if(m){history.replaceState(null,"",location.pathname+location.search);const o=gParse(m[1]);
-    if(o&&(o.u!==G.url||o.k!==G.key))confirmBox("Connect to the Google Sheet?","This computer will use the same Google Sheet backup. Tasks here are combined with the ones in the sheet.","Connect",async()=>{await gConnect(o.u,o.k);render()});else if(!o)toast("That setup link isn't valid")}
+    if(o&&(o.u!==G.url||o.k!==G.key))confirmBox("Connect to the Google Sheet?","This computer will use the same Google Sheet backup. Tasks here are combined with the ones in the sheet.","Connect",async()=>{await gConnect(o.u,o.k);render()});else if(!o)toast("That setup link isn't valid");else setTimeout(()=>toast("This computer is already connected to this Google Sheet backup ✓"),2900)}
   if(G.url)setTimeout(gSync,1200)})();
 snapshot();
 render();
