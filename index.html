@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v30</title>
+<title>Minerva Priorities · v31</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -702,7 +702,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v30</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v31</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1344,6 +1344,7 @@ const HELP=[
  {q:"Can I go through the meeting person by person instead?",k:"person by person style instead order change meeting way",a:"Yes. Data & settings → Morning meeting → Person by person.",s:["Go to Data & settings.","Under Morning meeting, choose Person by person."],go:{tab:"set"}},
  {q:"How do I get back yesterday's data?",k:"restore recover snapshot yesterday lost deleted gone data back",a:"Use Daily snapshots or Restore a backup in Data & settings.",s:["Go to Data & settings.","Click Daily snapshots to pick a day, or Restore a backup to load a backup file you downloaded."],go:{tab:"set"}},
  {q:"How do I take attendance for the meeting?",k:"attendance attend absent present late register who missed reason roll call",a:"Use the Attendance button on the meeting screen, or the Attendance tab.",s:["In Run meeting, click Take attendance under the date (or open the Attendance tab).","Click Present, Late or Absent for each person. For Late or Absent, pick a reason and add a note if needed.","Click Mark everyone else present to finish. Anyone logged as out all day in Availability is pre-filled as absent."],go:{tab:"att"}},
+ {q:"Can I bring in old attendance from the Excel sheet?",k:"import old previous history attendance spreadsheet excel past months",a:"Yes. Importing the team's Excel brings in its \"Attendance\" sheet too, month by month.",s:["Go to Data & settings → Import your Excel sheet and choose the file.","The import box shows how many attendance marks it found. Click Import.","P = present, A = absent, VL/V = leave, BT = travel; H (holiday) is skipped. Days you already marked in the app are kept."],go:{tab:"set"}},
  {q:"How do I see someone's attendance record?",k:"attendance history record month percentage how often missed",a:"The Attendance tab shows the whole month for everyone, with an attendance %.",s:["Open the Attendance tab.","Scroll to the month grid: ✓ present, L late, ✕ absent. Hover a mark for the reason.","Use ‹ › to change month. Download Excel also includes an Attendance sheet."],go:{tab:"att"}},
  {q:"How do I give people view-only access?",k:"view only read only access share team everyone permission edit editors viewers link",a:"Send the view-only link to everyone and the editor link only to the 2–3 people who run the meeting.",s:["Go to Data & settings → Google Sheet backup → Share it with the team.","Copy view-only link and send it to the team. They can see everything, updated live, but can't change anything.","Copy editor link and send it privately to the 2–3 editors.","First time only: if the view-only link is greyed out, follow the one-time step shown there to update the Google script."],go:{tab:"set"}},
  {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 8 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Attendance, 4 Availability, 5 Priority board, 6 Summary, 7 Completed, 8 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
@@ -1408,7 +1409,7 @@ function renderAtt(){
   S.attDay=S.attDay||todayKey();const day=S.attDay,tk=todayKey(),off=S.attM||0;
   const base=new Date();base.setDate(1);base.setMonth(base.getMonth()+off);const y=base.getFullYear(),mo=base.getMonth();
   const days=[];for(let d=new Date(y,mo,1);d.getMonth()===mo;d.setDate(d.getDate()+1)){if(isWork(d))days.push(key(d))}
-  const ppl=attPeople(),past=days.filter(k=>k<=tk);
+  const ppl=attPeople(),past=days.filter(k=>k<=tk),gp=[...new Set([...ppl,...days.flatMap(k=>Object.entries((D.att||{})[k]||{}).filter(([n,r])=>r&&r.s).map(([n])=>n))])].sort(byName);
   let h=`<div class="today"><div><div class="eyebrow">Meeting attendance</div><h1>${esc(dateOf(day).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1></div>
     <div class="awnav"><button class="btn ghost sm" data-atday="-1">‹</button><button class="btn ghost sm" data-atday="0"${day===tk?" disabled":""}>Today</button><button class="btn ghost sm" data-atday="1">›</button></div></div>`;
   if(!ppl.length)return h+`<div class="empty"><h2>No team yet</h2><p>Add people in Data &amp; settings first.</p></div>`;
@@ -1416,7 +1417,7 @@ function renderAtt(){
   h+=`<div class="panel" style="margin-top:14px"><div class="atmh"><h3>${esc(base.toLocaleDateString("en-GB",{month:"long",year:"numeric"}))}</h3><div class="awnav"><button class="btn ghost sm" data-atm="-1">‹</button>${off?`<button class="btn ghost sm" data-atm="0">This month</button>`:""}<button class="btn ghost sm" data-atm="1">›</button></div></div>
     <p class="sub">Click a day to open its register. Hover a mark to see the reason.</p>
     <div class="scroll"><table class="t atgrid"><thead><tr><th>Person</th>${days.map(k=>`<th class="${k===day?"sel":""}${k===tk?" tod":""}" data-atgo="${k}">${dateOf(k).getDate()}<small>${esc(dateOf(k).toLocaleDateString("en-GB",{weekday:"narrow"}))}</small></th>`).join("")}<th class="n">Attended</th><th class="n">Absent</th></tr></thead><tbody>
-    ${ppl.map(n=>{let here=0,ab=0,marked=0;const cells=days.map(k=>{const r=k<=tk?attGet(k,n):null;if(r){marked++;if(r.s==="absent")ab++;else here++}
+    ${gp.map(n=>{let here=0,ab=0,marked=0;const cells=days.map(k=>{const r=k<=tk?attGet(k,n):null;if(r){marked++;if(r.s==="absent")ab++;else here++}
       const tip=r?ATS[r.s][0]+(r.r?" · "+(ATR[r.r]||r.r):"")+(r.n?" · "+r.n:""):"";return `<td class="atc${k===day?" sel":""}" data-atgo="${k}" title="${esc(tip)}">${r?`<i class="m ${r.s}">${r.s==="present"?"✓":r.s==="late"?"L":"✕"}</i>`:""}</td>`}).join("");
       return `<tr><td><span class="person">${av(n)}${esc(n)}</span></td>${cells}<td class="n"><b>${marked?Math.round(here/marked*100)+"%":"—"}</b></td><td class="n">${ab||"—"}</td></tr>`}).join("")}</tbody></table></div>
     <p class="hint" style="margin:8px 0 0">✓ present · L late · ✕ absent. Attended % counts only the meetings marked.</p></div>`;
@@ -1948,12 +1949,14 @@ async function importExcel(file){
   const main=wb.SheetNames.find(n=>/^main/i.test(n))||wb.SheetNames.find(n=>{const ws=wb.Sheets[n];return ws&&XLSX.utils.sheet_to_json(ws,{header:1}).slice(0,3).some(r=>r.some(c=>/^\s*task\s*$/i.test(String(c))))});
   if(main)take(main,false);
   const rem=wb.SheetNames.find(n=>/removed/i.test(n));if(rem)take(rem,true);
-  if(!found.length){toast("No tasks found. The sheet needs a TASK column.");return}
+  const att=parseAttSheet(wb);
+  if(!found.length&&!att){toast("No tasks found. The sheet needs a TASK column.");return}
   const op=found.filter(t=>t.status!=="done"),dn=found.filter(t=>t.status==="done"),movedNow=op.length?found.filter(t=>t.src===main&&t.status==="done").length:0;
   const people=[...new Set(found.flatMap(t=>t.owners))].sort(byName);
   modal(`<div class="mh"><h2>Import ${esc(file.name)}</h2></div><div class="mb">
     <div class="note"><b>${op.length}</b> open tasks${main?` from “${esc(main)}”`:""}, and <b>${dn.length}</b> finished${rem?` (including “${esc(rem)}”)`:""}.${movedNow?` <b>${movedNow}</b> marked Completed on the main sheet will go straight to Completed.`:""}</div>
     <p style="margin:0" class="hint">People found: ${people.map(esc).join(", ")||"none"}</p>
+    ${att?`<div class="note"><b>Meeting attendance:</b> ${att.recs.filter(r=>r.code!=="H").length} marks for ${Object.keys(att.roster).length} people, ${esc((()=>{const f=att.months[0],l=att.months[att.months.length-1],nm=m=>new Date(m[0]||new Date().getFullYear(),m[1],1).toLocaleDateString("en-GB",{month:"short",year:"numeric"});return f?nm(f)+" to "+nm(l):""})())} from “${esc(att.sheet)}”. Days already marked in the app are kept.</div>`:""}
     ${D.tasks.length?`<label style="display:flex;gap:8px;align-items:center"><input type="radio" name="imode" value="replace" checked> Replace the ${D.tasks.length} tasks already here</label><label style="display:flex;gap:8px;align-items:center"><input type="radio" name="imode" value="merge"> Add to them (skip tasks with the same name)</label>`:""}
   </div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">${IC.up}Import</button></div>`,e=>{
     if(!e.target.closest("[data-m=ok]"))return;const mode=(document.querySelector('input[name=imode]:checked')||{}).value||"replace";closeModal();
@@ -1961,8 +1964,33 @@ async function importExcel(file){
     if(mode==="replace"){bury(...D.tasks.map(t=>t.id));D.tasks=[]}
     const have=new Set(D.tasks.map(t=>t.title.toLowerCase()));found.forEach(t=>{if(mode==="merge"&&have.has(t.title.toLowerCase()))return;delete t.src;D.tasks.push(t)});
     found.forEach(t=>t.owners.concat(t.bdm?[t.bdm]:[]).forEach(o=>{if(o&&!D.staff.some(s=>s.toLowerCase()===o.toLowerCase()))D.staff.push(o)}));
-    save();S.tab="run";S.run.stage="follow";S.run.person=null;S.anim=true;render();toast("Imported "+found.length+" tasks",()=>{D=prev})});
+    const na=applyAttImport(att);
+    save();S.tab="run";S.run.stage="follow";S.run.person=null;S.anim=true;render();toast("Imported "+found.length+" tasks"+(na?" and "+na+" attendance marks":""),()=>{D=prev})});
 }
+/* ---- meeting attendance history from the Excel "Attendance" sheet ---- */
+const ATCODE={P:{s:"present"},PRESENT:{s:"present"},A:{s:"absent"},ABSENT:{s:"absent"},VL:{s:"absent",r:"leave"},V:{s:"absent",r:"leave"},AL:{s:"absent",r:"leave"},L:{s:"late"},LATE:{s:"late"},S:{s:"absent",r:"sick"},SL:{s:"absent",r:"sick"},BT:{s:"absent",r:"travel"},T:{s:"absent",r:"travel"},TR:{s:"absent",r:"training"},WFH:{s:"present",n:"WFH"},CM:{s:"absent",r:"client"},SV:{s:"absent",r:"site"}};
+const AT_IMP="2000-01-01T00:00:00.000Z";
+function parseAttSheet(wb){const sn=wb.SheetNames.find(n=>/attendance/i.test(n));if(!sn)return null;
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:""}),MON=["january","february","march","april","may","june","july","august","september","october","november","december"];
+  let year=null,mon=null,cols=null,block=0;const recs=[],roster={},months=[];
+  for(const r of rows){const cells=r.map(c=>c instanceof Date?"":String(c==null?"":c).trim());
+    if(!cols)cells.forEach(c=>{const y=c.match(/^(20\d\d)$/);if(y)year=+y[1]});
+    const ml=cells.join(" ").match(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b(?:\s+(20\d\d))?/i);
+    if(ml&&!cells.some(c=>/^name$/i.test(c))){mon=MON.indexOf(ml[1].toLowerCase());if(ml[2])year=+ml[2];cols=null;block++;months.push([year,mon]);continue}
+    const ni=cells.findIndex(c=>/^name$/i.test(c));
+    if(ni>=0){cols={name:ni,days:{}};cells.forEach((c,i)=>{const n=Number(c);if(i>ni&&c!==""&&Number.isInteger(n)&&n>=1&&n<=31)cols.days[i]=n});continue}
+    if(!cols||mon==null)continue;const nm=cells[cols.name].replace(/\s+/g," ");if(!nm||/^(name|total|working)/i.test(nm)||/^\d+$/.test(nm))continue;
+    roster[nm]=block;const y=year||new Date().getFullYear();
+    Object.entries(cols.days).forEach(([i,dn])=>{const v=cells[i];if(!v)return;const d=new Date(y,mon,dn);if(d.getMonth()!==mon)return;recs.push({day:key(d),name:nm,code:v.toUpperCase()})})}
+  return recs.length?{sheet:sn,recs,roster,last:block,months}:null}
+function mapAttName(full){const st=D.staff,f=full.trim(),ex=st.find(s=>s.toLowerCase()===f.toLowerCase());if(ex)return ex;
+  const [a,b]=f.split(/\s+/);const c=st.filter(s=>{const [x,y]=s.split(/\s+/);if(!x||x.toLowerCase()!==a.toLowerCase())return false;if(!y)return true;const yi=y.replace(/\./g,"");return !!b&&(y.toLowerCase()===b.toLowerCase()||(yi.length<=2&&b.toLowerCase().startsWith(yi.toLowerCase())))});
+  return c.length===1?c[0]:f}
+function applyAttImport(att){if(!att)return 0;D.att=D.att||{};const map={},nameOf=f=>map[f]||(map[f]=mapAttName(f));let n=0;
+  Object.keys(att.roster).forEach(nameOf);
+  Object.entries(att.roster).forEach(([f,b])=>{if(b!==att.last)return;const nm=nameOf(f);if(!D.staff.some(s=>s.toLowerCase()===nm.toLowerCase())){D.staff.push(nm);unbury("staff:"+nm)}});
+  att.recs.forEach(({day,name,code})=>{if(code==="H")return;const c=ATCODE[code]||{s:"absent",r:"other",n:code};const nm=nameOf(name),d=D.att[day]=D.att[day]||{},cur=d[nm];if(cur&&cur.s&&cur.at!==AT_IMP)return;d[nm]={...c,at:AT_IMP};n++});
+  return n}
 function normCountry(c){c=String(c||"").trim();if(!c)return "";const m={"uae":"UAE","u.a.e":"UAE","ksa":"Saudi","saudi arabia":"Saudi"};return m[c.toLowerCase()]||c.charAt(0).toUpperCase()+c.slice(1)}
 
 /* ================= Excel export ================= */
