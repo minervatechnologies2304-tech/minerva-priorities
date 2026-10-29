@@ -1,5 +1,5 @@
 // Minerva Daily Priorities: works offline. Bump VERSION after each update.
-const VERSION="priorities-v31";
+const VERSION="priorities-v32";
 const CORE=["./","index.html","manifest.webmanifest","logo-white.png","icon.png","icon-192.png","icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(VERSION).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

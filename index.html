@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v31</title>
+<title>Minerva Priorities · v32</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -683,6 +683,11 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 @media (min-width:1900px){html{font-size:17px}.kpi b{font-size:28px}table.ptab{font-size:16px}.ce.ct{font-size:16.5px}.rph b{font-size:17px}.pqt b{font-size:17px}}
 @media (min-width:1500px){html.present .wrap{max-width:96vw}}
 #splash img{width:clamp(220px,28vw,560px)}
+#splash{flex-direction:column}
+#splash .spltag{position:relative;margin-top:clamp(18px,2.2vw,34px);color:rgba(255,255,255,.85);font-size:clamp(12px,1.05vw,17px);font-weight:600;letter-spacing:.34em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:opacity .6s ease .25s,transform .8s cubic-bezier(.32,.72,0,1) .25s}
+#splash .spltag i{display:inline-block;width:28px;height:1px;background:rgba(0,183,237,.85);vertical-align:middle;margin:0 14px 3px}
+#splash.in .spltag{opacity:1;transform:none}
+#splash.out .spltag{opacity:0;transition:opacity .3s ease}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .round{display:flex;flex-direction:column;gap:8px}
 .rperson{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:inset 4px 0 0 var(--line)}
@@ -698,11 +703,11 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 </style>
 </head>
 <body>
-<div id="splash" aria-hidden="true"><img src="logo-white.png" alt=""></div>
+<div id="splash" aria-hidden="true"><img src="logo-white.png" alt=""><div class="spltag"><i></i>Daily Priorities<i></i></div></div>
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v31</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v32</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1347,6 +1352,7 @@ const HELP=[
  {q:"Can I bring in old attendance from the Excel sheet?",k:"import old previous history attendance spreadsheet excel past months",a:"Yes. Importing the team's Excel brings in its \"Attendance\" sheet too, month by month.",s:["Go to Data & settings → Import your Excel sheet and choose the file.","The import box shows how many attendance marks it found. Click Import.","P = present, A = absent, VL/V = leave, BT = travel; H (holiday) is skipped. Days you already marked in the app are kept."],go:{tab:"set"}},
  {q:"How do I see someone's attendance record?",k:"attendance history record month percentage how often missed",a:"The Attendance tab shows the whole month for everyone, with an attendance %.",s:["Open the Attendance tab.","Scroll to the month grid: ✓ present, L late, ✕ absent. Hover a mark for the reason.","Use ‹ › to change month. Download Excel also includes an Attendance sheet."],go:{tab:"att"}},
  {q:"How do I give people view-only access?",k:"view only read only access share team everyone permission edit editors viewers link",a:"Send the view-only link to everyone and the editor link only to the 2–3 people who run the meeting.",s:["Go to Data & settings → Google Sheet backup → Share it with the team.","Copy view-only link and send it to the team. They can see everything, updated live, but can't change anything.","Copy editor link and send it privately to the 2–3 editors.","First time only: if the view-only link is greyed out, follow the one-time step shown there to update the Google script."],go:{tab:"set"}},
+ {q:"What is the Eisenhower Matrix?",k:"eisenhower matrix priority priorities urgent important do now schedule delegate later method quadrant why",a:"It's the method the app is built on: every task is sorted by whether it's urgent and whether it's important.",s:["Do now: important and urgent. Handle these first.","Schedule: important but not urgent. Plan a time for them.","Delegate: urgent but not important. Hand them to someone else where possible.","Later: neither urgent nor important. Do them when there's time, or drop them.","The meeting goes through the boxes in that order, and the Priority board shows all four side by side."],go:{tab:"board"}},
  {q:"Are there keyboard shortcuts?",k:"keyboard shortcut shortcuts keys quick fast arrow navigate",a:"Yes, when you're not typing in a box.",s:["1 to 8 jump to the tabs: 1 Run meeting, 2 All tasks, 3 Attendance, 4 Availability, 5 Priority board, 6 Summary, 7 Completed, 8 Data & settings.","In Run meeting, → goes to the next priority or step and ← goes back.","N adds a new task, ? opens Help, Esc closes a window or leaves full screen."]},
  {q:"A button isn't working, what do I do?",k:"not working broken error wrong nothing happens bug stuck problem",a:"Close the app and open it again so it loads the latest version.",s:["Close the app window and open it again (or press Ctrl + Shift + R in Chrome).","Try again.","If a \"Something went wrong\" message appears at the bottom, send Byron a screenshot."]}
 ];
@@ -1587,7 +1593,7 @@ function prioTasks(p){return pendAll().filter(t=>t.prio===p).sort(prioSort)}
 function renderPrioRun(){
   const R=S.run,m=M(),p=R.pq||1,list=prioTasks(p),left=q=>prioTasks(q).filter(t=>!pDiscussed(t)).length,L=lists();
   const staff=[...new Set(D.staff)].filter(Boolean).sort(byName);
-  let h=`<div class="pqbar" role="tablist">${[1,2,3,4].map(q=>{const n=prioTasks(q).length,l=left(q);return `<button class="pq${q===p?" on":""}${n&&!l?" fin":""}" data-rprio="${q}" style="--qc:var(--p${q})"><span class="qdot"></span><span class="pqt"><b>${PRIO[q].s}</b></span>${n?(l?`<i>${l} left</i>`:'<i class="ok">✓ Done</i>'):'<i class="g">—</i>'}</button>`}).join("")}</div><div>`;
+  let h=`<div class="pqbar" role="tablist">${[1,2,3,4].map(q=>{const n=prioTasks(q).length,l=left(q);return `<button class="pq${q===p?" on":""}${n&&!l?" fin":""}" data-rprio="${q}" style="--qc:var(--p${q})" title="Eisenhower Matrix: ${PRIO[q].l}"><span class="qdot"></span><span class="pqt"><b>${PRIO[q].s}</b></span>${n?(l?`<i>${l} left</i>`:'<i class="ok">✓ Done</i>'):'<i class="g">—</i>'}</button>`}).join("")}</div><div>`;
   h+=`<div class="phead"><span class="qbig" style="background:var(--p${p})"></span><div style="flex:1;min-width:0"><h2>${PRIO[p].s} <span style="font-weight:500;color:var(--muted);font-size:.7em">· ${PRIO[p].l}</span></h2><p>${list.filter(pDiscussed).length} of ${list.length} dealt with</p></div>
     <button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>
     ${p<4?`<button class="btn sm${list.length&&!left(p)?" ok glow":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
@@ -2072,8 +2078,8 @@ let day=todayKey();setInterval(()=>{if(todayKey()!==day){day=todayKey();snapshot
 window.__D=()=>D;
 (function(){const sp=document.getElementById("splash");if(!sp)return;let done=false;const H=document.documentElement;
   const go=()=>{if(done)return;done=true;H.classList.add("spl-go");void sp.offsetWidth;H.classList.remove("spl");sp.classList.add("out");setTimeout(()=>{sp.remove();H.classList.remove("spl-go")},1700)};
-  const wait=()=>setTimeout(go,Math.max(0,2500-performance.now()));
-  if(document.readyState==="complete")wait();else addEventListener("load",wait);setTimeout(go,5000)})();
+  const wait=()=>setTimeout(go,Math.max(0,1200-performance.now()));
+  if(document.readyState==="complete")wait();else addEventListener("load",wait);setTimeout(go,3500)})();
 if(/^https?:$/.test(location.protocol)&&"serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update().catch(()=>{});let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(reloaded||S.edit)return;reloaded=true;location.reload()})}).catch(()=>{}));
 })();
 </script>
