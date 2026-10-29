@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v23</title>
+<title>Minerva Priorities · v24</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -510,6 +510,17 @@ tr.grp td{background:var(--fill);font-size:13px;padding:8px 10px!important;borde
 .inp,.ce.upd,.radd .inp,.search input{box-shadow:var(--inset)}
 .inp:focus,.ce.upd:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .card{box-shadow:var(--elev)}
+/* ===== help ===== */
+.mbox:has(.help){width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column}
+.mbox:has(.help) .mh{display:flex;align-items:center;justify-content:space-between}
+.mb.help{overflow:auto;gap:12px}
+.hask{position:relative}.hask svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}.hask .inp{padding-left:40px;font-size:16px;height:46px;width:100%}
+.hans{background:var(--surface-2);border-radius:14px;padding:14px 16px;animation:rowIn .4s var(--spring) both}
+.hans h3{margin:0 0 4px;font-size:16px}.hans p{margin:0 0 6px}.hans ol{margin:6px 0 10px;padding-left:22px;line-height:1.55}.hans li{margin:3px 0}
+.hmore,.hpop{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.hmore span,.hlbl{font-size:12.5px;color:var(--muted);font-weight:600}.hlbl{width:100%;text-transform:uppercase;letter-spacing:.06em;font-size:11.5px}
+.hmore .chip,.hpop .chip{border:0;background:var(--surface-2);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;text-align:left}
+.hmore .chip:hover,.hpop .chip:hover{background:var(--fill2)}
+.hguide{border:1px solid var(--line);border-radius:14px;padding:10px 14px}.hguide summary{cursor:pointer;font-weight:700;font-size:15px}.hguide ol{padding-left:22px;line-height:1.55}.hguide li{margin:6px 0}
 /* ===== clean meeting screen ===== */
 .runhead .mdate{margin:2px 0 0;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .pq{padding:9px 14px}.pqt b{font-size:16px}
@@ -625,7 +636,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v23</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v24</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -636,6 +647,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
       <button data-tab="set" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>Data &amp; settings</button>
     </nav>
     <button class="hbtn" id="syncBtn" type="button" title="Google Sheet backup"></button>
+    <button class="hbtn" id="helpBtn" type="button" title="Help and questions (?)" aria-label="Help"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 4"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/></svg></button>
     <button class="hbtn" id="themeBtn" type="button" title="Light or dark mode"></button>
     <button class="hbtn" id="presentBtn" type="button" aria-pressed="false" title="Bigger text for screen sharing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="pl">Present</span></button>
     <button class="hbtn" id="newBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New task</button>
@@ -1192,6 +1204,71 @@ function renderSet(){
     <div class="panel"><h3>Start again</h3><p class="sub">Removes every task from this computer. Download a backup first.</p><button class="btn danger" data-act="wipe">Delete all tasks</button></div>
   </div>`;
 }
+
+/* ================= help: guide + ask a question ================= */
+const HELP=[
+ {q:"How do I run the morning meeting?",k:"run meeting start morning steps present how use",a:"Use the Run meeting tab. It goes in three steps: pending tasks, today's round of names, then the minutes.",s:["Open the Run meeting tab, share your screen and click Present for full screen.","Step 1, Pending priorities: go through Do now, Schedule, Delegate, then Later. For each task type the update and press Enter, or tick ✓ if it's done.","Step 2, Today's priorities: go down the names and ask \"Anything needed from your side?\". Type it and press Enter, or click Nothing today.","Step 3, Wrap-up: the minutes are written for you. Click Copy minutes, Open in email, or Download Excel."],go:{tab:"run",stage:"follow"}},
+ {q:"How do I add an update to a task?",k:"update note feedback progress comment write log add",a:"Type it in the task's update box and press Enter. It's saved with today's date.",s:["In Run meeting, find the task's \"Add update…\" box.","Type what the person says and press Enter.","The row turns green and the update shows under Latest update. Outside the meeting, open the task with ✏ and use the Updates box."],go:{tab:"run",stage:"follow"}},
+ {q:"Nothing has changed on a task, what do I do?",k:"no change same nothing skip unchanged",a:"Press Enter in the empty update box. It's marked \"No change\" and counted as dealt with.",s:["Click into the task's \"Add update…\" box.","Leave it empty and press Enter."]},
+ {q:"How do I mark a task as done?",k:"done complete completed finish finished tick close closed",a:"Click the ✓ button on the task. It moves to the Completed tab.",s:["Click ✓ at the right of the task (Run meeting or All tasks).","It moves to Completed. Changed your mind? Click Undo at the bottom straight away, or Reopen it from the Completed tab."]},
+ {q:"How do I change a due date?",k:"due date deadline target change move push extend postpone",a:"Click the date on the task and pick a new one.",s:["In Run meeting, click the date in the Due column.","Pick the new date. The \"Overdue\" or \"Due in…\" label updates straight away.","Or open the task with ✏ and use the quick buttons: Today, +1 day, +3 days, +1 week."]},
+ {q:"How do I change who is responsible for a task?",k:"owner responsible assign person change two people reassign",a:"Click the owner's name on the task and choose one or more people.",s:["Click the name in the Owner column (or open the task with ✏).","Tap each person who should own it; tap again to remove them. Two or more is fine.","Click Save. Someone new? Type their name in \"Add a new person\" first."]},
+ {q:"How do I add or remove a person from the team?",k:"person people team staff member add remove new delete rename name",a:"Manage the team in Data & settings → Team.",s:["Go to Data & settings.","Under Team, type a name and click Add.","Use Rename or Remove next to a name. Removing someone keeps their tasks."],go:{tab:"set"}},
+ {q:"How do I move a task to another priority?",k:"priority move urgent important change quadrant do now schedule delegate later",a:"Hover over the task and use \"Move to…\", or drag it on the Priority board.",s:["In Run meeting, hover over the task row.","Choose a priority in the \"Move to…\" box under the buttons.","Or go to the Priority board tab and drag the card into another box."]},
+ {q:"How do I add a new task?",k:"new task add create",a:"Click + New task at the top, or add it in today's round of names.",s:["Click + New task in the top bar.","Type the task, choose the people, priority and dates, then click Add task.","During the meeting, step 2 adds tasks straight from each person's box."]},
+ {q:"How do I edit a task's name, partner or country?",k:"edit change rename title name partner end user country bdm details",a:"Click straight into the text on the meeting screen, or open the full task with ✏.",s:["In Run meeting, click the task name and type. Hover over the row to edit partner and end user.","For everything else, click ✏ to open the full task.","Click Save."]},
+ {q:"How do I delete a task?",k:"delete remove task get rid",a:"Open the task with ✏ and use Delete, or Remove from list to keep it in Completed.",s:["Click ✏ on the task.","Remove from list takes it off without completing it (it stays findable in Completed).","Delete erases it and its updates. Use this for mistakes only."]},
+ {q:"I made a mistake, how do I undo it?",k:"undo mistake wrong back revert accident oops",a:"Click Undo in the message at the bottom of the screen right after the change.",s:["After most changes a message appears at the bottom with an Undo button.","It stays for about 7 seconds.","Missed it? Edit the task back, or restore yesterday's copy from Data & settings → Daily snapshots."]},
+ {q:"How do I log that someone is out for a client meeting?",k:"out away availability client meeting site visit travel training leave absent busy unavailable",a:"Log it in the Availability tab. It then shows in the meeting.",s:["Open the Availability tab and click Log time away (or click an empty box in the week).","Choose the person, the reason, the date, and From/To times or All day.","It shows in the Out today bar and next to their name in the meeting."],go:{tab:"away"}},
+ {q:"Someone isn't at the meeting, what do I do?",k:"absent missing not here away skip person nothing",a:"In step 2 click Nothing today for them, and log time away in Availability if they're out.",s:["Their pending tasks can still be updated by whoever knows, or left for tomorrow.","In Today's priorities, click Nothing today next to their name.","Anything not covered is listed in the minutes."]},
+ {q:"How do I email someone about an urgent task?",k:"email mail send urgent remind notify outlook",a:"Click ✉ on any Do now task. A ready-written email opens.",s:["Hover over a Do now task and click ✉.","Check or edit the message, then choose Open in Outlook web, Outlook app, or Copy email.","Add people's email addresses in Data & settings → Team so the To line fills in."]},
+ {q:"How do I export to Excel?",k:"export excel download spreadsheet xlsx report file",a:"Data & settings → Export → Download Excel, or from the meeting wrap-up.",s:["Go to Data & settings and click Download Excel under Export (or Download Excel on the Wrap-up screen).","You get Main sheet, Completed and Summary tabs, with names in A–Z order."],go:{tab:"set"}},
+ {q:"How do I import the Excel sheet?",k:"import excel upload spreadsheet load sheet old",a:"Data & settings → Import your Excel sheet.",s:["Click Download backup first, just in case.","Under Import your Excel sheet, choose the file.","Keep \"Replace the tasks already here\" to start fresh, then click Import."],go:{tab:"set"}},
+ {q:"Is my data saved and backed up?",k:"backup backed save saved google sheet sync cloud lost data safe",a:"Yes. Every change saves on this computer straight away and backs up to Google within about 20 seconds.",s:["Look at the button at the top: \"Saved\" with a cloud icon means it's backed up.","\"Not backed up\" means Google isn't connected yet: open Data & settings → Google Sheet backup.","Click it any time to see details and daily snapshots."]},
+ {q:"How do I use the app on another computer?",k:"another computer pc laptop share link colleague install other send",a:"Send the setup link from Data & settings. The other computer connects to the same Google backup.",s:["Go to Data & settings → Google Sheet backup and click Copy link.","Send it privately; it holds the backup key.","On the other computer open it in Chrome, click Connect, then install it as an app."],go:{tab:"set"}},
+ {q:"How do I install it as an app?",k:"install app desktop shortcut start menu chrome",a:"In Chrome, use the install icon in the address bar.",s:["Open the app in Chrome.","Click the install icon at the right end of the address bar, or ⋮ → Cast, save and share → Install page as app.","It opens from the desktop or Start menu from then on."]},
+ {q:"How do I present it full screen?",k:"present presenting full screen fullscreen big share screen projector bigger text",a:"Click Present in the top bar. Press Esc to leave.",s:["Share your screen in Teams first.","Click Present: the app goes full screen with larger text.","Press Esc, or click Present again, to exit."]},
+ {q:"How do I switch between dark and light mode?",k:"dark light mode theme colour color night",a:"Click the moon/sun button in the top bar.",s:["Click the moon or sun button next to Present.","For automatic (follows Windows), go to Data & settings → Appearance."]},
+ {q:"Where do completed tasks go? Can I bring one back?",k:"completed done finished history find reopen bring back restore old",a:"They're in the Completed tab, where you can search them or Reopen one.",s:["Open the Completed tab.","Search for the task.","Click Reopen to put it back on the list."],go:{tab:"done"}},
+ {q:"Where are tasks that start in the future?",k:"future later upcoming start tomorrow next week scheduled",a:"In All tasks. They join the meeting automatically on their start date.",s:["Open All tasks and group by Due date to see them in date order.","A task with a future start date stays out of the meeting until that day."],go:{tab:"meet"}},
+ {q:"Will today's priorities show up again tomorrow?",k:"tomorrow next day carry over pending today priorities again repeat",a:"Yes. Anything added in step 2 shows under Pending priorities from the next meeting until it's ticked ✓.",s:["Add it in Today's priorities.","Next meeting it's in its priority box under Pending priorities.","Tick ✓ when it's done and it moves to Completed."]},
+ {q:"What do Overdue and \"No update 2+ days\" mean?",k:"overdue late no update stale meaning label red orange working days",a:"Overdue means the due date has passed. \"No update 2+ days\" means nobody has added an update for two working days or more.",s:["Both count working days only (Monday to Friday, UAE holidays skipped).","Change the due date or add an update and the label clears."]},
+ {q:"Where are the meeting minutes?",k:"minutes summary wrap up notes recap record copy",a:"Step 3, Wrap-up, in the Run meeting tab.",s:["Click Finish and wrap up, or the Wrap-up step at the top.","Click Copy minutes, Open in email, or Download Excel."],go:{tab:"run",stage:"wrap"}},
+ {q:"How do I see one person's tasks?",k:"person filter one someone tasks show only individual",a:"In All tasks, click the person's name in the row of names.",s:["Open All tasks.","Click a name in the row under the search box.","Click Everyone to see all again."],go:{tab:"meet"}},
+ {q:"How do I find a task?",k:"search find look task where",a:"Use the search box in All tasks.",s:["Open All tasks.","Type part of the task, partner, person or an update in Search."],go:{tab:"meet"}},
+ {q:"Can I go through the meeting person by person instead?",k:"person by person style instead order change meeting way",a:"Yes. Data & settings → Morning meeting → Person by person.",s:["Go to Data & settings.","Under Morning meeting, choose Person by person."],go:{tab:"set"}},
+ {q:"How do I get back yesterday's data?",k:"restore recover snapshot yesterday lost deleted gone data back",a:"Use Daily snapshots or Restore a backup in Data & settings.",s:["Go to Data & settings.","Click Daily snapshots to pick a day, or Restore a backup to load a backup file you downloaded."],go:{tab:"set"}},
+ {q:"A button isn't working, what do I do?",k:"not working broken error wrong nothing happens bug stuck problem",a:"Close the app and open it again so it loads the latest version.",s:["Close the app window and open it again (or press Ctrl + Shift + R in Chrome).","Try again.","If a \"Something went wrong\" message appears at the bottom, send Byron a screenshot."]}
+];
+const HSYN={remove:"delete",delete:"remove",change:"edit",edit:"change",modify:"edit",done:"complete",complete:"done",completed:"done",finish:"done",finished:"done",tick:"done",owner:"responsible",assign:"responsible",responsible:"owner",due:"date",deadline:"due",date:"due",away:"out",leave:"away",absent:"away",holiday:"away",vacation:"leave",backup:"google",save:"backup",saved:"backup",sync:"backup",export:"excel",spreadsheet:"excel",xlsx:"excel",mail:"email",outlook:"email",fullscreen:"present",projector:"present",theme:"dark",new:"add",create:"add",people:"person",staff:"person",team:"person",colleague:"person",mistake:"undo",revert:"undo",note:"update",feedback:"update",comment:"update",upcoming:"future",later:"future",pc:"computer",laptop:"computer",recover:"restore",lost:"restore",summary:"minutes",recap:"minutes",search:"find",look:"find",error:"working",broken:"working",urgent:"priority"};
+const HSTOP=new Set("i a an the to do does can how what where when why is are it my me we our of in on for with and or be this that there here should would will you your please app want need get".split(" "));
+function hTokens(t){return String(t).toLowerCase().replace(/[^a-z0-9 ]+/g," ").split(/\s+/).filter(w=>w&&!HSTOP.has(w)).map(w=>w.replace(/(ing|ed|es|s)$/,m=>w.length>4?"":m))}
+function hSearch(t){const toks=hTokens(t);if(!toks.length)return [];
+  return HELP.map((h,i)=>{const words=new Set(hTokens(h.q+" "+h.k));let sc=0;toks.forEach(w=>{const alts=[w,HSYN[w]].filter(Boolean);if(alts.some(a=>words.has(a)))sc+=2;else if(w.length>=4&&[...words].some(x=>x.startsWith(w)||w.startsWith(x)&&x.length>=4))sc+=1});return {i,sc:sc/Math.sqrt(toks.length)}}).filter(r=>r.sc>0).sort((a,b)=>b.sc-a.sc)}
+function hAnswer(i){const h=HELP[i];return `<div class="hans"><h3>${esc(h.q)}</h3><p>${esc(h.a)}</p><ol>${h.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${h.go?`<button class="btn sm" data-hgo="${i}">Take me there ›</button>`:""}</div>`}
+function hResults(t){const r=hSearch(t);if(!t.trim())return "";if(!r.length)return `<div class="hans"><p><b>No answer for that yet.</b> Try other words, like “due date”, “backup” or “add a person”, or pick a question below. Still stuck? Ask Byron.</p></div>`;
+  return hAnswer(r[0].i)+(r.length>1?`<div class="hmore"><span>Also:</span>${r.slice(1,4).map(x=>`<button class="chip" data-hq="${x.i}">${esc(HELP[x.i].q)}</button>`).join("")}</div>`:"")}
+function openHelp(){
+  const pop=[0,1,3,4,5,12,14,17].map(i=>`<button class="chip" data-hq="${i}">${esc(HELP[i].q)}</button>`).join("");
+  modal(`<div class="mh"><h2>Help</h2><button class="icon" data-m="close" title="Close (Esc)">${IC.x}</button></div><div class="mb help">
+    <div class="hask">${IC.search}<input class="inp" id="hq" placeholder="Ask a question, e.g. how do I change a due date?" autocomplete="off"></div>
+    <div id="hres"></div>
+    <div class="hpop"><span class="hlbl">Common questions</span>${pop}</div>
+    <details class="hguide"><summary>How to run the morning meeting</summary>
+      <ol><li><b>Before:</b> open Run meeting, share your screen and click <b>Present</b>. Anyone out shows in the Out today bar.</li>
+      <li><b>Step 1, Pending priorities:</b> go through Do now → Schedule → Delegate → Later. For each task: type the update and press Enter, press Enter on an empty box for “no change”, or tick ✓ if done. Click the date, status or owner to change them.</li>
+      <li><b>Step 2, Today's priorities:</b> go down the names and ask “Anything needed from your side?”. Type it and press Enter, or click <b>Nothing today</b>.</li>
+      <li><b>Step 3, Wrap-up:</b> the minutes are written for you. Copy minutes, Open in email, or Download Excel.</li></ol>
+      <p class="hint">Everything saves as you type and backs up to Google. Undo appears at the bottom after each change.</p></details>
+  </div>`,ev=>{
+    const q=ev.target.closest("[data-hq]");if(q){const i=+q.dataset.hq;document.getElementById("hq").value=HELP[i].q;document.getElementById("hres").innerHTML=hAnswer(i);document.getElementById("hres").scrollIntoView({block:"nearest",behavior:"smooth"});return}
+    const g=ev.target.closest("[data-hgo]");if(g){const go=HELP[+g.dataset.hgo].go;closeModal();S.tab=go.tab;if(go.stage){S.run.stage=go.stage}S.anim=true;render();window.scrollTo({top:0});return}});
+  const x=document.getElementById("hq");let tm;x.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(()=>{document.getElementById("hres").innerHTML=hResults(x.value)},150)});
+  x.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();document.getElementById("hres").innerHTML=hResults(x.value)}});
+  setTimeout(()=>x.focus(),60);
+}
+document.getElementById("helpBtn").addEventListener("click",openHelp);
+document.addEventListener("keydown",e=>{if(e.key==="?"&&!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||"")&&document.getElementById("modal").hidden&&!S.edit){e.preventDefault();openHelp()}});
 
 /* ================= one-click urgent email ================= */
 function mailTask(t){
