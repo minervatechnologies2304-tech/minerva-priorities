@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v34</title>
+<title>Minerva Priorities · v35</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -723,6 +723,57 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 .round .radd:not(:focus-within):not(:hover) .fromin:placeholder-shown{opacity:.45}
 .round .radd .fromin:not(:placeholder-shown){border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent);font-weight:700}
 @media (max-width:760px){.round .radd{flex-wrap:wrap}.round .radd .fromin{flex:1 1 140px}}
+
+/* ===== refreshed motion (Nov): one timing system, cross-fading pages, lighter work for the browser ===== */
+:root{--spring:cubic-bezier(.32,.72,0,1);--ease-out:cubic-bezier(.22,1,.36,1);--t-fast:.16s;--t-base:.3s;--t-slow:.5s}
+header{view-transition-name:hdr}
+::view-transition-old(hdr){display:none}::view-transition-new(hdr){animation:none}
+::view-transition-old(root){animation:vtOut .2s var(--ease-out) both}
+::view-transition-new(root){animation:vtIn .34s var(--ease-out) both}
+@keyframes vtOut{to{opacity:0;transform:scale(.992)}}
+@keyframes vtIn{from{opacity:0}to{opacity:1}}
+/* page content: shorter, calmer cascade */
+@keyframes pageIn{from{opacity:0;transform:translate3d(calc(var(--dx,0px) * .5),var(--dy,6px),0)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translate3d(0,6px,0)}to{opacity:1;transform:none}}
+.enter>*{animation:pageIn .46s var(--spring) both}
+.enter>*:nth-child(2){animation-delay:.025s}.enter>*:nth-child(3){animation-delay:.05s}.enter>*:nth-child(4){animation-delay:.075s}.enter>*:nth-child(n+5){animation-delay:.1s}
+.enter .cas{animation:rowIn .42s var(--spring) both;animation-delay:calc(var(--i,0) * 16ms + 60ms)}
+/* buttons: transform-only press, no shadow/filter animation on every button */
+button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transform .3s var(--spring),background-color var(--t-base) var(--ease-out),color var(--t-base) var(--ease-out),border-color var(--t-base) var(--ease-out)}
+.btn:active,.icon:active,.opt:active,.chip:active,.awchip:active,.ownb:active,.rneed:active{transform:scale(.97);transition-duration:.08s}
+.pq:active,.step:active,.kpi:active,.rp:active{transform:scale(.98);transition-duration:.08s}
+.row{transition:transform .35s var(--spring),box-shadow .35s var(--ease-out)}
+@media (hover:hover){.row:hover{transform:translateY(-1px)}}
+/* fields: soft focus ring */
+.inp,.ce{transition:border-color var(--t-base) var(--ease-out),box-shadow var(--t-base) var(--ease-out),background-color var(--t-base) var(--ease-out),opacity var(--t-base) var(--ease-out)}
+.inp:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+/* sheets: no bounce, Apple-style spring; dim fades with a light blur */
+.modal:not([hidden]){animation:dimIn .3s var(--ease-out) both}
+.modal:not([hidden]) .mbox{animation:sheetIn .5s var(--spring) both}
+@keyframes sheetIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+.modal.out{animation:dimOut .2s var(--ease-out) both}.modal.out .mbox{animation:sheetOut .2s var(--ease-out) both}
+.drawer{transition:transform .55s var(--spring)}
+.scrim{transition:opacity .4s var(--ease-out);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.toast:not([hidden]){animation:toastUp .55s var(--spring) both}
+/* today's priorities: rows dim gently around the one you're typing in; new items glide in */
+.round .rperson{transition:background-color .3s var(--ease-out),opacity .3s var(--ease-out),box-shadow .35s var(--spring)}
+.round:has(.rperson:focus-within) .rperson:not(:focus-within){opacity:.62}
+.ritem.fresh{animation:itemIn .5s var(--spring) both}
+@keyframes itemIn{from{opacity:0;transform:translate3d(0,-6px,0) scale(.985);background:color-mix(in srgb,var(--accent) 14%,transparent)}to{opacity:1;transform:none}}
+.rneeds{animation:none}.rneed{transition:transform .3s var(--spring),background-color .25s var(--ease-out)}
+@media (hover:hover){.rneed:hover{transform:translateY(-1px)}}
+/* today's priorities layout: the text box never gets squeezed */
+.round .rperson{grid-template-columns:minmax(120px,200px) minmax(0,1fr) auto}
+.round .radd{flex-wrap:wrap;row-gap:6px}
+.round .radd .savew{flex:1 1 280px;min-width:min(280px,100%)}
+.round .radd .savew .inp{width:100%;min-width:0}
+.round .radd .fromin{flex:0 1 170px;min-width:130px}
+.round .radd .hov2{flex:0 0 118px}
+.round .ritem{flex-wrap:wrap;row-gap:2px}.round .ritem .ct{flex:1 1 220px;min-width:160px}
+.round .ritem .hov{margin-left:auto;display:inline-flex;flex:none}
+@media (max-width:1150px){.round .radd:not(:focus-within) .fromin:placeholder-shown,.round .radd:not(:focus-within) .hov2{display:none}.round .ritem .ct{flex:1 1 300px}.round .radd .savew{flex-basis:100%}.round .radd .fromin{flex:1 1 160px}.round .rperson{grid-template-columns:minmax(110px,160px) minmax(0,1fr)}.round .rend{grid-column:2;text-align:left;margin-top:-2px}.round .rend .btn{padding:4px 10px}}
+@media (max-width:760px){.round .rperson{grid-template-columns:1fr}.round .rend{grid-column:1}}
+@media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}.ritem.fresh{animation:none}.row:hover{transform:none}}
 </style>
 </head>
 <body>
@@ -730,7 +781,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v34</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v35</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1211,6 +1262,10 @@ function placeSegPills(old){view.querySelectorAll(".seg").forEach((sg,i)=>{const
   const o=old&&old[i];if(o&&o.key===sg.textContent.slice(0,60)&&!RM()){const dx=o.r.left-br.left;if(Math.abs(dx)>1)p.animate([{transform:`translateX(${dx}px)`,width:o.r.width+"px"},{transform:"none",width:br.width+"px"}],{duration:480,easing:"cubic-bezier(.32,.72,0,1)"})}})}
 addEventListener("resize",()=>placeTabPill(true));
 function render(){
+  if(S.anim&&S.vt&&!render.vt&&document.startViewTransition&&!RM()&&document.visibilityState==="visible"){render.vt=true;S.vt=false;
+    try{const t=document.startViewTransition(()=>renderNow());t.finished.finally(()=>{render.vt=false})}catch(e){render.vt=false;renderNow()}return}
+  S.vt=false;renderNow()}
+function renderNow(){
   const anim=!RM(),pageChange=S.anim,old=anim&&!pageChange?snapView():null,nums=anim&&!pageChange?snapNums():{m:new Map()},segs=snapSegs();
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));placeTabPill(false);
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
@@ -1654,7 +1709,7 @@ function renderTodayShared(){
       <div class="rph">${av(n)}<b>${esc(n)}</b>${aw.length?`<span class="rout" title="${esc(aw.map(a=>(AWT[a.type]||AWT.other)[0]+" "+awTime(a,tk)).join(", "))}">${esc((AWT[aw[0].type]||AWT.other)[0])}</span>`:""}</div>
       <div class="rmid">
       ${(()=>{const w=open().filter(t=>t.from===n);return w.length?`<div class="rneeds"><span class="rnl">${IC_FROM}Needed from ${esc(n)}</span>${w.map(t=>`<button type="button" class="rneed" data-open="${t.id}" title="${esc(t.title)}">${esc(ownersOf(t).join(" + "))}<i>${esc(t.title)}</i></button>`).join("")}</div>`:""})()}
-      ${items.map(t=>`<div class="ritem" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
+      ${items.map(t=>`<div class="ritem${S.fresh===t.id&&Date.now()-(S.freshT||0)<900?" fresh":""}" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
         <select class="spill p" data-pf="prio" data-id="${t.id}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
         <label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>
         <select class="fromsel${t.from?" on":""}" data-pf="from" data-id="${t.id}" title="Who this is needed from">${fromOpts(t.from,ownersOf(t))}</select>
@@ -1676,7 +1731,7 @@ function resolveFrom(v,owner){v=String(v||"").replace(/\s+/g," ").trim();if(!v)r
 function addForPerson(i,stay){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
   const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),from=fe?resolveFrom(fe.value,n):"";
   const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};if(from)t.from=from;
-  const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);save();render();
+  const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);S.fresh=t.id;S.freshT=Date.now();save();render();
   toast("Added for "+n+" · "+PRIO[prio].s+(from?" · from "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
   if(!stay)setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 const dShort=k=>k?dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"";
@@ -1842,7 +1897,7 @@ drawer.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="d-newp"
 scrim.addEventListener("click",()=>{if(S.edit){readDrawer();const E=S.edit;const orig=E.t.id&&find(E.t.id);const dirty=E.isNew?E.t.title:orig&&JSON.stringify({...orig,updates:0})!==JSON.stringify({...E.t,updates:0});if(dirty){saveDrawer(true)}else closeDrawer()}});
 
 /* ================= events ================= */
-document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.tab=b.dataset.tab;S.anim=true;render();window.scrollTo({top:0});if(S.tab==="set"&&G.url&&!gSnaps)gLoadSnaps()});
+document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.tab=b.dataset.tab;S.anim=true;S.vt=true;render();window.scrollTo({top:0});if(S.tab==="set"&&G.url&&!gSnaps)gLoadSnaps()});
 document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));
   try{if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}setTimeout(()=>placeTabPill(true),350)});
@@ -1946,7 +2001,7 @@ document.addEventListener("keydown",e=>{
   const a=document.activeElement;if(a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;if(S.edit||!document.getElementById("modal").hidden||e.ctrlKey||e.metaKey||e.altKey)return;
   if(e.key==="n"||e.key==="N"){e.preventDefault();openTask(null)}
   else if(e.key==="/"){e.preventDefault();const q=document.getElementById("q");q&&q.focus()}
-  else if(/^[1-8]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;render();window.scrollTo({top:0})}}
+  else if(/^[1-8]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;S.vt=true;render();window.scrollTo({top:0})}}
   else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="run"){e.preventDefault();
     if(S.run.stage==="wrap"){if(e.key==="ArrowLeft"){S.run.stage="today";S.anim=true;render()}return}
     const b=view.querySelector(e.key==="ArrowRight"?'.phead [data-act=rnext],.phead [data-act=pnext],.phead .btn[data-stage="today"],.phead .btn[data-stage="wrap"]':'.phead [data-act=rprev],.phead [data-act=pprev],.phead .btn[data-stage="follow"]');
