@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v33</title>
+<title>Minerva Priorities · v34</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -718,6 +718,11 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 .rneed{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);background:color-mix(in srgb,var(--warn) 9%,transparent);color:var(--text,inherit);border-radius:99px;padding:3px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
 .rneed i{font-style:normal;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .ftag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:99px;padding:1px 8px;margin-right:6px;white-space:nowrap}
+
+.round .radd .fromin{flex:0 0 170px;padding:7px 10px;transition:opacity .2s ease,border-color .2s ease}
+.round .radd:not(:focus-within):not(:hover) .fromin:placeholder-shown{opacity:.45}
+.round .radd .fromin:not(:placeholder-shown){border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent);font-weight:700}
+@media (max-width:760px){.round .radd{flex-wrap:wrap}.round .radd .fromin{flex:1 1 140px}}
 </style>
 </head>
 <body>
@@ -725,7 +730,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v33</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v34</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1641,7 +1646,7 @@ const addedFor=n=>{const m=M();return D.tasks.filter(t=>m.added.includes(t.id)&&
 const asked=n=>saidNone(n)||addedFor(n).length>0||!!attAbsent(todayKey(),n);
 function renderTodayShared(){
   const R=S.run,ppl=roundPeople(),done=ppl.filter(asked).length,left=pendAll().filter(t=>!pDiscussed(t)).length,tk=todayKey();
-  let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>${done} of ${ppl.length} asked · type and press Enter, or click Nothing today${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
+  let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>${done} of ${ppl.length} asked · type the priority, <b>Tab</b> to choose who it’s needed from, then <b>Enter</b>${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
     <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok glow":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
   const rowH=(n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
@@ -1654,22 +1659,25 @@ function renderTodayShared(){
         <label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>
         <select class="fromsel${t.from?" on":""}" data-pf="from" data-id="${t.id}" title="Who this is needed from">${fromOpts(t.from,ownersOf(t))}</select>
         <span class="hov"><button class="icon" data-open="${t.id}" title="Add details (partner, country, updates)">${IC.note}</button><button class="icon" data-act="tdel" data-id="${t.id}" title="Remove this">${IC.x}</button></span></div>`).join("")}
-      ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else? (Enter to add)":"Anything needed from "+esc(n)+"? (Enter to add)"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
-        <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
-        <select class="inp hov2 fromadd" id="tpf-${i}" title="Who it's needed from (optional)">${fromOpts("",[n])}</select></div>`}
+      ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else?":"Anything needed from "+esc(n)+"?"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
+        <input class="inp fromin" id="tpf-${i}" data-tpf="${esc(n)}" list="dl-from" placeholder="Needed from…" title="Who it's needed from (optional). Type a name, then Enter" autocomplete="off">
+        <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
       </div>
       <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
     </section>`};
   const dps=depts();
+  h+=`<datalist id="dl-from">${[...dps,...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned"&&!isDept(x)).sort(byName)].map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`${dps.length?`<div class="rgroup"><b>Departments</b><span>A priority for the whole department</span></div><div class="round dround">${dps.map((n,i)=>rowH(n,"d"+i)).join("")}</div><div class="rgroup"><b>People</b><span>Anything needed from your side?</span></div>`:""}<div class="round">${ppl.map((n,i)=>rowH(n,i)).join("")}</div>
     <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   return h;
 }
+function resolveFrom(v,owner){v=String(v||"").replace(/\s+/g," ").trim();if(!v)return "";const all=[...depts(),...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned")].filter(x=>x!==owner),lv=v.toLowerCase();
+  return all.find(x=>x.toLowerCase()===lv)||all.filter(x=>x.toLowerCase().startsWith(lv)).sort(byName)[0]||all.find(x=>x.toLowerCase().split(" ").some(w=>w.startsWith(lv)))||all.find(x=>x.toLowerCase().includes(lv))||normName(v)}
 function addForPerson(i,stay){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
-  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),from=fe?fe.value:"";
+  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),from=fe?resolveFrom(fe.value,n):"";
   const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};if(from)t.from=from;
   const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);save();render();
-  toast("Added for "+n+" · "+PRIO[prio].s+(from?" · needs "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
+  toast("Added for "+n+" · "+PRIO[prio].s+(from?" · from "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
   if(!stay)setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 const dShort=k=>k?dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"";
 function prow(t){
@@ -1895,14 +1903,19 @@ view.addEventListener("click",e=>{
 });
 view.addEventListener("keydown",e=>{
   if(e.target.dataset&&e.target.dataset.tp!=null&&e.key==="Enter"){e.preventDefault();addForPerson(e.target.id.slice(3));return}
+  if(e.target.dataset&&e.target.dataset.tpf!=null){const i=e.target.id.slice(4);
+    if(e.key==="Enter"){e.preventDefault();const tt=document.getElementById("tp-"+i);if(tt&&!tt.value.trim()){tt.focus();toast("Type the priority first");return}addForPerson(i);return}
+    if(e.key==="Escape"){e.target.value="";document.getElementById("tp-"+i)?.focus();return}}
   if(e.target.id&&e.target.id.startsWith("fb-")&&e.key==="Enter"){e.preventDefault();const id=e.target.id.slice(3);feedback(id,e.target.value.trim()?"upd":"same");return}
   if(e.target.id&&e.target.id.startsWith("qu-")){if(e.key==="Enter"){e.preventDefault();view.querySelector(`[data-act=qusave][data-id="${e.target.id.slice(3)}"]`).click()}else if(e.key==="Escape"){S.quickU=null;render()}return}
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
 view.addEventListener("click",e=>{const l=e.target.closest(".dpick");if(!l)return;const i=l.querySelector("input[type=date]");if(i&&i.showPicker){e.preventDefault();try{i.showPicker()}catch(_){i.focus()}}});
+view.addEventListener("focusout",e=>{const ft=e.target;if(ft&&ft.dataset&&(ft.dataset.tpf!=null||/^tpp-/.test(ft.id||""))){const i=ft.id.replace(/^tp[fp]-/,""),tt=document.getElementById("tp-"+i),box=ft.closest(".radd");
+    if(tt&&tt.value.trim()&&!(e.relatedTarget&&box&&box.contains(e.relatedTarget)))setTimeout(()=>{const x=document.getElementById("tp-"+i);if(x&&x.value.trim()&&!(document.activeElement&&box&&box.contains(document.activeElement)))addForPerson(i,true)},0);return}});
 view.addEventListener("focusout",e=>{const t=e.target;if(!t||!t.id||!t.value||!t.value.trim())return;
   const isU=t.id.startsWith("fb-"),isP=t.id.startsWith("tp-");if(!isU&&!isP)return;
-  const box=t.closest(".savew,tr,.fu,.rperson");if(e.relatedTarget&&box&&box.contains(e.relatedTarget))return;
+  const box=isP?t.closest(".radd"):t.closest(".savew,tr,.fu,.rperson");if(e.relatedTarget&&box&&box.contains(e.relatedTarget))return;
   setTimeout(()=>{const x=document.getElementById(t.id);if(!x||!x.value.trim())return;if(isU)feedback(t.id.slice(3),"upd",true);else addForPerson(t.id.slice(3),true)},0)});
 view.addEventListener("submit",e=>{e.preventDefault();
   if(e.target.id==="deptForm"){const x=document.getElementById("deptName"),n=x.value.replace(/\s+/g," ").trim();if(!n){x.focus();return}
