@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v32</title>
+<title>Minerva Priorities · v33</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -700,6 +700,24 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 .radd{display:flex;gap:8px;margin:8px 0 0 34px;flex-wrap:wrap}.radd .inp:first-child{flex:1 1 300px}.radd select{flex:0 0 130px}
 .rnone{margin:6px 0 0 34px;color:var(--muted);font-size:13px}
 .padd{display:flex;gap:8px;flex-wrap:wrap;padding:10px 4px 6px;border-top:1px dashed var(--line);margin-top:4px}.padd #pa-title{flex:1 1 280px}.padd select{flex:0 1 180px}.padd input[type=date]{flex:0 0 150px}
+
+/* ===== departments + needed from ===== */
+.av.dept{display:inline-grid;place-items:center;border-radius:9px}
+.av.dept svg{width:62%;height:62%}
+.rgroup{display:flex;align-items:baseline;gap:10px;margin:14px 2px 8px}.rgroup b{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.rgroup span{font-size:13px;color:var(--muted)}
+.rgroup:first-of-type{margin-top:4px}
+.round.dround{margin-bottom:6px}
+.round.dround .rperson{background:color-mix(in srgb,var(--accent) 3%,transparent)}
+.fromsel{appearance:none;-webkit-appearance:none;border:1px dashed var(--line2,var(--line));background:transparent;color:var(--muted);border-radius:99px;padding:2px 10px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;max-width:170px;text-overflow:ellipsis}
+.fromsel.on{border-style:solid;border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:700}
+.round .ritem:not(:hover):not(:focus-within) .fromsel:not(.on){opacity:.55}
+.round .radd .fromadd{flex:0 0 150px}
+.rneeds{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:2px 6px 6px}
+.rnl{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--warn)}
+.rnl svg,.ftag svg{width:13px;height:13px}
+.rneed{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);background:color-mix(in srgb,var(--warn) 9%,transparent);color:var(--text,inherit);border-radius:99px;padding:3px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.rneed i{font-style:normal;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.ftag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:99px;padding:1px 8px;margin-right:6px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -707,7 +725,7 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v32</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v33</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -886,12 +904,13 @@ const PRIO={1:{k:"p1",l:"Important and Urgent",s:"Do now"},2:{k:"p2",l:"Importan
 const STATUS={ns:"Not started",on:"Ongoing",wait:"Waiting",done:"Completed"};
 const DEFAULT_STAFF=[];
 let D=load();
-function blank(){return {v:1,tasks:[],away:[],att:{},staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
+function defDepts(){return ["Sales","Finance","CSR"]}
+function blank(){return {v:1,tasks:[],away:[],att:{},depts:defDepts(),staff:DEFAULT_STAFF.slice(),seen:{},meet:{},created:new Date().toISOString(),lastBackup:null}}
 function noWait(o){if(o&&o.gone){const lim=new Date();lim.setDate(lim.getDate()-90);const lk=lim.getFullYear()+"-"+String(lim.getMonth()+1).padStart(2,"0")+"-"+String(lim.getDate()).padStart(2,"0");Object.keys(o.gone).forEach(k=>{if(o.gone[k]<lk)delete o.gone[k]})}const seen=new Set();(o&&o.tasks||[]).forEach(t=>{if(t.status==="wait")t.status="on";
   let id=t.id==null||t.id===""?"":String(t.id);if(!id||seen.has(id))id=Date.now().toString(36)+Math.random().toString(36).slice(2,7);t.id=id;seen.add(id);
   if(!Array.isArray(t.owners))t.owners=t.owners?String(t.owners).split(/\s*[\/,&+]\s*/).filter(Boolean):[];
   if(!Array.isArray(t.updates))t.updates=[];t.title=String(t.title==null?"":t.title)});
-  if(o&&!Array.isArray(o.staff))o.staff=[];return o}
+  if(o&&!Array.isArray(o.staff))o.staff=[];if(o&&!Array.isArray(o.depts))o.depts=defDepts();return o}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return noWait({...blank(),...o})}}catch(e){}return blank()}
 let saveT=null, storageOk=true;
 function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
@@ -928,7 +947,16 @@ const HUES=[205,160,22,276,340,190,40,250,4,130,300,95];
 function hue(n){let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))>>>0;return HUES[h%HUES.length]}
 function color(n){return "hsl("+hue(n)+" 55% 42%)"}
 function initials(n){const p=String(n||"?").trim().split(/\s+/);return ((p[0]||"?")[0]+(p.length>1?p[p.length-1][0]:(p[0][1]||""))).toUpperCase()}
-const av=n=>`<span class="av" style="--h:${hue(n)}" title="${esc(n)}">${esc(initials(n))}</span>`;
+const depts=()=>((typeof D!=="undefined"&&D&&D.depts)||[]).slice();
+const isDept=n=>depts().includes(n);
+const DEPT_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5M17.5 14.5a5.5 5.5 0 0 1 3 4.5"/></svg>';
+const av=n=>isDept(n)?`<span class="av dept" style="--h:${hue(n)}" title="${esc(n)} department">${DEPT_IC}</span>`:`<span class="av" style="--h:${hue(n)}" title="${esc(n)}">${esc(initials(n))}</span>`;
+/* "needed from": who a priority depends on (a person or a department) */
+function fromOpts(cur,exclude,blankLabel){exclude=exclude||[];const ds=depts().filter(n=>!exclude.includes(n)),ps=[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned"&&!exclude.includes(n)&&!isDept(n)).sort(byName);
+  if(cur&&!ds.includes(cur)&&!ps.includes(cur))ps.unshift(cur);
+  return `<option value="">${blankLabel||"Needed from…"}</option>${ds.length?`<optgroup label="Departments">${ds.map(n=>`<option value="${esc(n)}"${n===cur?" selected":""}>From ${esc(n)}</option>`).join("")}</optgroup>`:""}<optgroup label="People">${ps.map(n=>`<option value="${esc(n)}"${n===cur?" selected":""}>From ${esc(n)}</option>`).join("")}</optgroup>`}
+const ftag=t=>t.from?`<span class="ftag" title="Needed from ${esc(t.from)}">${IC_FROM}From <b>${esc(t.from)}</b></span>`:"";
+const IC_FROM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>';
 function lastUpdate(t){return (t.updates||[]).slice().sort((a,b)=>(b.date+(b.at||"")).localeCompare(a.date+(a.at||"")))[0]||null}
 function lastTouch(t){const u=lastUpdate(t);const s=D.seen[t.id];return [u&&u.date,s].filter(Boolean).sort().pop()||t.start||""}
 const seenToday=t=>{const tk=todayKey();const u=lastUpdate(t);return D.seen[t.id]===tk||(u&&u.date===tk)};
@@ -1242,7 +1270,7 @@ function row(t){
   const d=dueInfo(t), u=lastUpdate(t), n=(t.updates||[]).length, st=staleDays(t), seen=seenToday(t);
   const meta=[t.partner&&`<b>${esc(t.partner)}</b>${t.endUser?" → "+esc(t.endUser):""}`,!t.partner&&t.endUser&&`<b>${esc(t.endUser)}</b>`,t.country&&esc(t.country),t.bdm&&"BDM "+esc(t.bdm)].filter(Boolean).join(" · ");
   return `<article class="row p${t.prio}${seen?" seen":""}" data-id="${t.id}" tabindex="0">
-    <div><div class="t">${esc(t.title)}</div>${meta?`<div class="meta">${meta}</div>`:""}</div>
+    <div><div class="t">${esc(t.title)}</div>${meta||t.from?`<div class="meta">${ftag(t)}${meta}</div>`:""}</div>
     <div class="right">
       ${seen?`<span class="seentag">✓ Discussed</span>`:st>=2?`<span class="stale" title="Last update ${esc(fmt(lastTouch(t)))}">No update ${st} days</span>`:""}
       <span class="due ${d.c}">${esc(d.l)}</span>
@@ -1309,6 +1337,9 @@ function renderSet(){
     <div class="panel"><h3>Team</h3><p class="sub">People who can own tasks. Names you pick from here always match, so the summary counts are right.</p>
       <form class="addrow" id="staffForm" autocomplete="off"><input class="inp" id="staffName" placeholder="Add a person, e.g. Byron" maxlength="40"><button class="btn" type="submit">${IC.plus}Add</button></form>
       <ul class="staff">${staff.map(n=>{const k=open().filter(t=>ownersOf(t).includes(n)).length;return `<li>${av(n)}<span>${esc(n)}</span><input class="inp em" type="email" data-email="${esc(n)}" value="${esc((D.emails||{})[n]||"")}" placeholder="Email (for urgent-task emails)" autocomplete="off"><small style="color:var(--muted)">${k} open</small><button class="btn ghost sm" data-act="rename" data-name="${esc(n)}">Rename</button><button class="btn ghost sm" data-act="rmstaff" data-name="${esc(n)}">Remove</button></li>`}).join("")}</ul></div>
+    <div class="panel"><h3>Departments</h3><p class="sub">Give a priority to a whole department in Today's priorities, or pick one as “Needed from”. Add an email to include them in urgent-task emails.</p>
+      <form class="addrow" id="deptForm" autocomplete="off"><input class="inp" id="deptName" placeholder="Add a department, e.g. Logistics" maxlength="30"><button class="btn" type="submit">${IC.plus}Add</button></form>
+      <ul class="staff">${depts().map(n=>{const k=open().filter(t=>ownersOf(t).includes(n)).length;return `<li>${av(n)}<span>${esc(n)}</span><input class="inp em" type="email" data-email="${esc(n)}" value="${esc((D.emails||{})[n]||"")}" placeholder="Department email (optional)" autocomplete="off"><span class="hint">${k} open</span><button class="icon" data-act="rmdept" data-name="${esc(n)}" title="Remove ${esc(n)}">${IC.x}</button></li>`}).join("")}</ul></div>
     <div class="panel"><h3>Appearance</h3><p class="sub">Present mode makes the text bigger for screen sharing.</p>
       <div class="seg">${[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${(localStorage.getItem("minerva-tracker:theme")||"auto")===k}">${l}</button>`).join("")}</div></div>
     <div class="panel"><h3>Start again</h3><p class="sub">Removes every task from this computer. Download a backup first.</p><button class="btn danger" data-act="wipe">Delete all tasks</button></div>
@@ -1613,27 +1644,32 @@ function renderTodayShared(){
   let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>${done} of ${ppl.length} asked · type and press Enter, or click Nothing today${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
     <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok glow":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
-  h+=`<div class="round">${ppl.map((n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
+  const rowH=(n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
     return `<section class="rperson${items.length||none?" asked":""}${attAbsent(tk,n)&&!items.length&&!none?" absent":""}" data-person="${esc(n)}">
       <div class="rph">${av(n)}<b>${esc(n)}</b>${aw.length?`<span class="rout" title="${esc(aw.map(a=>(AWT[a.type]||AWT.other)[0]+" "+awTime(a,tk)).join(", "))}">${esc((AWT[aw[0].type]||AWT.other)[0])}</span>`:""}</div>
       <div class="rmid">
+      ${(()=>{const w=open().filter(t=>t.from===n);return w.length?`<div class="rneeds"><span class="rnl">${IC_FROM}Needed from ${esc(n)}</span>${w.map(t=>`<button type="button" class="rneed" data-open="${t.id}" title="${esc(t.title)}">${esc(ownersOf(t).join(" + "))}<i>${esc(t.title)}</i></button>`).join("")}</div>`:""})()}
       ${items.map(t=>`<div class="ritem" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
         <select class="spill p" data-pf="prio" data-id="${t.id}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
         <label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>
+        <select class="fromsel${t.from?" on":""}" data-pf="from" data-id="${t.id}" title="Who this is needed from">${fromOpts(t.from,ownersOf(t))}</select>
         <span class="hov"><button class="icon" data-open="${t.id}" title="Add details (partner, country, updates)">${IC.note}</button><button class="icon" data-act="tdel" data-id="${t.id}" title="Remove this">${IC.x}</button></span></div>`).join("")}
       ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else? (Enter to add)":"Anything needed from "+esc(n)+"? (Enter to add)"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
-        <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
+        <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
+        <select class="inp hov2 fromadd" id="tpf-${i}" title="Who it's needed from (optional)">${fromOpts("",[n])}</select></div>`}
       </div>
       <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}">Nothing today</button>`}</div>
-    </section>`}).join("")}</div>
+    </section>`};
+  const dps=depts();
+  h+=`${dps.length?`<div class="rgroup"><b>Departments</b><span>A priority for the whole department</span></div><div class="round dround">${dps.map((n,i)=>rowH(n,"d"+i)).join("")}</div><div class="rgroup"><b>People</b><span>Anything needed from your side?</span></div>`:""}<div class="round">${ppl.map((n,i)=>rowH(n,i)).join("")}</div>
     <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length?" ok":""}" data-stage="wrap">Finish and wrap up ›</button></div>`;
   return h;
 }
 function addForPerson(i,stay){const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
-  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1;
-  const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};
+  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),from=fe?fe.value:"";
+  const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};if(from)t.from=from;
   const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);save();render();
-  toast("Added for "+n+" · "+PRIO[prio].s,()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
+  toast("Added for "+n+" · "+PRIO[prio].s+(from?" · needs "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
   if(!stay)setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 const dShort=k=>k?dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"";
 function prow(t){
@@ -1643,7 +1679,7 @@ function prow(t){
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
     <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}>
       <div class="ppx${t.partner||t.endUser?"":" noval"}"><input class="ce sm${t.partner?"":" blank"}" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span class="arr${t.partner&&t.endUser?"":" blank"}">→</span><input class="ce sm${t.endUser?"":" blank"}" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>
-      ${meta||tag?`<div class="mline">${meta?`<span>${esc(meta)}</span>`:""}${tag?`<span class="dtag">${tag}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div>`:""}</td>
+      ${meta||tag||t.from?`<div class="mline">${ftag(t)}${meta?`<span>${esc(meta)}</span>`:""}${tag?`<span class="dtag">${tag}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div>`:""}</td>
     <td class="c-own"><button type="button" class="ownb" data-act="pown" data-id="${t.id}" title="Change who is responsible">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</button></td>
     <td class="c-st">${done?`<span class="spill done">Completed</span>`:`<select class="spill ${t.status}" data-pf="status" data-id="${t.id}" title="Change status">${["ns","on"].map(k=>`<option value="${k}"${t.status===k?" selected":""}>${STATUS[k]}</option>`).join("")}</select>`}</td>
     <td class="c-dt"><label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}
@@ -1655,7 +1691,7 @@ function prow(t){
   </tr>`;
 }
 function openOwners(id){const t=find(id);if(!t)return;let sel=(t.owners||[]).slice();
-  const draw=()=>{const staff=[...new Set([...D.staff,...sel])].filter(Boolean).sort(byName);
+  const draw=()=>{const staff=[...depts(),...[...new Set([...D.staff,...sel])].filter(n=>n&&!isDept(n)).sort(byName)];
     modal(`<div class="mh"><h2>Who is responsible?</h2></div><div class="mb"><p class="hint" style="margin:0">${esc(t.title)}. Tap to choose one or more people, tap again to remove.</p>
       <div class="ochips">${staff.map(n=>`<button class="opt" data-ow="${esc(n)}" aria-pressed="${sel.includes(n)}">${av(n)}${esc(n)}${sel.includes(n)?" ✓":""}</button>`).join("")}</div>
       <div class="addrow"><input class="inp" id="ow-new" placeholder="Add a new person" maxlength="40" autocomplete="off"><button class="btn ghost sm" data-ow-add="1">${IC.plus}Add</button></div></div>
@@ -1690,13 +1726,13 @@ function feedback(id,kind,stay){
   toast(kind==="done"?"Completed: moved to the Completed list":OUT[kind][0],()=>{Object.assign(t,prev);if(prevO)m.f[id]=prevO;else delete m.f[id]});
 }
 function minutes(){
-  const tk=todayKey(), m=M(), d=new Date(), L=[], line=t=>"  • "+t.title+(t.partner?" ("+t.partner+")":"")+" – "+ownersOf(t).join(", ");
+  const tk=todayKey(), m=M(), d=new Date(), L=[], line=t=>"  • "+t.title+(t.partner?" ("+t.partner+")":"")+" – "+ownersOf(t).join(", ")+(t.from?" (needs "+t.from+")":"");
   L.push("Morning meeting – "+d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"}));L.push("");
   const fx=k=>Object.keys(m.f).filter(id=>m.f[id]===k).map(find).filter(Boolean);
   const done=fx("done"), upd=fx("upd"), wait=fx("wait"), added=m.added.map(find).filter(Boolean);
   if(done.length){L.push("Completed ("+done.length+")");done.forEach(t=>L.push(line(t)));L.push("")}
   if(upd.length||wait.length){L.push("Updates ("+(upd.length+wait.length)+")");[...upd,...wait].forEach(t=>{const u=lastUpdate(t);L.push(line(t)+(t.status==="wait"?" [Waiting]":"")+(u&&u.date===tk?": "+u.text:""))});L.push("")}
-  if(added.length){L.push("New priorities ("+added.length+")");added.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push("  • "+ownersOf(t).join(", ")+": "+t.title+" ["+PRIO[t.prio].s+(t.target?", due "+fmt(t.target,{day:"numeric",month:"short"}):"")+"]"));L.push("")}
+  if(added.length){L.push("New priorities ("+added.length+")");added.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push("  • "+ownersOf(t).join(", ")+": "+t.title+(t.from?" (needs "+t.from+")":"")+" ["+PRIO[t.prio].s+(t.target?", due "+fmt(t.target,{day:"numeric",month:"short"}):"")+"]"));L.push("")}
   const over=open().filter(isOver);if(over.length){L.push("Still overdue ("+over.length+")");over.sort((a,b)=>byName(ownersOf(a)[0],ownersOf(b)[0])).forEach(t=>L.push(line(t)+" – "+dueInfo(t).l));L.push("")}
   {const ab=attPeople().map(n=>[n,attAbsent(tk,n)]).filter(x=>x[1]),late=attPeople().filter(n=>{const r=attGet(tk,n);return r&&r.s==="late"});const st=attStats(tk);
     if(st.n-st.unmarked>0){L.push("Attendance: "+st.here+" of "+st.n+" present"+(late.length?" (late: "+late.join(", ")+")":""));if(ab.length)L.push("Absent: "+ab.map(([n,r])=>n+(r.r?" ("+(ATR[r.r]||r.r)+(r.n?", "+r.n:"")+")":"")).join("; "));L.push("")}}
@@ -1726,7 +1762,7 @@ function closeDrawer(){S.edit=null;scrim.classList.remove("on");drawer.classList
 function lists(){const u=k=>[...new Set(D.tasks.map(t=>t[k]).filter(Boolean))].sort(byName);return {partner:u("partner"),endUser:u("endUser"),country:[...new Set([...u("country"),"UAE","Saudi","Qatar","Kuwait","Oman","Bahrain","Iraq","Jordan","Lebanon","Egypt","Pakistan","Yemen"])].sort(byName)}}
 function renderDrawer(){
   const E=S.edit; if(!E){return} const t=E.t, L=lists();
-  const staff=[...new Set([...D.staff,...t.owners])].sort(byName);
+  const staff=[...depts(),...[...new Set([...D.staff,...t.owners])].filter(n=>!isDept(n)).sort(byName)];
   const ups=(t.updates||[]).slice().sort((a,b)=>(b.date+(b.at||"")).localeCompare(a.date+(a.at||"")));
   drawer.innerHTML=`<div class="dhead"><h2>${E.isNew?"New task":"Task"}</h2>${!E.isNew?`<span class="due ${dueInfo(t).c}">${esc(dueInfo(t).l)}</span>`:""}<button class="icon" data-d="close" title="Close (Esc)">${IC.x}</button></div>
   <div class="dbody">
@@ -1740,6 +1776,7 @@ function renderDrawer(){
     <div><span class="lbl">Responsible <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· tap to choose one or more people, tap again to remove</span></span>
       <div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}${t.owners.includes(n)?" ✓":""}</button>`).join("")}</div>
       <p class="hint" style="margin:6px 0 0">${t.owners.length?"Responsible: <b>"+t.owners.map(esc).join(" + ")+"</b>":"No one chosen yet"}</p>
+      <div style="margin-top:10px"><label class="lbl" for="d-from">Needed from <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· optional: the person or department they need something from</span></label><select class="inp" id="d-from">${fromOpts(t.from||"",t.owners,"No one")}</select></div>
       <div class="addrow" style="margin-top:8px"><input class="inp" id="d-newp" placeholder="Add a new person, e.g. Byron" maxlength="40" autocomplete="off"><button class="btn ghost sm" data-d="addp">${IC.plus}Add</button></div></div>
     <div class="g2"><div><label class="lbl" for="d-start">Start date</label><input class="inp" type="date" id="d-start" value="${esc(t.start||"")}"></div>
       <div><label class="lbl" for="d-target">Target date</label><input class="inp" type="date" id="d-target" value="${esc(t.target||"")}">
@@ -1754,7 +1791,7 @@ function renderDrawer(){
   <div class="dfoot"><button class="btn" data-d="save">${E.isNew?IC.plus+"Add task":"Save"}</button>${!E.isNew?`<button class="btn ok" data-d="done">${IC.check}Mark completed</button>${t.prio===1?`<button class="btn mail" data-d="mail" title="Email the people responsible about this urgent task" aria-label="Email about this urgent task" style="padding-left:11px;padding-right:11px">${IC.mail}</button>`:""}<span class="spacer"></span><button class="btn ghost sm" data-d="remove" title="Take it off the list without completing it">Remove from list</button><button class="btn danger sm" data-d="delete">Delete</button>`:`<button class="btn ghost" data-d="close">Cancel</button>`}</div>`;
 }
 function readDrawer(){const E=S.edit,t=E.t,v=id=>{const x=document.getElementById(id);return x?x.value:null};
-  const g=(id,k)=>{const x=v(id);if(x!=null)t[k]=x.trim()};g("d-title","title");g("d-partner","partner");g("d-end","endUser");g("d-country","country");g("d-bdm","bdm");g("d-start","start");g("d-target","target");
+  const g=(id,k)=>{const x=v(id);if(x!=null)t[k]=x.trim()};g("d-title","title");g("d-partner","partner");g("d-end","endUser");g("d-country","country");g("d-bdm","bdm");g("d-start","start");g("d-target","target");{const fx=v("d-from");if(fx!=null){if(fx)t.from=fx;else delete t.from}}
   const nu=v("d-newu");if(nu!=null)E.newU=nu;const nd=v("d-newud");if(nd)E.newUDate=nd}
 function saveDrawer(close){
   readDrawer();const E=S.edit,t=E.t;
@@ -1848,6 +1885,7 @@ view.addEventListener("click",e=>{
     case "backup":backup();break;
     case "snaps":showSnaps();break;
     case "wipe":confirmBox("Delete all tasks?","Every task on this computer will be removed. Download a backup first if you might need them.","Delete everything",()=>{const prev=JSON.parse(JSON.stringify(D));bury(...D.tasks.map(t=>t.id));D.tasks=[];D.meet={};D.seen={};save();render();toast("All tasks deleted",()=>{D=prev})},true);break;
+    case "rmdept":{const n=b.dataset.name,k=open().filter(t=>ownersOf(t).includes(n)).length;confirmBox("Remove "+n+"?",k?n+" has "+k+" open "+(k===1?"priority":"priorities")+". They stay on the list, just no longer as a department.":"It won't appear in Today's priorities any more.","Remove",()=>{const prev=D.depts.slice();D.depts=D.depts.filter(x=>x!==n);save();render();toast(n+" removed",()=>{D.depts=prev})});break}
     case "rmstaff":{const n=b.dataset.name;D.staff=D.staff.filter(x=>x!==n);bury("staff:"+n);save();render();toast(n+" removed from the team list")}break;
     case "rename":{const n=b.dataset.name;modal(`<div class="mh"><h2>Rename ${esc(n)}</h2></div><div class="mb"><input class="inp" id="rn" value="${esc(n)}" maxlength="40"><p class="hint" style="margin:0">Their tasks are updated too.</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Rename</button></div>`,ev=>{
       if(!ev.target.closest("[data-m=ok]"))return;const nn=document.getElementById("rn").value.trim();if(!nn)return;closeModal();D.staff=D.staff.map(x=>x===n?nn:x);if(D.emails&&D.emails[n]){D.emails[nn]=D.emails[n];delete D.emails[n]}(D.away||[]).forEach(a=>{if(a.person===n)a.person=nn});Object.values(D.meet||{}).forEach(m=>{m.skip=(m.skip||[]).map(x=>x==="none:"+n?"none:"+nn:x==="follow:"+n?"follow:"+nn:x)});bury("staff:"+n);unbury("staff:"+nn);D.tasks.forEach(t=>{t.owners=(t.owners||[]).map(o=>o===n?nn:o);if(t.bdm===n)t.bdm=nn});save();render();toast("Renamed to "+nn)});setTimeout(()=>{const x=document.getElementById("rn");x&&x.select()},30);break}
@@ -1867,6 +1905,10 @@ view.addEventListener("focusout",e=>{const t=e.target;if(!t||!t.id||!t.value||!t
   const box=t.closest(".savew,tr,.fu,.rperson");if(e.relatedTarget&&box&&box.contains(e.relatedTarget))return;
   setTimeout(()=>{const x=document.getElementById(t.id);if(!x||!x.value.trim())return;if(isU)feedback(t.id.slice(3),"upd",true);else addForPerson(t.id.slice(3),true)},0)});
 view.addEventListener("submit",e=>{e.preventDefault();
+  if(e.target.id==="deptForm"){const x=document.getElementById("deptName"),n=x.value.replace(/\s+/g," ").trim();if(!n){x.focus();return}
+    if(depts().some(d=>d.toLowerCase()===n.toLowerCase())){toast(n+" is already a department");return}
+    if(D.staff.some(d=>d.toLowerCase()===n.toLowerCase())){toast(n+" is already a person on the team");return}
+    D.depts=[...depts(),n];save();render();toast(n+" added");setTimeout(()=>{const y=document.getElementById("deptName");y&&y.focus()},0);return}
   if(e.target.id==="paddForm"){const x=document.getElementById("pa-title"),title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}const R=S.run,who=document.getElementById("pa-who").value,due=document.getElementById("pa-due").value,pe=document.getElementById("pa-prio");R.paWho=who;R.paDue=due;if(pe)R.np=+pe.value;
     const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:who?[who]:[],prio:pe?+pe.value:(R.pq||1),status:"ns",start:todayKey(),target:due||"",updates:[],created:new Date().toISOString()};
     D.tasks.push(t);M().added.push(t.id);D.seen[t.id]=todayKey();save();render();toast("Added to "+PRIO[t.prio].s+(who?" for "+who:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("pa-title");y&&y.focus()},0);return}
@@ -1877,6 +1919,7 @@ view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.pf){con
     if(f==="title"){v=v.replace(/\s+/g," ").trim();if(!v){e.target.value=t.title;return}}
     if(f==="prio"){const was=t.prio;t.prio=+v;D.seen[t.id]=todayKey();save();render();toast("Moved to "+PRIO[t.prio].s,()=>{t.prio=was});return}
     t[f]=f==="partner"||f==="endUser"?v.trim():v;D.seen[t.id]=todayKey();save();
+    if(f==="from"){if(!v)delete t.from;save();render();toast(v?"Needed from "+v:"Cleared");return}
     if(f==="start"||f==="target"||f==="status"){render()}else{const tr=e.target.closest("tr");tr&&tr.classList.add("handled");toast("Saved")}return}
   if(e.target.dataset&&e.target.dataset.email!=null){const n=e.target.dataset.email,v=e.target.value.trim();D.emails=D.emails||{};if(v)D.emails[n]=v;else delete D.emails[n];save();toast(v?"Email saved for "+n:"Email removed for "+n);return}if(e.target.id==="xlfile"&&e.target.files[0])importExcel(e.target.files[0]);if(e.target.id==="bkfile"&&e.target.files[0])restore(e.target.files[0])});
 view.addEventListener("dragover",e=>{const dz=e.target.closest("#dropzone");if(dz){e.preventDefault();dz.classList.add("on")}const q=e.target.closest(".quad");if(q&&dragId){e.preventDefault();q.classList.add("drag")}});
@@ -2029,7 +2072,7 @@ async function exportExcel(){
   head(ws,"Daily Priorities · Open tasks",COLS.length);tableHeader(ws,4,COLS);
   const op=open().sort(sortX);
   op.forEach((t,i)=>{const R=5+i,row=ws.getRow(R),u=lastUpdate(t),st=STATUS[t.status]==="Not started"?"Not Started":STATUS[t.status];
-    const vals=[t.partner,t.endUser,t.country,t.bdm,t.title,PRIO[t.prio].l,ownersOf(t).slice().sort(byName).join(" / "),st,t.start?dateOf(t.start):null,t.target?dateOf(t.target):null,null,u?fmt(u.date,{day:"2-digit",month:"short"})+" "+u.text:"",notesText(t)];
+    const vals=[t.partner,t.endUser,t.country,t.bdm,t.title,PRIO[t.prio].l,ownersOf(t).slice().sort(byName).join(" / ")+(t.from?" (needs "+t.from+")":""),st,t.start?dateOf(t.start):null,t.target?dateOf(t.target):null,null,u?fmt(u.date,{day:"2-digit",month:"short"})+" "+u.text:"",notesText(t)];
     vals.forEach((v,j)=>{const c=row.getCell(j+1);c.value=v;c.border=box;c.font={size:10,color:{argb:INK},bold:j===4};c.alignment={vertical:"top",wrapText:j>=11||j===4,horizontal:COLS[j][2]||"left"};if(i%2)c.fill=solid(ZEBRA);if(j===8||j===9)c.numFmt="dd mmm yyyy"});
     const due=dueInfo(t);row.getCell(11).value={formula:`IF(H${R}="Completed","Completed",IF(ISBLANK(J${R}),"No target date",IF(J${R}=TODAY(),"Due today",IF(J${R}>TODAY(),"Due in "&(NETWORKDAYS(TODAY(),J${R})-1)&" working days","Overdue by "&(NETWORKDAYS(J${R},TODAY())-1)&" working days"))))`,result:due.l};
     const pf=PF[t.prio];const pc=row.getCell(6);pc.fill=solid(pf[0]);pc.font={size:10,bold:true,color:{argb:pf[1]}};
