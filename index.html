@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v35</title>
+<title>Minerva Priorities · v36</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -774,6 +774,16 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 @media (max-width:1150px){.round .radd:not(:focus-within) .fromin:placeholder-shown,.round .radd:not(:focus-within) .hov2{display:none}.round .ritem .ct{flex:1 1 300px}.round .radd .savew{flex-basis:100%}.round .radd .fromin{flex:1 1 160px}.round .rperson{grid-template-columns:minmax(110px,160px) minmax(0,1fr)}.round .rend{grid-column:2;text-align:left;margin-top:-2px}.round .rend .btn{padding:4px 10px}}
 @media (max-width:760px){.round .rperson{grid-template-columns:1fr}.round .rend{grid-column:1}}
 @media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}.ritem.fresh{animation:none}.row:hover{transform:none}}
+
+/* ===== completion celebration ===== */
+.celeb{position:fixed;width:0;height:0;z-index:9999;pointer-events:none}
+.celeb .ctick{position:absolute;left:-17px;top:-17px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#16A34A;color:#fff;box-shadow:0 6px 18px rgba(22,163,74,.38),0 0 0 3px rgba(255,255,255,.9);opacity:0}
+.celeb .ctick svg{width:19px;height:19px}
+.celeb .ctick path{stroke-dasharray:1;stroke-dashoffset:1;animation:cdraw .22s .04s ease-out forwards}@keyframes cdraw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.celeb .ctick path{animation:none;stroke-dashoffset:0}}
+.celeb .cring{position:absolute;left:-17px;top:-17px;width:34px;height:34px;border-radius:50%;border:2px solid #22C55E;opacity:0}
+.celeb .cbit{position:absolute;left:0;top:0;width:7px;height:4px;border-radius:1.5px;opacity:0}
+.celeb .cbit.round{width:5px;height:5px;border-radius:50%}
 </style>
 </head>
 <body>
@@ -781,7 +791,7 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v35</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v36</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1211,10 +1221,32 @@ function modal(html,onClick){const m=document.getElementById("modal");mTok++;con
 let mTok=0;function closeModal(){const m=document.getElementById("modal");if(m.hidden)return;const k=++mTok;if(RM()){m.hidden=true;m.innerHTML="";return}m.classList.add("out");setTimeout(()=>{if(k!==mTok)return;m.hidden=true;m.innerHTML="";m.classList.remove("out")},180)}
 function confirmBox(title,text,okLabel,fn,danger){modal(`<div class="mh"><h2>${esc(title)}</h2></div><div class="mb"><p style="margin:0">${text}</p></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn ${danger?"danger":""}" data-m="ok">${esc(okLabel)}</button></div>`,e=>{if(e.target.closest("[data-m=ok]")){closeModal();fn()}})}
 
+/* ================= small celebration when a task is completed ================= */
+let lastTap={x:0,y:0,t:0};
+addEventListener("pointerdown",e=>{lastTap={x:e.clientX,y:e.clientY,t:Date.now()}},true);
+function celebrate(){
+  try{
+    const near=Date.now()-lastTap.t<2000&&lastTap.x;const x=near?lastTap.x:innerWidth/2,y=near?lastTap.y:innerHeight-120;
+    const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
+    const box=document.createElement("div");box.className="celeb";box.style.left=x+"px";box.style.top=y+"px";box.setAttribute("aria-hidden","true");
+    box.innerHTML='<i class="cring"></i><b class="ctick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg></b>';
+    document.body.appendChild(box);
+    const tick=box.querySelector(".ctick"),ring=box.querySelector(".cring");
+    if(rm){tick.animate([{opacity:0},{opacity:1,offset:.2},{opacity:1,offset:.75},{opacity:0}],{duration:700,easing:"ease"});setTimeout(()=>box.remove(),720);return}
+    tick.animate([{transform:"scale(.2)",opacity:0},{transform:"scale(1.18)",opacity:1,offset:.38},{transform:"scale(1)",opacity:1,offset:.62},{transform:"scale(.9)",opacity:0}],{duration:820,easing:"cubic-bezier(.32,.72,0,1)",fill:"forwards"});
+    ring.animate([{transform:"scale(.4)",opacity:.9},{transform:"scale(2.6)",opacity:0}],{duration:620,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"});
+    const cols=["#16A34A","#22C55E","#00A7E1","#0A4D8C","#F5B301","#E5484D","#8B5CF6"],n=14;
+    for(let i=0;i<n;i++){const c=document.createElement("i");c.className="cbit"+(i%3===0?" round":"");c.style.background=cols[i%cols.length];box.appendChild(c);
+      const a=(i/n)*Math.PI*2+Math.random()*.5,d=34+Math.random()*30,dx=Math.cos(a)*d,dy=Math.sin(a)*d-10,r=(Math.random()*240-120)|0;
+      c.animate([{transform:"translate(-50%,-50%) scale(.4) rotate(0deg)",opacity:1},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(1) rotate(${r}deg)`,opacity:1,offset:.55},{transform:`translate(calc(-50% + ${dx*1.15}px),calc(-50% + ${dy+22}px)) scale(.7) rotate(${r*1.4}deg)`,opacity:0}],{duration:720+Math.random()*160,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"})}
+    try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+    setTimeout(()=>box.remove(),950);
+  }catch(e){}
+}
 /* ================= task actions ================= */
 window.addEventListener("error",ev=>{window.__lastErr=(ev.message||"")+" @"+(ev.lineno||"?")+":"+(ev.colno||"?")+" "+(ev.error&&ev.error.stack?String(ev.error.stack).split("\n").slice(0,3).join(" | "):"");try{toast("Something went wrong: "+(ev.message||"unknown error")+". Send Claude a screenshot of this.")}catch(_){}});
 const find=id=>D.tasks.find(t=>String(t.id)===String(id));
-function markDone(id){const t=find(id);if(!t||t.status==="done")return;const prev=JSON.parse(JSON.stringify(t));
+function markDone(id){const t=find(id);if(!t||t.status==="done")return;const prev=JSON.parse(JSON.stringify(t));celebrate();
   const el=view.querySelector(`.row[data-id="${id}"]`);
   const go=()=>{t.status="done";t.doneAt=todayKey();t.doneHow="completed";save();render();toast("“"+t.title+"” moved to Completed",()=>Object.assign(t,prev))};
   if(el&&!matchMedia("(prefers-reduced-motion:reduce)").matches){el.classList.add("leaving");setTimeout(go,260)}else go()}
@@ -1781,7 +1813,7 @@ function feedback(id,kind,stay){
   const t=find(id);if(!t)return;const inp=document.getElementById("fb-"+id), text=inp?inp.value.trim():"";const m=M();const prev=JSON.parse(JSON.stringify(t)), prevO=m.f[id];
   if(kind==="upd"&&!text){toast("Type the feedback first, or choose No change.");inp&&inp.focus();return}
   if(text)addUpdate(id,text);
-  if(kind==="done"){t.status="done";t.doneAt=todayKey();t.doneHow="completed"}
+  if(kind==="done"){t.status="done";t.doneAt=todayKey();t.doneHow="completed";celebrate()}
   else if(kind==="wait"){t.status="wait"}
   else if(kind==="same"){D.seen[id]=todayKey()}
   m.f[id]=kind;save();render();
