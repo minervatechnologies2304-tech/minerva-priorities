@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v37</title>
+<title>Minerva Priorities · v38</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -819,6 +819,16 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 .adjcard .astats{display:flex;gap:22px;justify-content:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .adjcard .astats b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
 .adjcard .abit{position:absolute;left:50%;top:74px;width:8px;height:5px;border-radius:1.5px;opacity:0;will-change:transform,opacity}
+.adjcard{max-height:calc(100vh - 32px);overflow:auto;width:min(560px,100%)}
+.adjcard .alists{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px;text-align:left}
+.adjcard .alist h4{margin:0 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:6px;align-items:center}
+.adjcard .alist h4 span{background:var(--surface-2);color:var(--ink);border-radius:999px;padding:1px 8px;font-size:11.5px;letter-spacing:0}
+.adjcard .alist ul{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.adjcard .alist li{font-size:13.5px;line-height:1.35;color:var(--ink);padding-left:12px;position:relative}
+.adjcard .alist li::before{content:"";position:absolute;left:0;top:.5em;width:5px;height:5px;border-radius:50%;background:#16A34A}
+.adjcard .alist li b{font-weight:600;color:var(--muted);margin-right:4px}
+.adjcard .alist li.more{color:var(--muted);font-style:italic}.adjcard .alist li.more::before{display:none}
+.adjcard .aact{display:flex;gap:8px;justify-content:center;margin-top:20px}
 .adjban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;margin-bottom:12px;border-radius:14px;background:color-mix(in srgb,#16A34A 10%,var(--surface));border:1px solid color-mix(in srgb,#16A34A 32%,transparent)}
 .adjban .adot{width:26px;height:26px;border-radius:50%;background:#16A34A;color:#fff;display:grid;place-items:center;flex:none}.adjban .adot svg{width:15px;height:15px}
 .adjban b{font-size:15px}.adjban span{color:var(--muted);font-size:13.5px}.adjban .link{margin-left:auto}
@@ -829,7 +839,7 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v37</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v38</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1885,13 +1895,19 @@ function adjourn(){
   const m=M();if(m.adj)return;m.adj=new Date().toISOString();save();
   const st=adjStats(),when=adjT(m),rm=RM();
   const ov=document.createElement("div");ov.className="adjov";ov.setAttribute("role","status");ov.setAttribute("aria-live","polite");
-  ov.innerHTML=`<div class="adjcard"><div class="aic"><i class="aring"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="eyebrow">Morning meeting · ${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</div><h2>Meeting adjourned</h2><p>Closed at ${esc(when)}. Thanks everyone.</p><div class="astats">${st.map(([n,l])=>`<span><b data-n="${n}">0</b>${l}</span>`).join("")}</div></div>`;
+  const fx=k=>Object.keys(m.f).filter(id=>m.f[id]===k).map(find).filter(Boolean),dn=fx("done"),nw=m.added.map(find).filter(Boolean),at=attStats(todayKey());
+  const lst=(h,a,fn)=>a.length?`<div class="alist"><h4>${h} <span>${a.length}</span></h4><ul>${a.slice(0,6).map(t=>`<li>${fn(t)}</li>`).join("")}${a.length>6?`<li class="more">+ ${a.length-6} more in the minutes</li>`:""}</ul></div>`:"";
+  const lists=lst("Completed",dn,t=>`<b>${esc(ownersOf(t).join(", "))}</b> ${esc(t.title)}`)+lst("New priorities",nw,t=>`<b>${esc(ownersOf(t).join(", "))}</b> ${esc(t.title)}`);
+  ov.innerHTML=`<div class="adjcard"><div class="aic"><i class="aring"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="eyebrow">Morning meeting · ${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</div><h2>Meeting adjourned</h2><p>Closed at ${esc(when)}. Thanks everyone.</p><div class="astats">${st.map(([n,l])=>`<span><b data-n="${n}">0</b>${l}</span>`).join("")}${at.n&&at.n>at.unmarked?`<span><b>${at.here}/${at.n}</b>present</span>`:""}</div>${lists?`<div class="alists">${lists}</div>`:""}<div class="aact"><button type="button" class="btn ghost" data-adj="copy">Copy minutes</button><button type="button" class="btn" data-adj="close">Close</button></div></div>`;
   document.body.appendChild(ov);
   const card=ov.querySelector(".adjcard"),ic=ov.querySelector(".aic"),ring=ov.querySelector(".aring"),path=ov.querySelector(".aic path"),nums=[...ov.querySelectorAll("[data-n]")];
   const finish=()=>{S.run.stage="wrap";S.run.person=null;S.anim=true;render();window.scrollTo({top:0})};
-  const close=()=>{if(ov.dataset.c)return;ov.dataset.c=1;if(rm){ov.remove();return}card.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:260,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"});ov.animate([{opacity:1},{opacity:0}],{duration:320,easing:"ease-out",fill:"forwards"}).onfinish=()=>ov.remove()};
-  ov.addEventListener("click",close);
-  if(rm){ov.style.opacity=1;card.style.opacity=1;path.style.strokeDashoffset=0;nums.forEach(b=>b.textContent=b.dataset.n);finish();setTimeout(close,1800);return}
+  let close=()=>{if(ov.dataset.c)return;ov.dataset.c=1;if(rm){ov.remove();return}card.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:260,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"});ov.animate([{opacity:1},{opacity:0}],{duration:320,easing:"ease-out",fill:"forwards"}).onfinish=()=>ov.remove()};
+  const key=e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close()}};document.addEventListener("keydown",key,true);
+  const close0=close;close=()=>{document.removeEventListener("keydown",key,true);close0()};
+  ov.addEventListener("click",e=>{const a=e.target.closest("[data-adj]");if(!a)return;if(a.dataset.adj==="close")close();else{const t=minutes();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Minutes copied"),()=>toast("Copy blocked. Use Copy minutes on the Wrap-up page"))}});
+  setTimeout(()=>{const c=ov.querySelector('[data-adj="close"]');c&&c.focus({preventScroll:true})},400);
+  if(rm){ov.style.opacity=1;card.style.opacity=1;path.style.strokeDashoffset=0;nums.forEach(b=>b.textContent=b.dataset.n);finish();return}
   const sp="cubic-bezier(.32,.72,0,1)";
   ov.animate([{opacity:0},{opacity:1}],{duration:260,easing:"ease-out",fill:"forwards"});
   card.animate([{opacity:0,transform:"translateY(26px) scale(.94)"},{opacity:1,transform:"none"}],{duration:560,easing:sp,fill:"forwards"});
@@ -1904,7 +1920,7 @@ function adjourn(){
     const a=(i/n)*Math.PI*2+Math.random()*.4,d=90+Math.random()*80,dx=Math.cos(a)*d,dy=Math.sin(a)*d*.8-30,r=(Math.random()*360-180)|0;
     c.animate([{transform:"translate(-50%,-50%) scale(.3)",opacity:0},{transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.08},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${r}deg)`,opacity:1,offset:.6},{transform:`translate(calc(-50% + ${dx*1.1}px),calc(-50% + ${dy+60}px)) rotate(${r*1.4}deg)`,opacity:0}],{duration:1300+Math.random()*300,delay:500,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"})}
   try{navigator.vibrate&&navigator.vibrate([14,40,20])}catch(_){}
-  setTimeout(finish,700);setTimeout(close,2600);
+  setTimeout(finish,700);
 }
 function unadjourn(){const m=M();if(!m.adj)return;const was=m.adj;delete m.adj;save();render();toast("Meeting reopened",()=>{M().adj=was})}
 function renderWrap(){
