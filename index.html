@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v55</title>
+<title>Minerva Priorities · v56</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -993,6 +993,17 @@ html.present #syncBtn,html.present #helpBtn,html.present #newBtn{display:none!im
 html.present .toast{font-size:13px;padding:6px 8px 6px 12px;gap:8px;border-radius:10px;animation-duration:.1s;-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(29,29,31,.88);box-shadow:0 4px 12px rgba(0,0,0,.2)}
 html.present .toast.out{animation-duration:.1s}
 html.present .toast button{padding:3px 8px;font-size:12.5px}
+
+/* Present: today's priorities — the person being asked is the spotlight */
+html.present .round{overflow:visible}
+html.present .round:has(.rperson:focus-within) .rperson:not(:focus-within){opacity:1}
+html.present .round .rperson{transition:transform .15s ease,opacity .15s ease,filter .15s ease}
+html.present .round .rperson.spot{position:relative;z-index:2;background:var(--surface)!important;border-radius:16px;transform:scale(1.012);opacity:1!important;box-shadow:inset 6px 0 0 var(--accent),0 0 0 1.5px var(--line),0 4px 8px rgba(10,37,64,.06),0 22px 50px rgba(10,37,64,.18)!important}
+html.present:root[data-theme="dark"] .round .rperson.spot{box-shadow:inset 6px 0 0 var(--accent),0 0 0 1.5px var(--line),0 4px 8px rgba(0,0,0,.3),0 22px 50px rgba(0,0,0,.5)!important}
+@media (prefers-color-scheme:dark){html.present:root:not([data-theme="light"]) .round .rperson.spot{box-shadow:inset 6px 0 0 var(--accent),0 0 0 1.5px var(--line),0 4px 8px rgba(0,0,0,.3),0 22px 50px rgba(0,0,0,.5)!important}}
+html.present .rperson.spot .rph b{font-size:1.25em}
+html.present .rperson.spot .radd .inp[data-tp]{font-size:1.1em;border-width:2px;border-color:var(--accent);caret-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){html.present .round .rperson.spot{transform:none}}
 </style>
 </head>
 <body>
@@ -1000,7 +1011,7 @@ html.present .toast button{padding:3px 8px;font-size:12.5px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v55</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v56</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -2241,20 +2252,22 @@ document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
 /* present mode: depth-of-field around the spotlight card — nearer things blur less, useful bits stay sharp */
 (()=>{let tm=null;const SKIP=/^(SCRIPT|STYLE|TEMPLATE|DATALIST)$/,root=document.documentElement;
   const mark=(el,l)=>{el.classList.add("spd","spdim","l"+l)};
-  function clear(){root.classList.remove("spfoc");document.querySelectorAll(".spdim").forEach(e=>e.classList.remove("spdim","l1","l2","l3"))}
+  function clear(){root.classList.remove("spfoc");document.querySelectorAll(".rperson.spot").forEach(e=>e.classList.remove("spot"));document.querySelectorAll(".spdim").forEach(e=>e.classList.remove("spdim","l1","l2","l3"))}
   function lvl(sib){
     if(sib.matches(".sp-dots"))return 0;
     if(sib.matches(".phead")){[...sib.children].forEach(c=>{if(!c.matches("button,.btn"))mark(c,1)});return 0}
     if(sib.matches(".sp-next")){[...sib.children].forEach((r,i)=>mark(r,i===0?1:i===1?2:3));return 0}
     if(sib.matches(".sp-lbl"))return 1;
+    if(sib.matches(".rgroup,.adjban,.round"))return 2;
     if(sib.matches(".pqbar"))return 2;
     if(sib.matches("header,.runhead,.pfoot"))return 3;
     return 2}
-  function apply(card){clear();root.classList.add("spfoc");let el=card;while(el&&el!==document.body){const par=el.parentElement;if(!par)break;
+  function apply(card){clear();root.classList.add("spfoc");if(card.matches(".rperson"))card.classList.add("spot");let el=card;while(el&&el!==document.body){const par=el.parentElement;if(!par)break;
+    if(par.matches(".round")){const kids=[...par.children],me=kids.indexOf(el);kids.forEach((k,j)=>{if(k!==el){const d=Math.abs(j-me);mark(k,d===1?1:d===2?2:3)}});el=par;continue}
     for(const sib of par.children){if(sib===el||SKIP.test(sib.tagName)||sib.matches("#toast,#modal,#drawer,.toast,.modal,.drawer,dialog"))continue;if(getComputedStyle(sib).position==="fixed"&&!sib.matches("header"))continue;const l=lvl(sib);if(l)mark(sib,l)}el=par}}
-  function check(){clearTimeout(tm);const a=document.activeElement,c=a&&a.closest&&a.closest(".sp-card"),on=!!(c&&root.classList.contains("present"));
+  function check(){clearTimeout(tm);const pick=x=>x&&x.closest&&(x.closest(".sp-card")||(root.classList.contains("present")&&x.closest(".round .rperson")));const a=document.activeElement,c=pick(a),on=!!(c&&root.classList.contains("present"));
     if(on&&root.classList.contains("spfoc")){apply(c);return}
-    tm=setTimeout(()=>{const a2=document.activeElement,c2=a2&&a2.closest&&a2.closest(".sp-card");if(c2&&root.classList.contains("present"))apply(c2);else clear()},on?(root.classList.contains("present")?110:220):90)}
+    tm=setTimeout(()=>{const c2=pick(document.activeElement);if(c2&&root.classList.contains("present"))apply(c2);else clear()},on?(root.classList.contains("present")?110:220):90)}
   document.addEventListener("focusin",check);document.addEventListener("focusout",check);
 })();
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));render();
