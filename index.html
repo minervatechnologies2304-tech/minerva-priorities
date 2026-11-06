@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v38</title>
+<title>Minerva Priorities · v39</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -832,6 +832,15 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 .adjban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;margin-bottom:12px;border-radius:14px;background:color-mix(in srgb,#16A34A 10%,var(--surface));border:1px solid color-mix(in srgb,#16A34A 32%,transparent)}
 .adjban .adot{width:26px;height:26px;border-radius:50%;background:#16A34A;color:#fff;display:grid;place-items:center;flex:none}.adjban .adot svg{width:15px;height:15px}
 .adjban b{font-size:15px}.adjban span{color:var(--muted);font-size:13.5px}.adjban .link{margin-left:auto}
+
+/* ===== pending table: full task titles and roomier updates ===== */
+.c-task{width:30%}.c-upd{min-width:240px;width:26%}
+textarea.ce.grow{display:block;resize:none;overflow:hidden;field-sizing:content;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+textarea.ce.ct.grow{min-height:0;font-family:inherit}
+textarea.ce.upd.grow{min-height:3.4em;background:var(--surface);border-color:var(--line);padding:8px 10px;font-size:14px}
+textarea.ce.upd.grow:focus{border-color:var(--accent)}
+.c-upd .savew{display:block;position:relative}.c-upd .savebtn{position:static;transform:none;margin-top:6px}
+.c-upd .savew>textarea:placeholder-shown+.savebtn{opacity:0;pointer-events:none;transform:scale(.85)}
 </style>
 </head>
 <body>
@@ -839,7 +848,7 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v38</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v39</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1815,12 +1824,16 @@ function addForPerson(i,stay){const x=document.getElementById("tp-"+i);if(!x)ret
   toast("Added for "+n+" · "+PRIO[prio].s+(from?" · from "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
   if(!stay)setTimeout(()=>{const y=document.getElementById("tp-"+i);y&&y.focus()},0)}
 const dShort=k=>k?dateOf(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}):"";
+const FS=CSS.supports&&CSS.supports("field-sizing","content");
+function grow(el){if(FS||!el)return;el.style.height="auto";el.style.height=el.scrollHeight+"px"}
+if(!FS){document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.grow"))grow(e.target)},true);
+  new MutationObserver(()=>{requestAnimationFrame(()=>document.querySelectorAll("textarea.grow").forEach(grow))}).observe(document.getElementById("view"),{childList:true,subtree:true})}
 function prow(t){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
   const meta=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
   const tag=o||disc?(done?"✓ Completed":o==="upd"?"✓ Updated":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"):"";
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
-    <td class="c-task"><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}" ${done?"disabled":""}>
+    <td class="c-task"><textarea class="ce ct grow" rows="1" data-pf="title" data-id="${t.id}" ${done?"disabled":""}>${esc(t.title)}</textarea>
       <div class="ppx${t.partner||t.endUser?"":" noval"}"><input class="ce sm${t.partner?"":" blank"}" data-pf="partner" data-id="${t.id}" list="dl-partner" value="${esc(t.partner||"")}" placeholder="Partner"><span class="arr${t.partner&&t.endUser?"":" blank"}">→</span><input class="ce sm${t.endUser?"":" blank"}" data-pf="endUser" data-id="${t.id}" value="${esc(t.endUser||"")}" placeholder="End user"></div>
       ${meta||tag||t.from?`<div class="mline">${ftag(t)}${meta?`<span>${esc(meta)}</span>`:""}${tag?`<span class="dtag">${tag}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div>`:""}</td>
     <td class="c-own"><button type="button" class="ownb" data-act="pown" data-id="${t.id}" title="Change who is responsible">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</button></td>
@@ -1828,7 +1841,7 @@ function prow(t){
     <td class="c-dt"><label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}
 </td>
     <td class="c-lu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}${n>1?` <em>+${n-1} earlier</em>`:""}`:'<span class="none">—</span>'}</td>
-    <td class="c-upd">${done?"":`<div class="savew"><input class="ce upd" id="fb-${t.id}" placeholder="Add update… (Enter to save)" autocomplete="off"><button type="button" class="savebtn" data-act="fb-upd" data-id="${t.id}" tabindex="-1">Save ↵</button></div>`}</td>
+    <td class="c-upd">${done?"":`<div class="savew"><textarea class="ce upd grow" rows="2" id="fb-${t.id}" placeholder="Add update… (Enter to save, Shift+Enter for a new line)" autocomplete="off"></textarea><button type="button" class="savebtn" data-act="fb-upd" data-id="${t.id}" tabindex="-1">Save ↵</button></div>`}</td>
     <td class="c-act">${done?"":`<button class="icon okh" data-act="fb-done" data-id="${t.id}" title="Mark completed">${IC.check}</button>`}<span class="hov">${t.prio===1&&!done?`<button class="icon mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}</button>`:""}<button class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button>
       <select class="ce mv" data-pf="prio" data-id="${t.id}" title="Move to another priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>Move to ${PRIO[q].s}</option>`).join("")}</select></span></td>
   </tr>`;
@@ -2081,7 +2094,8 @@ view.addEventListener("keydown",e=>{
   if(e.target.dataset&&e.target.dataset.tpf!=null){const i=e.target.id.slice(4);
     if(e.key==="Enter"){e.preventDefault();const tt=document.getElementById("tp-"+i);if(tt&&!tt.value.trim()){tt.focus();toast("Type the priority first");return}addForPerson(i);return}
     if(e.key==="Escape"){e.target.value="";document.getElementById("tp-"+i)?.focus();return}}
-  if(e.target.id&&e.target.id.startsWith("fb-")&&e.key==="Enter"){e.preventDefault();const id=e.target.id.slice(3);feedback(id,e.target.value.trim()?"upd":"same");return}
+  if(e.key==="Enter"&&!e.shiftKey&&e.target.matches&&e.target.matches("textarea.ce.ct")){e.preventDefault();e.target.blur();return}
+  if(e.target.id&&e.target.id.startsWith("fb-")&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();const id=e.target.id.slice(3);feedback(id,e.target.value.trim()?"upd":"same");return}
   if(e.target.id&&e.target.id.startsWith("qu-")){if(e.key==="Enter"){e.preventDefault();view.querySelector(`[data-act=qusave][data-id="${e.target.id.slice(3)}"]`).click()}else if(e.key==="Escape"){S.quickU=null;render()}return}
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
