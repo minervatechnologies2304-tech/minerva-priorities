@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v53</title>
+<title>Minerva Priorities · v54</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -926,10 +926,17 @@ textarea.ce.upd.sp-in:focus{outline:none;border-color:var(--pc)}
 .sp-row.done{opacity:.6}.sp-row.done .t{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
 .sp-row .ck{color:var(--ok);font-weight:700}.sp-row .dot{width:8px;height:8px;border-radius:50%;background:var(--pc);opacity:.7;flex-shrink:0}
 html.viewonly .sp-ctl .sp-b{display:none}
-.spd{transition:filter .4s ease,opacity .4s ease}
-.spdim{filter:blur(2px) saturate(.85);opacity:.65}
-.spdim:hover{filter:blur(1px);opacity:.85}
-@media (prefers-reduced-motion:reduce){.spd{transition:none}}
+.spd{transition:filter .7s ease,opacity .7s ease}
+.spdim{transition-duration:.38s}
+.spdim.l1{filter:blur(.8px) saturate(.9);opacity:.8}
+.spdim.l2{filter:blur(1.8px) saturate(.85);opacity:.62}
+.spdim.l3{filter:blur(3px) saturate(.8);opacity:.5}
+.spdim:hover{filter:blur(.5px);opacity:.9}
+.sp-card{transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s ease}
+html.spfoc .sp-card{transform:translateY(-3px) scale(1.008);box-shadow:0 4px 8px rgba(10,37,64,.06),0 28px 64px rgba(10,37,64,.2)}
+:root[data-theme="dark"] html.spfoc .sp-card,html.spfoc[data-theme="dark"] .sp-card{box-shadow:0 4px 8px rgba(0,0,0,.3),0 28px 64px rgba(0,0,0,.5)}
+@media (prefers-color-scheme:dark){html.spfoc:not([data-theme="light"]) .sp-card{box-shadow:0 4px 8px rgba(0,0,0,.3),0 28px 64px rgba(0,0,0,.5)}}
+@media (prefers-reduced-motion:reduce){.spd,.sp-card{transition:none}html.spfoc .sp-card{transform:none}}
 @media (prefers-reduced-motion:reduce){.sp-card.in{animation:none}.sp-row:hover{transform:none}}
 /* Next-quadrant button takes the colour of the quadrant it leads to */
 .btn.qn{background:var(--qcs);color:var(--qc);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--qc) 45%,transparent)}
@@ -957,7 +964,7 @@ html.present .aclock{width:54px;height:54px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v53</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v54</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -2195,12 +2202,23 @@ scrim.addEventListener("click",()=>{if(S.edit){readDrawer();const E=S.edit;const
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.tab=b.dataset.tab;S.anim=true;S.vt=true;render();window.scrollTo({top:0});if(S.tab==="set"&&G.url&&!gSnaps)gLoadSnaps()});
 document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
 
-/* present mode: soften everything around the spotlight card while it is in use */
-(()=>{let tm=null;const SKIP=/^(SCRIPT|STYLE|TEMPLATE|DATALIST)$/;
-  function clear(){document.querySelectorAll(".spdim").forEach(e=>e.classList.remove("spdim"))}
-  function apply(card){clear();let el=card;while(el&&el!==document.body){const par=el.parentElement;if(!par)break;
-    for(const sib of par.children){if(sib===el||SKIP.test(sib.tagName)||sib.matches("#toast,#modal,#drawer,.toast,.modal,.drawer,dialog"))continue;const cs=getComputedStyle(sib);if(cs.position==="fixed"&&!sib.matches("header,.top,.hdr"))continue;sib.classList.add("spd","spdim")}el=par}}
-  function check(){clearTimeout(tm);tm=setTimeout(()=>{const a=document.activeElement,c=a&&a.closest&&a.closest(".sp-card");if(c&&document.documentElement.classList.contains("present"))apply(c);else clear()},90)}
+/* present mode: depth-of-field around the spotlight card — nearer things blur less, useful bits stay sharp */
+(()=>{let tm=null;const SKIP=/^(SCRIPT|STYLE|TEMPLATE|DATALIST)$/,root=document.documentElement;
+  const mark=(el,l)=>{el.classList.add("spd","spdim","l"+l)};
+  function clear(){root.classList.remove("spfoc");document.querySelectorAll(".spdim").forEach(e=>e.classList.remove("spdim","l1","l2","l3"))}
+  function lvl(sib){
+    if(sib.matches(".sp-dots"))return 0;
+    if(sib.matches(".phead")){[...sib.children].forEach(c=>{if(!c.matches("button,.btn"))mark(c,1)});return 0}
+    if(sib.matches(".sp-next")){[...sib.children].forEach((r,i)=>mark(r,i===0?1:i===1?2:3));return 0}
+    if(sib.matches(".sp-lbl"))return 1;
+    if(sib.matches(".pqbar"))return 2;
+    if(sib.matches("header,.runhead,.pfoot"))return 3;
+    return 2}
+  function apply(card){clear();root.classList.add("spfoc");let el=card;while(el&&el!==document.body){const par=el.parentElement;if(!par)break;
+    for(const sib of par.children){if(sib===el||SKIP.test(sib.tagName)||sib.matches("#toast,#modal,#drawer,.toast,.modal,.drawer,dialog"))continue;if(getComputedStyle(sib).position==="fixed"&&!sib.matches("header"))continue;const l=lvl(sib);if(l)mark(sib,l)}el=par}}
+  function check(){clearTimeout(tm);const a=document.activeElement,c=a&&a.closest&&a.closest(".sp-card"),on=!!(c&&root.classList.contains("present"));
+    if(on&&root.classList.contains("spfoc")){apply(c);return}
+    tm=setTimeout(()=>{const a2=document.activeElement,c2=a2&&a2.closest&&a2.closest(".sp-card");if(c2&&root.classList.contains("present"))apply(c2);else clear()},on?220:90)}
   document.addEventListener("focusin",check);document.addEventListener("focusout",check);
 })();
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));render();
