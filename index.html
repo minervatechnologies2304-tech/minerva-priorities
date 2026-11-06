@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v56</title>
+<title>Minerva Priorities · v57</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1004,6 +1004,16 @@ html.present:root[data-theme="dark"] .round .rperson.spot{box-shadow:inset 6px 0
 html.present .rperson.spot .rph b{font-size:1.25em}
 html.present .rperson.spot .radd .inp[data-tp]{font-size:1.1em;border-width:2px;border-color:var(--accent);caret-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){html.present .round .rperson.spot{transform:none}}
+
+/* "Nothing today" is used constantly — green, like No update */
+.btn.tpn{background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 48%,transparent);font-weight:600;box-shadow:none}
+.btn.tpn:hover{background:var(--ok);border-color:var(--ok);color:#fff;filter:none}
+.btn.tpn:active{transform:scale(.97)}
+:root[data-theme="dark"] .btn.tpn:hover{color:#08241A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.tpn:hover{color:#08241A}}
+html.present .rperson.spot .btn.tpn{background:var(--ok);border-color:var(--ok);color:#fff}
+html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
+@media (prefers-color-scheme:dark){html.present:root:not([data-theme="light"]) .rperson.spot .btn.tpn{color:#08241A}}
 </style>
 </head>
 <body>
@@ -1011,7 +1021,7 @@ html.present .rperson.spot .radd .inp[data-tp]{font-size:1.1em;border-width:2px;
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v56</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v57</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -2009,7 +2019,7 @@ function renderTodayShared(){
         <input class="inp fromin" id="tpf-${i}" data-tpf="${esc(n)}" list="dl-from" placeholder="Needed from…" title="Who it's needed from (optional). Type a name, then Enter" autocomplete="off">
         <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
       </div>
-      <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<span class="rbtns"><button class="btn ghost sm" data-act="tpnone" data-person="${esc(n)}" title="Nothing needed (Shift + Enter in the box)">Nothing today</button><button class="btn ghost sm" data-act="tplater" data-person="${esc(n)}" title="${isLater(n)?"Put back in order":"Move to the end and come back to them"}">${isLater(n)?"Back in order":"Ask later"}</button></span>`}</div>
+      <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<span class="rbtns"><button class="btn sm tpn" data-act="tpnone" data-person="${esc(n)}" title="Nothing needed (Shift + Enter in the box)">✓ Nothing today</button><button class="btn ghost sm" data-act="tplater" data-person="${esc(n)}" title="${isLater(n)?"Put back in order":"Move to the end and come back to them"}">${isLater(n)?"Back in order":"Ask later"}</button></span>`}</div>
     </section>`};
   const dps=depts();
   h+=`<datalist id="dl-from">${[...dps,...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned"&&!isDept(x)).sort(byName)].map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
