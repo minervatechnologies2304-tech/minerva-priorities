@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v42</title>
+<title>Minerva Priorities · v43</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -867,7 +867,7 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v42</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v43</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1516,7 +1516,7 @@ function renderSet(){
 
 /* ================= help: guide + ask a question ================= */
 const HELP=[
- {q:"How do I run the morning meeting?",k:"run meeting start morning steps present how use",a:"Use the Run meeting tab. It goes in three steps: pending tasks, today's round of names, then the minutes.",s:["Open the Run meeting tab, share your screen and click Present for full screen.","Step 1, Pending priorities: go through Do now, Schedule, Delegate, then Later. For each task type the update and press Enter, or tick ✓ if it's done.","Step 2, Today's priorities: go down the names and ask \"Anything needed from your side?\". Type it and press Enter, or click Nothing today.","Step 3, Wrap-up: the minutes are written for you. Click Copy minutes, Open in email, or Download Excel."],go:{tab:"run",stage:"follow"}},
+ {q:"How do I run the morning meeting?",k:"run meeting start morning steps present how use",a:"Use the Run meeting tab. It goes in two steps: pending tasks, then today's round of names. Finish with Meeting adjourned.",s:["Open the Run meeting tab, share your screen and click Present for full screen.","Step 1, Pending priorities: go through Do now, Schedule, Delegate, then Later. For each task type the update and press Enter, or tick ✓ if it's done.","Step 2, Today's priorities: go down the names and ask \"Anything needed from your side?\". Type it and press Enter, or click Nothing today.","Finish: click Meeting adjourned. The card shows what you got through and has Copy minutes."],go:{tab:"run",stage:"follow"}},
  {q:"How do I add an update to a task?",k:"update note feedback progress comment write log add",a:"Type it in the task's update box and press Enter. It's saved with today's date.",s:["In Run meeting, find the task's \"Add update…\" box.","Type what the person says and press Enter.","The row turns green and the update shows under Latest update. Outside the meeting, open the task with ✏ and use the Updates box."],go:{tab:"run",stage:"follow"}},
  {q:"Nothing has changed on a task, what do I do?",k:"no change same nothing skip unchanged",a:"Press Enter in the empty update box. It's marked \"No change\" and counted as dealt with.",s:["Click into the task's \"Add update…\" box.","Leave it empty and press Enter."]},
  {q:"How do I mark a task as done?",k:"done complete completed finish finished tick close closed",a:"Click the ✓ button on the task. It moves to the Completed tab.",s:["Click ✓ at the right of the task (Run meeting or All tasks).","It moves to Completed. Changed your mind? Click Undo at the bottom straight away, or Reopen it from the Completed tab."]},
@@ -1531,7 +1531,7 @@ const HELP=[
  {q:"How do I log that someone is out for a client meeting?",k:"out away availability client meeting site visit travel training leave absent busy unavailable",a:"Log it in the Availability tab. It then shows in the meeting.",s:["Open the Availability tab and click Log time away (or click an empty box in the week).","Choose the person, the reason, the date, and From/To times or All day.","It shows in the Out today bar and next to their name in the meeting."],go:{tab:"away"}},
  {q:"Someone isn't at the meeting, what do I do?",k:"absent missing not here away skip person nothing",a:"In step 2 click Nothing today for them, and log time away in Availability if they're out.",s:["Their pending tasks can still be updated by whoever knows, or left for tomorrow.","In Today's priorities, click Nothing today next to their name.","Anything not covered is listed in the minutes."]},
  {q:"How do I email someone about an urgent task?",k:"email mail send urgent remind notify outlook",a:"Click ✉ on any Do now task. If that person has several urgent tasks, they all go in one email.",s:["Hover over a Do now task and click ✉.","All their urgent tasks are listed and ticked. Untick any to leave out; overdue ones can be added too.","Check or edit the message, then choose Open in Outlook web, Outlook app, or Copy email.","Add people's email addresses in Data & settings → Team so the To line fills in."]},
- {q:"How do I export to Excel?",k:"export excel download spreadsheet xlsx report file",a:"Data & settings → Export → Download Excel, or from the meeting wrap-up.",s:["Go to Data & settings and click Download Excel under Export (or Download Excel on the Wrap-up screen).","You get Main sheet, Completed and Summary tabs, with names in A–Z order."],go:{tab:"set"}},
+ {q:"How do I export to Excel?",k:"export excel download spreadsheet xlsx report file",a:"Data & settings → Export → Download Excel, ",s:["Go to Data & settings and click Download Excel under Export.","You get Main sheet, Completed and Summary tabs, with names in A–Z order."],go:{tab:"set"}},
  {q:"How do I import the Excel sheet?",k:"import excel upload spreadsheet load sheet old",a:"Data & settings → Import your Excel sheet.",s:["Click Download backup first, just in case.","Under Import your Excel sheet, choose the file.","Keep \"Replace the tasks already here\" to start fresh, then click Import."],go:{tab:"set"}},
  {q:"Is my data saved and backed up?",k:"backup backed save saved google sheet sync cloud lost data safe",a:"Yes. Every change saves on this computer straight away and backs up to Google within about 20 seconds.",s:["Look at the button at the top: \"Saved\" with a cloud icon means it's backed up.","\"Not backed up\" means Google isn't connected yet: open Data & settings → Google Sheet backup.","Click it any time to see details and daily snapshots."]},
  {q:"How do I use the app on another computer?",k:"another computer pc laptop share link colleague install other send",a:"Send the setup link from Data & settings. The other computer connects to the same Google backup.",s:["Go to Data & settings → Google Sheet backup and click Copy link.","Send it privately; it holds the backup key.","On the other computer open it in Chrome, click Connect, then install it as an app."],go:{tab:"set"}},
@@ -1542,7 +1542,7 @@ const HELP=[
  {q:"Where are tasks that start in the future?",k:"future later upcoming start tomorrow next week scheduled",a:"In All tasks. They join the meeting automatically on their start date.",s:["Open All tasks and group by Due date to see them in date order.","A task with a future start date stays out of the meeting until that day."],go:{tab:"meet"}},
  {q:"Will today's priorities show up again tomorrow?",k:"tomorrow next day carry over pending today priorities again repeat",a:"Yes. Anything added in step 2 shows under Pending priorities from the next meeting until it's ticked ✓.",s:["Add it in Today's priorities.","Next meeting it's in its priority box under Pending priorities.","Tick ✓ when it's done and it moves to Completed."]},
  {q:"What do Overdue and \"No update 2+ days\" mean?",k:"overdue late no update stale meaning label red orange working days",a:"Overdue means the due date has passed. \"No update 2+ days\" means nobody has added an update for two working days or more.",s:["Both count working days only (Monday to Friday, UAE holidays skipped).","Change the due date or add an update and the label clears."]},
- {q:"Where are the meeting minutes?",k:"minutes summary wrap up notes recap record copy",a:"Step 3, Wrap-up, in the Run meeting tab.",s:["Click Wrap-up ›, or the Wrap-up step at the top. When you are done, click Meeting adjourned.","Click Copy minutes, Open in email, or Download Excel."],go:{tab:"run",stage:"wrap"}},
+ {q:"Where are the meeting minutes?",k:"minutes summary wrap up notes recap record copy adjourn",a:"Click Meeting adjourned at the end of Today's priorities. The card that appears has Copy minutes, and so does the green banner afterwards.",s:["Go through Today's priorities.","Click Meeting adjourned.","Use Copy minutes or Open in email on the card or the green banner."],go:{tab:"run"}},
  {q:"How do I see one person's tasks?",k:"person filter one someone tasks show only individual",a:"In All tasks, click the person's name in the row of names.",s:["Open All tasks.","Click a name in the row under the search box.","Click Everyone to see all again."],go:{tab:"meet"}},
  {q:"How do I find a task?",k:"search find look task where",a:"Use the search box in All tasks.",s:["Open All tasks.","Type part of the task, partner, person or an update in Search."],go:{tab:"meet"}},
  {q:"Can I go through the meeting person by person instead?",k:"person by person style instead order change meeting way",a:"Yes. Data & settings → Morning meeting → Person by person.",s:["Go to Data & settings.","Under Morning meeting, choose Person by person."],go:{tab:"set"}},
@@ -1572,8 +1572,8 @@ function openHelp(){
     <details class="hguide"><summary>How to run the morning meeting</summary>
       <ol><li><b>Before:</b> open Run meeting, share your screen and click <b>Present</b>. Anyone out shows in the Out today bar.</li>
       <li><b>Step 1, Pending priorities:</b> go through Do now → Schedule → Delegate → Later. For each task: type the update and press Enter, press Enter on an empty box for “no change”, or tick ✓ if done. Click the date, status or owner to change them.</li>
-      <li><b>Step 2, Today's priorities:</b> go down the names and ask “Anything needed from your side?”. Type it and press Enter, or click <b>Nothing today</b>.</li>
-      <li><b>Step 3, Wrap-up:</b> the minutes are written for you. Copy minutes, Open in email, or Download Excel.</li></ol>
+      <li><b>Step 2, Today's priorities:</b> go down the names and ask “Anything needed from your side?”. Type it and press Enter, or click <b>Nothing today</b> (Shift + Enter). Empty Enter jumps to the next person.</li>
+      <li><b>Finish:</b> click <b>Meeting adjourned</b>. The card shows what you got through, with <b>Copy minutes</b>; the green banner afterwards has Copy minutes and Open in email too.</li></ol>
       <p class="hint">Everything saves as you type and backs up to Google. Undo appears at the bottom after each change.</p></details>
   </div>`,ev=>{
     const q=ev.target.closest("[data-hq]");if(q){const i=+q.dataset.hq;document.getElementById("hq").value=HELP[i].q;document.getElementById("hres").innerHTML=hAnswer(i);document.getElementById("hres").scrollIntoView({block:"nearest",behavior:"smooth"});return}
@@ -1752,11 +1752,11 @@ function renderRun(){
   const fp=followPeople(), allF=D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id]))), fDone=allF.filter(handled).length;
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
-  const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`],["wrap","3","Wrap-up",m.adj?"Adjourned "+adjT(m):"Minutes"]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`],["wrap","3","Wrap-up",m.adj?"Adjourned "+adjT(m):"Minutes"]];
+  const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`]];
   let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   if(awOn(tk).length)h+=awTodayBox();
-  if(R.stage==="wrap")return h+renderWrap();
+  if(R.stage==="wrap")R.stage="today";
   if(byP)return h+(R.stage==="today"?renderTodayShared():renderPrioRun());
   const people=R.stage==="follow"?fp:todayPeople();
   if(!people.length)return h+`<div class="empty"><h2>${R.stage==="follow"?"Nothing to follow up":"No one on the team yet"}</h2><p>${R.stage==="follow"?"There are no open tasks from before today.":"Add people in Data & settings."}</p>${R.stage==="follow"?`<button class="btn" data-stage="today" style="margin-top:10px">Go to today's priorities ›</button>`:""}</div>`;
@@ -1767,7 +1767,7 @@ function renderRun(){
   h+=`<div class="phead">${av(R.person)}<div style="flex:1;min-width:0"><h2>${esc(R.person)}</h2><p>${R.stage==="follow"?`${followTasks(R.person).length} priorities from before today · ${left(R.person)} to go`:`${left(R.person)} open · add what they're working on today`}</p>${awTodayBox(R.person)}</div>
     <button class="btn ghost sm" data-act="rskip">${skipped?"Mark present":"Absent today"}</button>
     <button class="btn ghost sm" data-act="rprev" ${i<=0?"disabled":""}>‹ Back</button>
-    ${i<people.length-1?`<button class="btn sm${R.stage==="follow"&&!left(R.person)?" ok glow":""}" data-act="rnext">Next: ${esc(people[i+1])} ›</button>`:R.stage==="follow"?`<button class="btn ok sm" data-stage="today">Start today's priorities ›</button>`:`<button class="btn ok sm" data-stage="wrap">Finish and wrap up ›</button>`}</div>`;
+    ${i<people.length-1?`<button class="btn sm${R.stage==="follow"&&!left(R.person)?" ok glow":""}" data-act="rnext">Next: ${esc(people[i+1])} ›</button>`:R.stage==="follow"?`<button class="btn ok sm" data-stage="today">Start today's priorities ›</button>`:(M().adj?"":adjBtn("sm"))}</div>`;
   if(R.stage==="follow"){
     const list=followTasks(R.person);
     h+=list.length?`<div class="fus">${list.map(fu).join("")}</div>`:`<div class="empty" style="padding:24px"><p style="margin:0">No priorities to follow up for ${esc(R.person)}.</p></div>`;
@@ -1828,7 +1828,8 @@ function nextPerson(from){const all=[...view.querySelectorAll(".rperson")];const
 function renderTodayShared(){
   const R=S.run,tk0=todayKey(),ppl=roundPeople().map((n,i)=>[n,i]).sort((a,b)=>((isLater(a[0])||attAbsent(tk0,a[0])?1:0)-(isLater(b[0])||attAbsent(tk0,b[0])?1:0))||a[1]-b[1]).map(x=>x[0]),done=ppl.filter(asked).length,left=pendAll().filter(t=>!pDiscussed(t)).length,tk=todayKey();
   let h=`<div class="phead"><span class="qbig" style="background:var(--accent)"></span><div style="flex:1;min-width:0"><h2>Today's priorities</h2><p>${done} of ${ppl.length} asked · type the priority and press <b>Enter</b> · empty <b>Enter</b> = next person · <b>Shift + Enter</b> = nothing today${left?` · <b style="color:var(--warn)">${left} pending still not dealt with</b>`:""}</p></div>
-    <button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length&&M().adj?" ok":""}${done===ppl.length&&ppl.length&&!M().adj?" ghost":""}" data-stage="wrap">Wrap-up ›</button>${done===ppl.length&&ppl.length&&!isView()?adjBtn("sm glow"):""}</div>`;
+    <button class="btn ghost sm" data-stage="follow">‹ Pending</button>${isView()?"":adjBtn("sm"+(done===ppl.length&&ppl.length?" glow":""))}</div>`;
+  if(M().adj)h+=`<div class="adjban"><span class="adot">${IC_ADJ}</span><b>Meeting adjourned at ${esc(adjT(M()))}</b><span>Today's priorities are set.</span><span style="margin-left:auto;display:inline-flex;gap:6px;flex-wrap:wrap"><button class="btn ghost sm" data-act="copymin">Copy minutes</button><button class="btn ghost sm" data-act="mailmin">Open in email</button>${isView()?"":`<button class="link xs" data-act="unadjourn">Reopen meeting</button>`}</span></div>`;
   if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
   const rowH=(n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
     return `<section class="rperson${items.length||none?" asked":""}${attAbsent(tk,n)&&!items.length&&!none?" absent":""}" data-person="${esc(n)}">
@@ -1849,7 +1850,7 @@ function renderTodayShared(){
   const dps=depts();
   h+=`<datalist id="dl-from">${[...dps,...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned"&&!isDept(x)).sort(byName)].map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`${dps.length?`<div class="rgroup"><b>Departments</b><span>A priority for the whole department</span></div><div class="round dround">${dps.map((n,i)=>rowH(n,"d"+i)).join("")}</div><div class="rgroup"><b>People</b><span>Anything needed from your side?</span></div>`:""}<div class="round">${ppl.map((n,i)=>rowH(n,i)).join("")}</div>
-    <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button><button class="btn sm${done===ppl.length&&ppl.length&&!M().adj?" ghost":""}" data-stage="wrap">Wrap-up ›</button>${done===ppl.length&&ppl.length&&!isView()?adjBtn("sm"):""}</div>`;
+    <div class="pfoot"><button class="btn ghost sm" data-stage="follow">‹ Pending</button>${isView()?"":adjBtn("sm")}</div>`;
   return h;
 }
 function resolveFrom(v,owner){v=String(v||"").replace(/\s+/g," ").trim();if(!v)return "";const all=[...depts(),...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned")].filter(x=>x!==owner),lv=v.toLowerCase();
@@ -1951,7 +1952,7 @@ function adjourn(){
   ov.innerHTML=`<div class="adjcard"><div class="aic"><i class="aring"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="eyebrow">Morning meeting · ${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</div><h2>Meeting adjourned</h2><p>Closed at ${esc(when)}. Thanks everyone.</p><div class="astats">${st.map(([n,l])=>`<span><b data-n="${n}">0</b>${l}</span>`).join("")}${at.n&&at.n>at.unmarked?`<span><b>${at.here}/${at.n}</b>present</span>`:""}</div>${lists?`<div class="alists">${lists}</div>`:""}<div class="aact"><button type="button" class="btn ghost" data-adj="copy">Copy minutes</button><button type="button" class="btn" data-adj="close">Close</button></div></div>`;
   document.body.appendChild(ov);
   const card=ov.querySelector(".adjcard"),ic=ov.querySelector(".aic"),ring=ov.querySelector(".aring"),path=ov.querySelector(".aic path"),nums=[...ov.querySelectorAll("[data-n]")];
-  const finish=()=>{S.run.stage="wrap";S.run.person=null;S.anim=true;render();window.scrollTo({top:0})};
+  const finish=()=>{if(S.run.stage==="wrap")S.run.stage="today";render();window.scrollTo({top:0})};
   let close=()=>{if(ov.dataset.c)return;ov.dataset.c=1;if(rm){ov.remove();return}card.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(10px) scale(.97)"}],{duration:260,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"});ov.animate([{opacity:1},{opacity:0}],{duration:320,easing:"ease-out",fill:"forwards"}).onfinish=()=>ov.remove()};
   const key=e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();close()}};document.addEventListener("keydown",key,true);
   const close0=close;close=()=>{document.removeEventListener("keydown",key,true);close0()};
@@ -2106,8 +2107,8 @@ view.addEventListener("click",e=>{
     case "adjourn":{adjourn();break}
     case "unadjourn":{unadjourn();break}
     case "rskip":{const m=M(),k=S.run.stage+":"+S.run.person,i=m.skip.indexOf(k);if(i>=0)m.skip.splice(i,1);else m.skip.push(k);save();if(i<0&&S.run.stage==="follow"){const people=followPeople();const j=people.indexOf(S.run.person);if(people[j+1])S.run.person=people[j+1]}render();break}
-    case "copymin":{const t=document.getElementById("minutes");try{navigator.clipboard.writeText(t.value).then(()=>toast("Minutes copied. Paste them into your email or Teams."),()=>{t.select();toast("Press Ctrl+C to copy")})}catch(_){t.select();toast("Press Ctrl+C to copy")}break}
-    case "mailmin":{const t=document.getElementById("minutes").value;location.href="mailto:?subject="+encodeURIComponent("Morning meeting – "+new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))+"&body="+encodeURIComponent(t.slice(0,1800));break}
+    case "copymin":{const t=document.getElementById("minutes")||{value:minutes(),select(){}};try{navigator.clipboard.writeText(t.value).then(()=>toast("Minutes copied. Paste them into your email or Teams."),()=>{t.select();toast("Press Ctrl+C to copy")})}catch(_){t.select();toast("Press Ctrl+C to copy")}break}
+    case "mailmin":{const t=(document.getElementById("minutes")||{value:minutes()}).value;location.href="mailto:?subject="+encodeURIComponent("Morning meeting – "+new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))+"&body="+encodeURIComponent(t.slice(0,1800));break}
     case "seen":markSeen(id);break;
     case "cycle":cycleStatus(id);break;
     case "upd":S.quickU=id;render();setTimeout(()=>{const x=document.getElementById("qu-"+id);x&&x.focus()},0);break;
@@ -2181,8 +2182,7 @@ document.addEventListener("keydown",e=>{
   else if(e.key==="/"){e.preventDefault();const q=document.getElementById("q");q&&q.focus()}
   else if(/^[1-8]$/.test(e.key)){const t=TABS[+e.key-1];if(t&&t!==S.tab){S.tab=t;S.anim=true;S.vt=true;render();window.scrollTo({top:0})}}
   else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="run"){e.preventDefault();
-    if(S.run.stage==="wrap"){if(e.key==="ArrowLeft"){S.run.stage="today";S.anim=true;render()}return}
-    const b=view.querySelector(e.key==="ArrowRight"?'.phead [data-act=rnext],.phead [data-act=pnext],.phead .btn[data-stage="today"],.phead .btn[data-stage="wrap"]':'.phead [data-act=rprev],.phead [data-act=pprev],.phead .btn[data-stage="follow"]');
+    const b=view.querySelector(e.key==="ArrowRight"?'.phead [data-act=rnext],.phead [data-act=pnext],.phead .btn[data-stage="today"]':'.phead [data-act=rprev],.phead [data-act=pprev],.phead .btn[data-stage="follow"]');
     if(b&&!b.disabled)b.click();else if(e.key==="ArrowLeft"&&S.run.stage==="follow"&&S.run.by!=="person"&&(S.run.pq||1)===1)return}
   else if((e.key==="ArrowRight"||e.key==="ArrowLeft")&&S.tab==="meet"){const ppl=[...new Set(open().flatMap(ownersOf))].sort(byName);if(!ppl.length)return;const i=S.focus?ppl.indexOf(S.focus):-1;const j=e.key==="ArrowRight"?i+1:i-1;S.focus=j<0?null:ppl[Math.min(j,ppl.length-1)];S.anim=true;render()}
 });
