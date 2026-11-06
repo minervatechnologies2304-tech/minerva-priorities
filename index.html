@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v47</title>
+<title>Minerva Priorities · v48</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -881,8 +881,17 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .aclock .s{animation-duration:60s}.aclock .s line{stroke:#00A7E1;stroke-width:.9}.aclock .s circle{fill:#00A7E1}
 .aclock .pin{fill:var(--surface)}
 @keyframes aspin{to{transform:rotate(360deg)}}
+/* light: navy rim, darker ticks and hands; dark keeps the softer look */
+.aclock{width:46px;height:46px;--ac-face:#fff;--ac-rim:#0A4D8C;--ac-rw:1.8;--ac-tk:#5B6B7D;--ac-q:#0A2540;--ac-hand:#0A2540;--ac-sec:#0090C8;--ac-to:.9;box-shadow:0 2px 6px rgba(0,30,60,.14),0 6px 18px rgba(0,30,60,.12)}
+:root[data-theme="dark"] .aclock{--ac-face:var(--surface);--ac-rim:var(--line);--ac-rw:1;--ac-tk:var(--muted);--ac-q:var(--ink);--ac-hand:var(--ink);--ac-sec:#00A7E1;--ac-to:.6;box-shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .aclock{--ac-face:var(--surface);--ac-rim:var(--line);--ac-rw:1;--ac-tk:var(--muted);--ac-q:var(--ink);--ac-hand:var(--ink);--ac-sec:#00A7E1;--ac-to:.6;box-shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25)}}
+.aclock .face{fill:var(--ac-face);stroke:var(--ac-rim);stroke-width:var(--ac-rw)}
+.aclock .tk{stroke:var(--ac-tk);opacity:var(--ac-to);stroke-width:1}.aclock .tk.q{stroke:var(--ac-q);opacity:1;stroke-width:1.8}
+.aclock .h line,.aclock .m line{stroke:var(--ac-hand)}
+.aclock .s line{stroke:var(--ac-sec)}.aclock .s circle{fill:var(--ac-sec)}
+.aclock .pin{fill:var(--ac-face)}
 @media (prefers-reduced-motion:reduce){.aclock .s{display:none}}
-html.present .aclock{width:50px;height:50px}
+html.present .aclock{width:54px;height:54px}
 </style>
 </head>
 <body>
@@ -890,7 +899,7 @@ html.present .aclock{width:50px;height:50px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v47</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v48</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
