@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v48</title>
+<title>Minerva Priorities · v49</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -881,6 +881,14 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .aclock .s{animation-duration:60s}.aclock .s line{stroke:#00A7E1;stroke-width:.9}.aclock .s circle{fill:#00A7E1}
 .aclock .pin{fill:var(--surface)}
 @keyframes aspin{to{transform:rotate(360deg)}}
+/* Next-quadrant button takes the colour of the quadrant it leads to */
+.btn.qn{background:var(--qcs);color:var(--qc);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--qc) 45%,transparent)}
+.btn.qn:hover{background:color-mix(in srgb,var(--qc) 22%,var(--qcs))}
+.btn.qn.ok{background:var(--qc);color:#fff;box-shadow:none}.btn.qn.q2.ok{color:#2B1A00}
+.btn.qn.ok:hover{filter:brightness(.94);background:var(--qc)}
+.btn.qn.glow::after{box-shadow:0 0 0 5px color-mix(in srgb,var(--qc) 30%,transparent)}
+:root[data-theme="dark"] .btn.qn.ok{color:#0B1A26}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.qn.ok{color:#0B1A26}}
 /* light: navy rim, darker ticks and hands; dark keeps the softer look */
 .aclock{width:46px;height:46px;--ac-face:#fff;--ac-rim:#0A4D8C;--ac-rw:1.8;--ac-tk:#5B6B7D;--ac-q:#0A2540;--ac-hand:#0A2540;--ac-sec:#0090C8;--ac-to:.9;box-shadow:0 2px 6px rgba(0,30,60,.14),0 6px 18px rgba(0,30,60,.12)}
 :root[data-theme="dark"] .aclock{--ac-face:var(--surface);--ac-rim:var(--line);--ac-rw:1;--ac-tk:var(--muted);--ac-q:var(--ink);--ac-hand:var(--ink);--ac-sec:#00A7E1;--ac-to:.6;box-shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25)}
@@ -899,7 +907,7 @@ html.present .aclock{width:54px;height:54px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v48</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v49</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1827,11 +1835,11 @@ function renderPrioRun(){
   let h=`<div class="pqbar" role="tablist">${[1,2,3,4].map(q=>{const n=prioTasks(q).length,l=left(q);return `<button class="pq${q===p?" on":""}${n&&!l?" fin":""}" data-rprio="${q}" style="--qc:var(--p${q})" title="Eisenhower Matrix: ${PRIO[q].l}"><span class="qdot"></span><span class="pqt"><b>${PRIO[q].s}</b></span>${n?(l?`<i>${l} left</i>`:'<i class="ok">✓ Done</i>'):'<i class="g">—</i>'}</button>`}).join("")}</div><div>`;
   h+=`<div class="phead"><span class="qbig" style="background:var(--p${p})"></span><div style="flex:1;min-width:0"><h2>${PRIO[p].s} <span style="font-weight:500;color:var(--muted);font-size:.7em">· ${PRIO[p].l}</span></h2><p>${list.filter(pDiscussed).length} of ${list.length} dealt with</p></div>
     <button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>
-    ${p<4?`<button class="btn sm${list.length&&!left(p)?" ok glow":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
+    ${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok glow":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
   h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
     ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
-    </div><div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm${list.length&&!left(p)?" ok":""}" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
+    </div><div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
 }
 /* step 2: go round everyone's name, "anything needed from your side?", write it down */
