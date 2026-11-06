@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v49</title>
+<title>Minerva Priorities · v50</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -881,6 +881,44 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .aclock .s{animation-duration:60s}.aclock .s line{stroke:#00A7E1;stroke-width:.9}.aclock .s circle{fill:#00A7E1}
 .aclock .pin{fill:var(--surface)}
 @keyframes aspin{to{transform:rotate(360deg)}}
+/* Presenting: one task in the spotlight */
+.sp{display:flex;flex-direction:column;gap:18px;margin-top:6px}
+.sp-dots{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.8em;letter-spacing:.06em;text-transform:uppercase;flex-wrap:wrap}
+.sp-dots button{width:12px;height:12px;padding:0;border:0;border-radius:50%;background:color-mix(in srgb,var(--muted) 30%,transparent);cursor:pointer;transition:transform .2s ease,background-color .3s ease}
+.sp-dots button:hover{transform:scale(1.3)}.sp-dots button.d{background:var(--ok)}.sp-dots button.c{background:var(--pc);box-shadow:0 0 0 4px color-mix(in srgb,var(--pc) 25%,transparent)}
+.sp-dots span{margin-left:6px}
+.sp-card{position:relative;background:color-mix(in srgb,var(--surface) 95%,transparent);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:22px;padding:30px 36px 28px 44px;box-shadow:0 2px 4px rgba(10,37,64,.05),0 18px 44px rgba(10,37,64,.12);overflow:hidden}
+.sp-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--pc)}
+.sp-card.handled::before{background:var(--ok)}
+.sp-card.in{animation:spIn .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes spIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.sp-top{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.sp-title{font-size:2.05em;line-height:1.18;font-weight:700;letter-spacing:-.01em;color:var(--ink);text-wrap:balance;overflow-wrap:anywhere}
+.sp-sub{color:var(--muted);margin:8px 0 0;font-size:1em}
+.sp-meta{display:flex;gap:12px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.sp-meta .spill,.sp-meta .due{font-size:.85em;padding:6px 14px;border-radius:999px;margin:0!important;display:inline-flex;align-items:center;line-height:1.3;vertical-align:middle}
+.sp-own{display:inline-flex;align-items:center;gap:16px;font-weight:600;font-size:1.1em;flex-wrap:wrap}
+.sp-own .oc{display:inline-flex;align-items:center;gap:10px}.sp-own .av{width:38px;height:38px;font-size:.7em}
+.sp-disc{color:var(--ok);font-weight:600;font-size:.9em}
+.sp-ctl{display:flex;gap:8px;flex-shrink:0;align-items:center;opacity:.55;transition:opacity .2s ease}.sp-ctl:hover,.sp-ctl:focus-within{opacity:1}
+.sp-cols{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;margin-top:26px}
+@media (max-width:900px){.sp-cols{grid-template-columns:1fr}.sp-card{padding:22px 20px 22px 28px}}
+.sp-lbl{font-size:.7em;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px}
+.sp-nl{margin:6px 0 -6px 4px}
+.sp-last{border-left:3px solid color-mix(in srgb,var(--muted) 40%,transparent);padding:2px 0 2px 16px;font-size:1.1em;color:var(--ink);line-height:1.45;white-space:pre-wrap}
+.sp-last.none{color:var(--muted)}
+textarea.ce.upd.sp-in{width:100%;min-height:96px;border:1.5px solid color-mix(in srgb,var(--pc) 55%,var(--line));border-radius:14px;padding:14px 16px;font-size:1.1em;line-height:1.45;color:var(--ink);background:var(--surface);box-shadow:0 0 0 5px color-mix(in srgb,var(--pc) 10%,transparent)}
+textarea.ce.upd.sp-in:focus{outline:none;border-color:var(--pc)}
+.sp-next{display:flex;flex-direction:column;gap:8px}
+.sp-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;cursor:pointer;background:color-mix(in srgb,var(--surface) 90%,transparent);border:1px solid color-mix(in srgb,var(--line) 60%,transparent);border-radius:14px;padding:12px 18px;font-size:.95em;color:var(--ink);transition:background-color .2s ease,transform .2s ease}
+.sp-row:hover{background:var(--surface);transform:translateX(3px)}
+.sp-row .t{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-row .o{color:var(--muted);display:flex;align-items:center;gap:8px;white-space:nowrap}.sp-row .o .av{width:28px;height:28px}
+.sp-row .du{color:var(--muted);font-size:.85em;min-width:90px;text-align:right}
+.sp-row.done{opacity:.6}.sp-row.done .t{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.sp-row .ck{color:var(--ok);font-weight:700}.sp-row .dot{width:8px;height:8px;border-radius:50%;background:var(--pc);opacity:.7;flex-shrink:0}
+html.viewonly .sp-ctl .btn{display:none}
+@media (prefers-reduced-motion:reduce){.sp-card.in{animation:none}.sp-row:hover{transform:none}}
 /* Next-quadrant button takes the colour of the quadrant it leads to */
 .btn.qn{background:var(--qcs);color:var(--qc);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--qc) 45%,transparent)}
 .btn.qn:hover{background:color-mix(in srgb,var(--qc) 22%,var(--qcs))}
@@ -907,7 +945,7 @@ html.present .aclock{width:54px;height:54px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v49</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v50</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1261,7 +1299,7 @@ const isView=()=>G.role==="view";
 if(isView())document.documentElement.classList.add("viewonly");
 /* view-only: allow looking around, block every change */
 (()=>{const OK='[data-tab],[data-stage],[data-rprio],[data-group],[data-focus],[data-sfocus],[data-quick],[data-atday],[data-atm],[data-atgo],[data-awk],[data-awday],[data-hq],[data-hgo],[data-m=close],[data-d=close],[data-open],[data-theme],[data-g=now],[data-g=disc],a[href],summary,details,.tabs,#helpBtn,#themeBtn,#presentBtn,#syncBtn,#q,#hq,#modal .mf a,#modal [data-m=copy]';
-  const OKACT=new Set(["pnext","pprev","rnext","rprev","fnext","fprev","copymin","mailmin","xlsx","print","runby","backup","mail","snaps"]);
+  const OKACT=new Set(["spot","pnext","pprev","rnext","rprev","fnext","fprev","copymin","mailmin","xlsx","print","runby","backup","mail","snaps"]);
   let warned=0;const warn=()=>{if(Date.now()-warned>2500){warned=Date.now();toast("View only: ask an editor to make changes")}};
   const allowed=t=>{if(!t||!t.closest)return true;if(t.closest(OK))return true;const a=t.closest("[data-act]");if(a&&OKACT.has(a.dataset.act))return true;
     if(t.closest("[data-mt]"))return true;
@@ -1829,6 +1867,26 @@ function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t
 function todayAll(){const tk=todayKey();return D.tasks.filter(t=>isToday(t)&&(t.status!=="done"||t.doneAt===tk))}
 const prioSort=(a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]);
 function prioTasks(p){return pendAll().filter(t=>t.prio===p).sort(prioSort)}
+const isPres=()=>document.documentElement.classList.contains("present");
+let lastSpot=null;
+function spotHtml(list,p){
+  const m=M();let cur=list.find(t=>t.id===S.run.spot)||list.find(t=>!pDiscussed(t));
+  const ix=cur?list.indexOf(cur):-1,anim=cur&&cur.id!==lastSpot;lastSpot=cur?cur.id:null;
+  const dots=`<div class="sp-dots">${list.map((t,i)=>`<button type="button" data-act="spot" data-id="${t.id}" class="${t===cur?"c":pDiscussed(t)?"d":""}" title="${esc(t.title)}"></button>`).join("")}<span>${cur?`Task ${ix+1} of ${list.length}`:`All ${list.length} dealt with`}</span></div>`;
+  let card;
+  if(cur){const t=cur,o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),d=dueInfo(t),disc=pDiscussed(t);
+    const meta=[t.partner&&(t.partner+(t.endUser?" → "+t.endUser:"")),!t.partner&&t.endUser,t.country].filter(Boolean).join(" · ");
+    card=`<div class="sp-card pr${disc?" handled":""}${anim?" in":""}" data-id="${t.id}"><div class="sp-top"><div style="flex:1;min-width:0">
+      <div class="sp-title">${esc(t.title)}</div>${meta?`<div class="sp-sub">${esc(meta)}</div>`:""}
+      <div class="sp-meta"><span class="sp-own">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</span>${done?`<span class="spill done">Completed</span>`:`<span class="spill ${t.status}">${STATUS[t.status]||""}</span>`}${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}${disc?`<span class="sp-disc">✓ ${done?"Completed":o==="upd"?"Updated":o==="same"?"No change":"Discussed"}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div></div>
+      <div class="sp-ctl">${done?"":`<button type="button" class="btn ghost sm" data-act="fb-same" data-id="${t.id}">✓ No update</button><button type="button" class="btn ghost sm" data-act="fb-done" data-id="${t.id}">Mark done</button>`}<button type="button" class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button></div></div>
+      <div class="sp-cols"><div><div class="sp-lbl">Last update${u?" · "+esc(fmt(u.date,{weekday:"long"})):""}</div>${u?`<div class="sp-last">${esc(u.text)}</div>`:`<div class="sp-last none">No updates yet</div>`}</div>
+      <div><div class="sp-lbl">Today's update</div>${done?`<div class="sp-last none">Completed</div>`:`<div class="savew"><textarea class="ce upd grow sp-in" rows="3" id="fb-${t.id}" placeholder="Type the update, then Enter. Empty Enter = no update." autocomplete="off"></textarea></div>`}</div></div></div>`;
+  }else card=`<div class="sp-card sp-fin${anim!==false?"":""}"><div class="sp-title">All ${list.length} dealt with in ${esc(PRIO[p].s)} ✓</div><p class="sp-sub">Move on with the Next button, or click a task below to go back to it.</p></div>`;
+  const rest=list.filter(t=>t!==cur);
+  const rows=rest.length?`<div class="sp-lbl sp-nl">${cur?"Up next":"Tasks"}</div><div class="sp-next">${rest.sort((a,b)=>pDiscussed(a)-pDiscussed(b)).map(t=>{const dn=pDiscussed(t),d=dueInfo(t);return `<button type="button" class="sp-row${dn?" done":""}" data-act="spot" data-id="${t.id}">${dn?'<span class="ck">✓</span>':'<span class="dot"></span>'}<span class="t">${esc(t.title)}</span><span class="o">${ownersOf(t).map(x=>av(x)+esc(x)).join(" ")}</span><span class="du">${dn?"Discussed":t.target?esc(d.l):""}</span></button>`}).join("")}</div>`:"";
+  return `<div class="sp" style="--pc:var(--p${p})">${dots}${card}${rows}</div>`;
+}
 function renderPrioRun(){
   const R=S.run,m=M(),p=R.pq||1,list=prioTasks(p),left=q=>prioTasks(q).filter(t=>!pDiscussed(t)).length,L=lists();
   const staff=[...new Set(D.staff)].filter(Boolean).sort(byName);
@@ -1837,9 +1895,9 @@ function renderPrioRun(){
     <button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>
     ${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok glow":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
   h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
-  h+=`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
+  h+=`${isPres()&&list.length?spotHtml(list,p):`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
     ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
-    </div><div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
+    </div>`}<div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
 }
 /* step 2: go round everyone's name, "anything needed from your side?", write it down */
@@ -1948,7 +2006,7 @@ function fu(t){
       <span class="push"><span class="hint">Push date:</span>${[["+1d",1],["+3d",3],["+1w",5]].map(([l,k])=>`<button data-act="fb-push" data-n="${k}" data-id="${t.id}">${l}</button>`).join("")}</span></div></div>`}
   </article>`;
 }
-function feedback(id,kind,stay){meetStart();
+function feedback(id,kind,stay){meetStart();if(S.run)S.run.spot=null;
   const t=find(id);if(!t)return;const inp=document.getElementById("fb-"+id), text=inp?inp.value.trim():"";const m=M();const prev=JSON.parse(JSON.stringify(t)), prevO=m.f[id];
   if(kind==="upd"&&!text){toast("Type the feedback first, or choose No change.");inp&&inp.focus();return}
   if(text)addUpdate(id,text);
@@ -2124,7 +2182,7 @@ scrim.addEventListener("click",()=>{if(S.edit){readDrawer();const E=S.edit;const
 /* ================= events ================= */
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;S.tab=b.dataset.tab;S.anim=true;S.vt=true;render();window.scrollTo({top:0});if(S.tab==="set"&&G.url&&!gSnaps)gLoadSnaps()});
 document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
-document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));
+document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));render();
   try{if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}setTimeout(()=>placeTabPill(true),350)});
 document.addEventListener("fullscreenchange",()=>setTimeout(()=>placeTabPill(true),100));
 document.getElementById("presentBtn").setAttribute("aria-pressed",String(document.documentElement.classList.contains("present")));
@@ -2145,11 +2203,12 @@ view.addEventListener("click",e=>{
   if(b){const id=b.dataset.id;switch(b.dataset.act){
     case "done":markDone(id);break;
     case "mail":{const t=find(id);if(t)mailTask(t);break}
+    case "spot":S.run.spot=id;S.anim=true;render();{const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
-    case "fb-undo":{const m=M();delete m.f[id];const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
+    case "fb-undo":{const m=M();delete m.f[id];if(S.run)S.run.spot=id;const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
     case "runby":{S.run.by=b.dataset.v;try{localStorage.setItem("minerva-tracker:runby",S.run.by)}catch(_){}if(S.run.stage==="today"&&S.run.by==="prio")S.run.stage="follow";S.anim=true;render();break}
-    case "pnext":case "pprev":{S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
+    case "pnext":case "pprev":{S.run.spot=null;S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
     case "pown":openOwners(id);break;
     case "attopen":openAttModal();break;
     case "tpadd":addForPerson(b.dataset.i);break;
