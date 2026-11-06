@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v45</title>
+<title>Minerva Priorities · v46</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -867,17 +867,15 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .mclock.done{color:#16A34A;border-color:color-mix(in srgb,#16A34A 35%,var(--line))}
 .mclock.off{padding:3px 6px;opacity:.6}.mclock.off:hover{opacity:1}
 
-/* ===== header clock ===== */
-.hclock{margin-left:auto;display:inline-flex;align-items:center;gap:10px;padding:5px 14px 5px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03));color:#fff;user-select:none;white-space:nowrap}
-.hclock .hcd{display:flex;flex-direction:column;align-items:flex-end;line-height:1.05;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.72)}
-.hclock .hcd small{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:none;color:rgba(255,255,255,.55)}
-.hclock .hct{font-size:22px;font-weight:300;letter-spacing:.02em;font-variant-numeric:tabular-nums;line-height:1}
-.hclock .hct span{font-weight:600}
-.hclock .hct i{font-style:normal;display:inline-block;margin:0 1px;color:#00A7E1;animation:hcBlink 1s steps(1,end) infinite}
-@keyframes hcBlink{50%{opacity:.25}}
-@media (prefers-reduced-motion:reduce){.hclock .hct i{animation:none}}
-@media (max-width:640px){.hclock .hcd{display:none}.hclock{padding:4px 10px}.hclock .hct{font-size:18px}}
-html.present .hclock .hct{font-size:25px}
+/* ===== header clock: quiet, text-only ===== */
+.hclock{margin-left:auto;display:inline-flex;align-items:baseline;gap:10px;padding:0 4px 0 10px;color:#fff;user-select:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.hclock .hcd{font-size:13px;font-weight:500;color:rgba(255,255,255,.6);letter-spacing:.01em}
+.hclock .hcd small{font-size:inherit;font-weight:inherit;color:inherit;margin-left:4px}
+.hclock .hct{font-size:17px;font-weight:600;letter-spacing:.01em;line-height:1}
+.hclock .hct i{font-style:normal;margin:0 1px;opacity:.7}
+.hclock .hcd::after{content:"";display:inline-block;width:1px;height:12px;background:rgba(255,255,255,.25);margin-left:10px;vertical-align:-1px}
+@media (max-width:640px){.hclock .hcd{display:none}}
+html.present .hclock .hct{font-size:19px}
 </style>
 </head>
 <body>
@@ -885,7 +883,7 @@ html.present .hclock .hct{font-size:25px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v45</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v46</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
