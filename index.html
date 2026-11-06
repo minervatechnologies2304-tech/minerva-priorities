@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v54</title>
+<title>Minerva Priorities · v55</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -957,6 +957,42 @@ html.spfoc .sp-card{transform:translateY(-3px) scale(1.008);box-shadow:0 4px 8px
 .aclock .pin{fill:var(--ac-face)}
 @media (prefers-reduced-motion:reduce){.aclock .s{display:none}}
 html.present .aclock{width:54px;height:54px}
+
+/* ===== Present mode, tuned for screen sharing (Google Meet) ===== */
+/* 2. stronger greys and lines so text survives compression */
+html.present:root{--muted:#46576A;--faint:#56687B;--line:#C9D5E1;--line-2:#B5C4D3}
+html.present:root[data-theme="dark"]{--muted:#AEBDCB;--faint:#98AABA;--line:#34546F;--line-2:#41627F}
+@media (prefers-color-scheme:dark){html.present:root:not([data-theme="light"]){--muted:#AEBDCB;--faint:#98AABA;--line:#34546F;--line-2:#41627F}}
+/* wave background pushed further back */
+html.present body::after{content:"";position:fixed;inset:0;background:var(--bg);opacity:.5;pointer-events:none;z-index:-1}
+html.present .sp-card,html.present .sp-row{border-color:var(--line)}
+html.present .sp-card{border-width:1.5px}
+html.present .sp-last{border-left-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+/* 3 + 4. bigger where it matters; clearer typing */
+html.present .sp-title{font-size:2.25em}
+html.present .sp-last{font-size:1.2em}
+html.present textarea.ce.upd.sp-in{font-size:1.2em;border-width:2px;caret-color:var(--pc);font-weight:500}
+html.present .sp-lbl{font-size:.74em;color:var(--muted)}
+/* 1. quick, crisp transitions (Meet sends few frames per second) */
+html.present .sp-card.in{animation-duration:.16s}
+html.present .spd,html.present .spdim{transition-duration:.15s!important}
+html.present .sp-row,html.present .sp-b,html.present .sp-dots button,html.present .sp-ctl{transition-duration:.1s}
+html.present .sp-row:hover{transform:none}
+/* 5. no moving shadows or pulsing glows */
+html.present .sp-card{transition:none}
+html.present .glow::after{animation:none;opacity:0}
+html.present .glow{animation:none}
+/* 6. lighter blur, more fade */
+html.present .spdim.l1{filter:blur(.4px);opacity:.72}
+html.present .spdim.l2{filter:blur(1px);opacity:.5}
+html.present .spdim.l3{filter:blur(1.6px);opacity:.38}
+html.present .spdim:hover{filter:none;opacity:.9}
+/* 7. hide clutter viewers don't need */
+html.present #syncBtn,html.present #helpBtn,html.present #newBtn{display:none!important}
+/* 8. small, quick toast */
+html.present .toast{font-size:13px;padding:6px 8px 6px 12px;gap:8px;border-radius:10px;animation-duration:.1s;-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(29,29,31,.88);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+html.present .toast.out{animation-duration:.1s}
+html.present .toast button{padding:3px 8px;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -964,7 +1000,7 @@ html.present .aclock{width:54px;height:54px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v54</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v55</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1480,7 +1516,7 @@ function renderNow(){
     view.classList.remove("enter");void view.offsetWidth;
     let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<14){el.classList.add("cas");el.style.setProperty("--i",i++)}});
     view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},900)}
-  else if(old&&old.size)morph(old,nums);
+  else if(old&&old.size&&!document.documentElement.classList.contains("present"))morph(old,nums);
   lastPos=pos;placeSegPills(pageChange?null:segs);try{localStorage.setItem("minerva-tracker:tab",S.tab)}catch(e){}
   const hd=document.querySelector("header");if(hd)document.documentElement.style.setProperty("--hh",hd.offsetHeight+"px");
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(s0!=null)el.setSelectionRange(s0,s1)}catch(e){}}}
@@ -2218,7 +2254,7 @@ document.getElementById("newBtn").addEventListener("click",()=>openTask(null));
     for(const sib of par.children){if(sib===el||SKIP.test(sib.tagName)||sib.matches("#toast,#modal,#drawer,.toast,.modal,.drawer,dialog"))continue;if(getComputedStyle(sib).position==="fixed"&&!sib.matches("header"))continue;const l=lvl(sib);if(l)mark(sib,l)}el=par}}
   function check(){clearTimeout(tm);const a=document.activeElement,c=a&&a.closest&&a.closest(".sp-card"),on=!!(c&&root.classList.contains("present"));
     if(on&&root.classList.contains("spfoc")){apply(c);return}
-    tm=setTimeout(()=>{const a2=document.activeElement,c2=a2&&a2.closest&&a2.closest(".sp-card");if(c2&&root.classList.contains("present"))apply(c2);else clear()},on?220:90)}
+    tm=setTimeout(()=>{const a2=document.activeElement,c2=a2&&a2.closest&&a2.closest(".sp-card");if(c2&&root.classList.contains("present"))apply(c2);else clear()},on?(root.classList.contains("present")?110:220):90)}
   document.addEventListener("focusin",check);document.addEventListener("focusout",check);
 })();
 document.getElementById("presentBtn").addEventListener("click",()=>{const on=document.documentElement.classList.toggle("present");try{localStorage.setItem("minerva-tracker:present",on?"1":"0")}catch(e){}document.getElementById("presentBtn").setAttribute("aria-pressed",String(on));render();
@@ -2242,7 +2278,7 @@ view.addEventListener("click",e=>{
   if(b){const id=b.dataset.id;switch(b.dataset.act){
     case "done":markDone(id);break;
     case "mail":{const t=find(id);if(t)mailTask(t);break}
-    case "spot":S.run.spot=id;S.anim=true;render();{const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
+    case "spot":S.run.spot=id;render();{const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
     case "fb-undo":{const m=M();delete m.f[id];if(S.run)S.run.spot=id;const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
