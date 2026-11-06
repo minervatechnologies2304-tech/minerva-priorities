@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v51</title>
+<title>Minerva Priorities · v52</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -900,7 +900,14 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .sp-own{display:inline-flex;align-items:center;gap:16px;font-weight:600;font-size:1.1em;flex-wrap:wrap}
 .sp-own .oc{display:inline-flex;align-items:center;gap:10px}.sp-own .av{width:38px;height:38px;font-size:.7em}
 .sp-disc{color:var(--ok);font-weight:600;font-size:.9em}
-.sp-ctl{display:flex;gap:8px;flex-shrink:0;align-items:center;opacity:.55;transition:opacity .2s ease}.sp-ctl:hover,.sp-ctl:focus-within{opacity:1}
+.sp-ctl{display:flex;gap:8px;flex-shrink:0;align-items:center}
+.sp-b{--c:var(--ok);display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:.78em;font-weight:600;padding:7px 14px;border-radius:10px;cursor:pointer;color:var(--c);background:color-mix(in srgb,var(--c) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 42%,transparent);transition:background-color .15s ease,color .15s ease,border-color .15s ease}
+.sp-b svg{width:14px;height:14px}
+.sp-b:hover{background:var(--c);border-color:var(--c);color:#fff}.sp-b:active{transform:scale(.97)}
+.sp-b.md{--c:var(--navy2)}
+:root[data-theme="dark"] .sp-b:hover{color:#08202F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sp-b:hover{color:#08202F}}
+.sp-ctl .icon{color:var(--navy2)}
 .sp-cols{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;margin-top:26px}
 @media (max-width:900px){.sp-cols{grid-template-columns:1fr}.sp-card{padding:22px 20px 22px 28px}}
 .sp-lbl{font-size:.7em;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px}
@@ -918,7 +925,7 @@ textarea.ce.upd.sp-in:focus{outline:none;border-color:var(--pc)}
 .sp-row .du{color:var(--muted);font-size:.85em;min-width:90px;text-align:right}
 .sp-row.done{opacity:.6}.sp-row.done .t{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
 .sp-row .ck{color:var(--ok);font-weight:700}.sp-row .dot{width:8px;height:8px;border-radius:50%;background:var(--pc);opacity:.7;flex-shrink:0}
-html.viewonly .sp-ctl .btn{display:none}
+html.viewonly .sp-ctl .sp-b{display:none}
 @media (prefers-reduced-motion:reduce){.sp-card.in{animation:none}.sp-row:hover{transform:none}}
 /* Next-quadrant button takes the colour of the quadrant it leads to */
 .btn.qn{background:var(--qcs);color:var(--qc);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--qc) 45%,transparent)}
@@ -946,7 +953,7 @@ html.present .aclock{width:54px;height:54px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v51</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v52</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1880,7 +1887,7 @@ function spotHtml(list,p){
     card=`<div class="sp-card pr${disc?" handled":""}${anim?" in":""}" data-id="${t.id}"><div class="sp-top"><div style="flex:1;min-width:0">
       <div class="sp-title">${esc(t.title)}</div>${meta?`<div class="sp-sub">${esc(meta)}</div>`:""}
       <div class="sp-meta"><span class="sp-own">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</span>${done?`<span class="spill done">Completed</span>`:`<span class="spill ${t.status}">${STATUS[t.status]||""}</span>`}${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}${disc?`<span class="sp-disc">✓ ${done?"Completed":o==="upd"?"Updated":o==="same"?"No change":"Discussed"}${o?` <button type="button" class="link xs" data-act="fb-undo" data-id="${t.id}">undo</button>`:""}</span>`:""}</div></div>
-      <div class="sp-ctl">${done?"":`<button type="button" class="btn ghost sm" data-act="fb-same" data-id="${t.id}">✓ No update</button><button type="button" class="btn ghost sm" data-act="fb-done" data-id="${t.id}">Mark done</button>`}<button type="button" class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button></div></div>
+      <div class="sp-ctl">${done?"":`<button type="button" class="sp-b nu" data-act="fb-same" data-id="${t.id}" title="Nothing new (or Enter on an empty box)">✓ No update</button><button type="button" class="sp-b md" data-act="fb-done" data-id="${t.id}">${IC.check}Mark done</button>`}<button type="button" class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button></div></div>
       <div class="sp-cols"><div><div class="sp-lbl">Latest update${u?" · "+esc(u.date===todayKey()?"Today":fmt(u.date,{weekday:"short",day:"numeric",month:"short"})):""}</div>${u?`<div class="sp-last">${esc(u.text)}</div>${(()=>{const e=(t.updates||[]).slice().sort((a,b)=>(b.date+(b.at||"")).localeCompare(a.date+(a.at||""))).slice(1,3);return e.length?`<div class="sp-hist">${e.map(x=>`<div><time>${esc(fmt(x.date,{day:"numeric",month:"short"}))}</time>${esc(x.text)}</div>`).join("")}${(t.updates||[]).length>3?`<button type="button" class="link xs" data-open="${t.id}">+${t.updates.length-3} earlier</button>`:""}</div>`:""})()}`:`<div class="sp-last none">No updates yet</div>`}</div>
       <div><div class="sp-lbl">Today's update</div>${done?`<div class="sp-last none">Completed</div>`:`<div class="savew"><textarea class="ce upd grow sp-in" rows="3" id="fb-${t.id}" placeholder="Type the update, then Enter. Empty Enter = no update." autocomplete="off"></textarea></div>`}</div></div></div>`;
   }else card=`<div class="sp-card sp-fin${anim!==false?"":""}"><div class="sp-title">All ${list.length} dealt with in ${esc(PRIO[p].s)} ✓</div><p class="sp-sub">Move on with the Next button, or click a task below to go back to it.</p></div>`;
