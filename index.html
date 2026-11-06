@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v39</title>
+<title>Minerva Priorities · v40</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -840,7 +840,11 @@ textarea.ce.ct.grow{min-height:0;font-family:inherit}
 textarea.ce.upd.grow{min-height:3.4em;background:var(--surface);border-color:var(--line);padding:8px 10px;font-size:14px}
 textarea.ce.upd.grow:focus{border-color:var(--accent)}
 .c-upd .savew{display:block;position:relative}.c-upd .savebtn{position:static;transform:none;margin-top:6px}
-.c-upd .savew>textarea:placeholder-shown+.savebtn{opacity:0;pointer-events:none;transform:scale(.85)}
+.c-upd .savew>textarea:placeholder-shown+.savebtn{display:none}
+.c-upd .nupd{margin-top:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;font:inherit;font-size:12.5px;font-weight:600;padding:4px 10px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
+.c-upd .nupd:hover{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface));color:var(--ok)}
+.c-upd .savew>textarea:not(:placeholder-shown)~.nupd{display:none}
+html.viewonly .c-upd .nupd{display:none}
 </style>
 </head>
 <body>
@@ -848,7 +852,7 @@ textarea.ce.upd.grow:focus{border-color:var(--accent)}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v39</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v40</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1841,7 +1845,7 @@ function prow(t){
     <td class="c-dt"><label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}
 </td>
     <td class="c-lu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}${n>1?` <em>+${n-1} earlier</em>`:""}`:'<span class="none">—</span>'}</td>
-    <td class="c-upd">${done?"":`<div class="savew"><textarea class="ce upd grow" rows="2" id="fb-${t.id}" placeholder="Add update… (Enter to save, Shift+Enter for a new line)" autocomplete="off"></textarea><button type="button" class="savebtn" data-act="fb-upd" data-id="${t.id}" tabindex="-1">Save ↵</button></div>`}</td>
+    <td class="c-upd">${done?"":`<div class="savew"><textarea class="ce upd grow" rows="2" id="fb-${t.id}" placeholder="Add update… (Enter to save, Shift+Enter for a new line)" autocomplete="off"></textarea><button type="button" class="savebtn" data-act="fb-upd" data-id="${t.id}" tabindex="-1">Save ↵</button>${m.f[t.id]==="same"?"":`<button type="button" class="nupd" data-act="fb-same" data-id="${t.id}" title="Still ongoing, nothing new to add">✓ No update</button>`}</div>`}</td>
     <td class="c-act">${done?"":`<button class="icon okh" data-act="fb-done" data-id="${t.id}" title="Mark completed">${IC.check}</button>`}<span class="hov">${t.prio===1&&!done?`<button class="icon mail" data-act="mail" data-id="${t.id}" title="Email about this urgent task">${IC.mail}</button>`:""}<button class="icon" data-open="${t.id}" title="Open the full task">${IC.note}</button>
       <select class="ce mv" data-pf="prio" data-id="${t.id}" title="Move to another priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>Move to ${PRIO[q].s}</option>`).join("")}</select></span></td>
   </tr>`;
