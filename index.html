@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v44</title>
+<title>Minerva Priorities · v45</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -866,6 +866,18 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .mclock svg{width:14px;height:14px}.mclock:hover{border-color:var(--accent);color:var(--ink)}
 .mclock.done{color:#16A34A;border-color:color-mix(in srgb,#16A34A 35%,var(--line))}
 .mclock.off{padding:3px 6px;opacity:.6}.mclock.off:hover{opacity:1}
+
+/* ===== header clock ===== */
+.hclock{margin-left:auto;display:inline-flex;align-items:center;gap:10px;padding:5px 14px 5px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03));color:#fff;user-select:none;white-space:nowrap}
+.hclock .hcd{display:flex;flex-direction:column;align-items:flex-end;line-height:1.05;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.hclock .hcd small{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:none;color:rgba(255,255,255,.55)}
+.hclock .hct{font-size:22px;font-weight:300;letter-spacing:.02em;font-variant-numeric:tabular-nums;line-height:1}
+.hclock .hct span{font-weight:600}
+.hclock .hct i{font-style:normal;display:inline-block;margin:0 1px;color:#00A7E1;animation:hcBlink 1s steps(1,end) infinite}
+@keyframes hcBlink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.hclock .hct i{animation:none}}
+@media (max-width:640px){.hclock .hcd{display:none}.hclock{padding:4px 10px}.hclock .hct{font-size:18px}}
+html.present .hclock .hct{font-size:25px}
 </style>
 </head>
 <body>
@@ -873,7 +885,7 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v44</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v45</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -889,6 +901,7 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
     <button class="hbtn" id="themeBtn" type="button" title="Light or dark mode"></button>
     <button class="hbtn" id="presentBtn" type="button" aria-pressed="false" title="Bigger text for screen sharing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="pl">Present</span></button>
     <button class="hbtn" id="newBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New task</button>
+    <div class="hclock" id="hclock" role="timer" aria-live="off" title="Current time"><span class="hcd" id="hcd"></span><span class="hct"><span id="hch">--</span><i>:</i><span id="hcm">--</span></span></div>
   </div>
 </header>
 <main class="wrap"><section id="view"></section></main>
@@ -1953,6 +1966,9 @@ function clockHtml(){const m=M();if(!m.st)return "";const n=meetMin(m);
   return `<button type="button" class="mclock${m.adj?" done":""}" data-act="clock" title="Meeting time (click to hide)">${IC_CLK}<span id="mclockt">${m.adj?durTxt(n)+" · adjourned":"Meeting · "+durTxt(n)}</span></button>`}
 const IC_CLK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 setInterval(()=>{const el=document.getElementById("mclockt");if(!el)return;const m=M();if(m.adj||!m.st)return;el.textContent="Meeting · "+durTxt(meetMin(m))},20000);
+(function hclock(){const pad=x=>String(x).padStart(2,"0");function tick(){const d=new Date(),h=document.getElementById("hch");if(!h)return;h.textContent=pad(d.getHours());document.getElementById("hcm").textContent=pad(d.getMinutes());
+  document.getElementById("hcd").innerHTML=d.toLocaleDateString("en-GB",{weekday:"short"})+"<small>"+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+"</small>";
+  document.getElementById("hclock").setAttribute("aria-label","Time "+pad(d.getHours())+":"+pad(d.getMinutes()));setTimeout(tick,(60-d.getSeconds())*1000-d.getMilliseconds()+30)}tick()})();
 const adjT=m=>m&&m.adj?new Date(m.adj).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
 function adjBtn(cls){return M().adj?"":`<button class="btn adj${cls?" "+cls:""}" data-act="adjourn" title="Close today's meeting">${IC_ADJ}Meeting adjourned</button>`}
 function adjStats(){const m=M(),k=x=>Object.values(m.f).filter(v=>v===x).length;return [[k("done"),"completed"],[k("upd")+k("wait"),"updated"],[m.added.length,"new priorities"]]}
