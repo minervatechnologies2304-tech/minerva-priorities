@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v40</title>
+<title>Minerva Priorities · v41</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -841,8 +841,8 @@ textarea.ce.upd.grow{min-height:3.4em;background:var(--surface);border-color:var
 textarea.ce.upd.grow:focus{border-color:var(--accent)}
 .c-upd .savew{display:block;position:relative}.c-upd .savebtn{position:static;transform:none;margin-top:6px}
 .c-upd .savew>textarea:placeholder-shown+.savebtn{display:none}
-.c-upd .nupd{margin-top:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;font:inherit;font-size:12.5px;font-weight:600;padding:4px 10px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
-.c-upd .nupd:hover{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface));color:var(--ok)}
+.c-upd .nupd{margin-top:6px;border:1px solid color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--ok) 14%,var(--surface));color:var(--ok);border-radius:8px;font:inherit;font-size:12.5px;font-weight:600;padding:4px 10px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
+.c-upd .nupd:hover{border-color:var(--ok);background:var(--ok);color:#fff}.c-upd .nupd:active{transform:scale(.97)}
 .c-upd .savew>textarea:not(:placeholder-shown)~.nupd{display:none}
 html.viewonly .c-upd .nupd{display:none}
 </style>
@@ -852,7 +852,7 @@ html.viewonly .c-upd .nupd{display:none}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v40</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v41</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
