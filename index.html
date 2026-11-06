@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v46</title>
+<title>Minerva Priorities · v47</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -867,15 +867,22 @@ html.present .rph b{font-size:1.15em}html.present .ritem .ce.ct,html.present .ra
 .mclock.done{color:#16A34A;border-color:color-mix(in srgb,#16A34A 35%,var(--line))}
 .mclock.off{padding:3px 6px;opacity:.6}.mclock.off:hover{opacity:1}
 
-/* ===== header clock: quiet, text-only ===== */
-.hclock{margin-left:auto;display:inline-flex;align-items:baseline;gap:10px;padding:0 4px 0 10px;color:#fff;user-select:none;white-space:nowrap;font-variant-numeric:tabular-nums}
-.hclock .hcd{font-size:13px;font-weight:500;color:rgba(255,255,255,.6);letter-spacing:.01em}
-.hclock .hcd small{font-size:inherit;font-weight:inherit;color:inherit;margin-left:4px}
-.hclock .hct{font-size:17px;font-weight:600;letter-spacing:.01em;line-height:1}
-.hclock .hct i{font-style:normal;margin:0 1px;opacity:.7}
-.hclock .hcd::after{content:"";display:inline-block;width:1px;height:12px;background:rgba(255,255,255,.25);margin-left:10px;vertical-align:-1px}
-@media (max-width:640px){.hclock .hcd{display:none}}
-html.present .hclock .hct{font-size:19px}
+
+/* ===== analog clock beside the meeting date ===== */
+.mdrow{display:flex;align-items:center;gap:14px}
+.aclock{display:inline-block;width:42px;height:42px;flex:none;border-radius:50%;box-shadow:0 1px 2px rgba(0,20,40,.08),0 4px 14px rgba(0,20,40,.08)}
+.aclock svg{width:100%;height:100%;display:block;overflow:visible}
+.aclock .face{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.aclock .tk{stroke:var(--muted);stroke-width:.9;stroke-linecap:round;opacity:.55}.aclock .tk.q{stroke:var(--ink);stroke-width:1.5;opacity:.8}
+.aclock .hand{transform-origin:20px 20px;transform-box:view-box;animation:aspin linear infinite}
+.aclock .hand line{stroke-linecap:round}
+.aclock .h{animation-duration:43200s}.aclock .h line{stroke:var(--ink);stroke-width:2.6}
+.aclock .m{animation-duration:3600s}.aclock .m line{stroke:var(--ink);stroke-width:1.8}
+.aclock .s{animation-duration:60s}.aclock .s line{stroke:#00A7E1;stroke-width:.9}.aclock .s circle{fill:#00A7E1}
+.aclock .pin{fill:var(--surface)}
+@keyframes aspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.aclock .s{display:none}}
+html.present .aclock{width:50px;height:50px}
 </style>
 </head>
 <body>
@@ -883,7 +890,7 @@ html.present .hclock .hct{font-size:19px}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v46</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v47</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -899,7 +906,6 @@ html.present .hclock .hct{font-size:19px}
     <button class="hbtn" id="themeBtn" type="button" title="Light or dark mode"></button>
     <button class="hbtn" id="presentBtn" type="button" aria-pressed="false" title="Bigger text for screen sharing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span class="pl">Present</span></button>
     <button class="hbtn" id="newBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New task</button>
-    <div class="hclock" id="hclock" role="timer" aria-live="off" title="Current time"><span class="hcd" id="hcd"></span><span class="hct"><span id="hch">--</span><i>:</i><span id="hcm">--</span></span></div>
   </div>
 </header>
 <main class="wrap"><section id="view"></section></main>
@@ -1770,7 +1776,7 @@ function renderRun(){
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
   const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`]];
-  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${clockHtml()}${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
+  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><div class="mdrow"><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${aclock()}</div>${clockHtml()}${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   if(awOn(tk).length)h+=awTodayBox();
   if(R.stage==="wrap")R.stage="today";
@@ -1964,9 +1970,13 @@ function clockHtml(){const m=M();if(!m.st)return "";const n=meetMin(m);
   return `<button type="button" class="mclock${m.adj?" done":""}" data-act="clock" title="Meeting time (click to hide)">${IC_CLK}<span id="mclockt">${m.adj?durTxt(n)+" · adjourned":"Meeting · "+durTxt(n)}</span></button>`}
 const IC_CLK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 setInterval(()=>{const el=document.getElementById("mclockt");if(!el)return;const m=M();if(m.adj||!m.st)return;el.textContent="Meeting · "+durTxt(meetMin(m))},20000);
-(function hclock(){const pad=x=>String(x).padStart(2,"0");function tick(){const d=new Date(),h=document.getElementById("hch");if(!h)return;h.textContent=pad(d.getHours());document.getElementById("hcm").textContent=pad(d.getMinutes());
-  document.getElementById("hcd").innerHTML=d.toLocaleDateString("en-GB",{weekday:"short"})+"<small>"+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+"</small>";
-  document.getElementById("hclock").setAttribute("aria-label","Time "+pad(d.getHours())+":"+pad(d.getMinutes()));setTimeout(tick,(60-d.getSeconds())*1000-d.getMilliseconds()+30)}tick()})();
+function aclock(){const d=new Date(),sec=d.getSeconds()+d.getMilliseconds()/1000,min=d.getMinutes()+sec/60,hr=(d.getHours()%12)+min/60;
+  const t=[...Array(12)].map((_,i)=>{const a=i*30*Math.PI/180,r1=i%3?16.2:14.6,r2=18;return `<line x1="${(20+Math.sin(a)*r1).toFixed(2)}" y1="${(20-Math.cos(a)*r1).toFixed(2)}" x2="${(20+Math.sin(a)*r2).toFixed(2)}" y2="${(20-Math.cos(a)*r2).toFixed(2)}" class="${i%3?"tk":"tk q"}"/>`}).join("");
+  return `<span class="aclock" role="img" aria-label="${esc(d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))}" title="${esc(d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))}"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" class="face"/>${t}
+    <g class="hand h" style="animation-delay:-${(hr*3600).toFixed(1)}s"><line x1="20" y1="22.5" x2="20" y2="10.5"/></g>
+    <g class="hand m" style="animation-delay:-${(min*60).toFixed(1)}s"><line x1="20" y1="23" x2="20" y2="6"/></g>
+    <g class="hand s" style="animation-delay:-${sec.toFixed(2)}s"><line x1="20" y1="24.5" x2="20" y2="4.5"/><circle cx="20" cy="20" r="1.6"/></g>
+    <circle cx="20" cy="20" r="0.8" class="pin"/></svg></span>`}
 const adjT=m=>m&&m.adj?new Date(m.adj).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}):"";
 function adjBtn(cls){return M().adj?"":`<button class="btn adj${cls?" "+cls:""}" data-act="adjourn" title="Close today's meeting">${IC_ADJ}Meeting adjourned</button>`}
 function adjStats(){const m=M(),k=x=>Object.values(m.f).filter(v=>v===x).length;return [[k("done"),"completed"],[k("upd")+k("wait"),"updated"],[m.added.length,"new priorities"]]}
