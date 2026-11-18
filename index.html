@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v58</title>
+<title>Minerva Priorities · v59</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -709,7 +709,16 @@ html{scroll-behavior:smooth}main{overflow-x:clip}
 .round.dround{margin-bottom:6px}
 .round.dround .rperson{background:color-mix(in srgb,var(--accent) 3%,transparent)}
 .fromsel{appearance:none;-webkit-appearance:none;border:1px dashed var(--line2,var(--line));background:transparent;color:var(--muted);border-radius:99px;padding:2px 10px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;max-width:170px;text-overflow:ellipsis}
-input.fromsel{cursor:text;field-sizing:content;min-width:120px;max-width:280px}
+.fpick{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px;cursor:text;min-width:0}
+.fpick .fpin{flex:1 1 70px;min-width:70px;border:0;outline:0;background:transparent;font:inherit;color:inherit;padding:0;margin:0}
+.fpick .fpin::-webkit-calendar-picker-indicator{display:none!important;opacity:0}
+.fchip{display:inline-flex;align-items:center;gap:3px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:99px;padding:1px 4px 1px 9px;font-size:12.5px;font-weight:700;line-height:1.5;white-space:nowrap}
+.fchip .fx{border:0;background:transparent;color:inherit;cursor:pointer;padding:0 3px;font-size:14px;line-height:1;opacity:.6;border-radius:99px}
+.fchip .fx:hover{opacity:1;background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.fromsel.fpick{max-width:360px;padding:2px 6px;cursor:text}
+.fromsel.fpick .fpin{flex-basis:90px;font-size:12.5px}
+.fpick.inp{padding:5px 8px}
+.fpick.inp:focus-within{border-color:var(--accent)}
 .fromsel.on{border-style:solid;border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);font-weight:700}
 .round .ritem:not(:hover):not(:focus-within) .fromsel:not(.on){opacity:.55}
 .round .radd .fromadd{flex:0 0 150px}
@@ -720,9 +729,9 @@ input.fromsel{cursor:text;field-sizing:content;min-width:120px;max-width:280px}
 .rneed i{font-style:normal;font-weight:500;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .ftag{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:99px;padding:1px 8px;margin-right:6px;white-space:nowrap}
 
-.round .radd .fromin{flex:0 0 170px;padding:7px 10px;transition:opacity .2s ease,border-color .2s ease}
-.round .radd:not(:focus-within):not(:hover) .fromin:placeholder-shown{opacity:.45}
-.round .radd .fromin:not(:placeholder-shown){border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent);font-weight:700}
+.round .radd .fromin{flex:0 1 auto;min-width:170px;max-width:380px;padding:7px 10px;transition:opacity .2s ease,border-color .2s ease}
+.round .radd:not(:focus-within):not(:hover) .fromin:not(.has){opacity:.45}
+.round .radd .fromin.has{border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent);font-weight:700}
 @media (max-width:760px){.round .radd{flex-wrap:wrap}.round .radd .fromin{flex:1 1 140px}}
 
 /* ===== refreshed motion (Nov): one timing system, cross-fading pages, lighter work for the browser ===== */
@@ -772,7 +781,7 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 .round .radd .hov2{flex:0 0 118px}
 .round .ritem{flex-wrap:wrap;row-gap:2px}.round .ritem .ct{flex:1 1 220px;min-width:160px}
 .round .ritem .hov{margin-left:auto;display:inline-flex;flex:none}
-@media (max-width:1150px){.round .radd:not(:focus-within) .fromin:placeholder-shown,.round .radd:not(:focus-within) .hov2{display:none}.round .ritem .ct{flex:1 1 300px}.round .radd .savew{flex-basis:100%}.round .radd .fromin{flex:1 1 160px}.round .rperson{grid-template-columns:minmax(110px,160px) minmax(0,1fr)}.round .rend{grid-column:2;text-align:left;margin-top:-2px}.round .rend .btn{padding:4px 10px}}
+@media (max-width:1150px){.round .radd:not(:focus-within) .fromin:not(.has),.round .radd:not(:focus-within) .hov2{display:none}.round .ritem .ct{flex:1 1 300px}.round .radd .savew{flex-basis:100%}.round .radd .fromin{flex:1 1 160px}.round .rperson{grid-template-columns:minmax(110px,160px) minmax(0,1fr)}.round .rend{grid-column:2;text-align:left;margin-top:-2px}.round .rend .btn{padding:4px 10px}}
 @media (max-width:760px){.round .rperson{grid-template-columns:1fr}.round .rend{grid-column:1}}
 @media (prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}.ritem.fresh{animation:none}.row:hover{transform:none}}
 
@@ -1022,7 +1031,7 @@ html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v58</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v59</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1253,8 +1262,27 @@ const fromsOf=t=>String(t&&t.from||"").split(/\s*,\s*/).filter(Boolean);
 function fromNames(){return [...depts(),...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned"&&!isDept(x)).sort(byName)]}
 function resolveFroms(v,owners){const ex=[].concat(owners||[]),out=[];String(v||"").split(/\s*[,;&+]\s*/).map(x=>x.trim()).filter(Boolean).forEach(x=>{const r=resolveFrom(x,ex);if(r&&!ex.includes(r)&&!out.some(o=>o.toLowerCase()===r.toLowerCase()))out.push(r)});return out.join(", ")}
 function fromDL(id){return `<datalist id="${id}">${fromNames().map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`}
-function fromSuggest(x){const dl=x&&x.list;if(!dl||!/^dl-from/.test(dl.id))return;const v=x.value,k=v.lastIndexOf(",");const pre=k<0?"":v.slice(0,k+1).replace(/\s*$/," ");const used=pre.split(/\s*,\s*/).map(z=>z.trim().toLowerCase()).filter(Boolean);
-  dl.innerHTML=fromNames().filter(n=>!used.includes(n.toLowerCase())).map(n=>`<option value="${esc(pre+n)}">`).join("")}
+function fromSuggest(x){const dl=x&&x.list;if(!dl||!/^dl-from/.test(dl.id))return;const w=x.closest(".fpick"),used=w?[...fpVals(w),...fpExclude(w)].map(z=>z.toLowerCase()):[];
+  dl.innerHTML=fromNames().filter(n=>!used.includes(n.toLowerCase())).map(n=>`<option value="${esc(n)}">`).join("")}
+document.addEventListener("focusin",e=>{if(e.target&&e.target.classList&&e.target.classList.contains("fpin"))fromSuggest(e.target)});
+document.addEventListener("input",e=>{const x=e.target;if(!x||!x.classList||!x.classList.contains("fpin"))return;const w=x.closest(".fpick"),v=x.value;
+  if(/[,;]\s*$/.test(v)){fpAdd(w,v.replace(/[,;]\s*$/,""));return}
+  if(e.inputType==null||e.inputType==="insertReplacementText"){if(fromNames().some(n=>n.toLowerCase()===v.trim().toLowerCase())){fpAdd(w,v);return}}});
+document.addEventListener("keydown",e=>{const x=e.target;if(!x||!x.classList||!x.classList.contains("fpin"))return;const w=x.closest(".fpick");
+  if((e.key==="Enter"||(e.key==="Tab"&&!e.shiftKey))&&x.value.trim()){e.preventDefault();e.stopPropagation();fpAdd(w,x.value);return}
+  if(e.key==="Backspace"&&!x.value){const vals=fpVals(w);if(vals.length){e.preventDefault();fpDel(w,vals[vals.length-1])}return}
+  if(e.key==="Enter"&&w.dataset.tpf==null){e.preventDefault();e.stopPropagation();x.blur()}},true);
+document.addEventListener("focusout",e=>{const x=e.target;if(x&&x.classList&&x.classList.contains("fpin")&&x.value.trim()){const w=x.closest(".fpick");if(w.dataset.tpf==null)fpAdd(w,x.value)}},true);
+document.addEventListener("mousedown",e=>{const b=e.target.closest&&e.target.closest(".fx");if(b){e.preventDefault();e.stopPropagation();fpDel(b.closest(".fpick"),b.dataset.fx);return}const w=e.target.closest&&e.target.closest(".fpick");if(w&&!e.target.classList.contains("fpin")){e.preventDefault();w.querySelector(".fpin").focus()}},true);
+const fchipH=n=>`<span class="fchip">${esc(n)}<button type="button" class="fx" data-fx="${esc(n)}" tabindex="-1" title="Remove ${esc(n)}">×</button></span>`;
+function fpickH(cls,vals,attrs,inAttrs,ph){return `<span class="fpick ${cls}${vals.length?" has on":""}" data-vals="${esc(vals.join(", "))}" ${attrs}>${vals.map(fchipH).join("")}<input class="fpin" list="dl-from" placeholder="${vals.length?"+ add":ph}" autocomplete="off" ${inAttrs}></span>`}
+const fpVals=w=>String(w&&w.dataset.vals||"").split(/\s*,\s*/).filter(Boolean);
+function fpExclude(w){if(w.dataset.tpf!=null)return [w.dataset.tpf];if(w.dataset.tid){const t=find(w.dataset.tid);return t?ownersOf(t):[]}if(w.id==="d-from"&&S.edit)return S.edit.t.owners||[];return []}
+function fpSet(w,vals,msg){w.dataset.vals=vals.join(", ");w.classList.toggle("has",!!vals.length);w.classList.toggle("on",!!vals.length);w.querySelectorAll(".fchip").forEach(c=>c.remove());const inp=w.querySelector(".fpin");inp.insertAdjacentHTML("beforebegin",vals.map(fchipH).join(""));inp.placeholder=vals.length?"+ add":(w.dataset.ph||"Needed from…");
+  if(w.dataset.tpf!=null){S.fd=S.fd||{};S.fd[w.dataset.tpf]=vals.slice()}
+  if(w.dataset.tid){const t=find(w.dataset.tid);if(t){if(vals.length)t.from=vals.join(", ");else delete t.from;D.seen[t.id]=todayKey();save();const id=w.id,had=document.activeElement===inp;render();if(had)setTimeout(()=>{const x=document.getElementById(id);x&&x.querySelector(".fpin").focus()},0);if(msg)toast(msg)}}}
+function fpAdd(w,raw){const inp=w.querySelector(".fpin");const r=resolveFroms(raw,fpExclude(w));inp.value="";if(!r){fromSuggest(inp);return false}const vals=fpVals(w);r.split(", ").forEach(n=>{if(!vals.some(v=>v.toLowerCase()===n.toLowerCase()))vals.push(n)});fpSet(w,vals,"Needed from "+vals.join(", "));fromSuggest(inp);return true}
+function fpDel(w,n){fpSet(w,fpVals(w).filter(v=>v!==n),"Needed from "+(fpVals(w).filter(v=>v!==n).join(", ")||"no one"))}
 function fromOpts(cur,exclude,blankLabel){exclude=exclude||[];const ds=depts().filter(n=>!exclude.includes(n)),ps=[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned"&&!exclude.includes(n)&&!isDept(n)).sort(byName);
   if(cur&&!ds.includes(cur)&&!ps.includes(cur))ps.unshift(cur);
   return `<option value="">${blankLabel||"Needed from…"}</option>${ds.length?`<optgroup label="Departments">${ds.map(n=>`<option value="${esc(n)}"${n===cur?" selected":""}>From ${esc(n)}</option>`).join("")}</optgroup>`:""}<optgroup label="People">${ps.map(n=>`<option value="${esc(n)}"${n===cur?" selected":""}>From ${esc(n)}</option>`).join("")}</optgroup>`}
@@ -2020,10 +2048,10 @@ function renderTodayShared(){
       ${items.map(t=>`<div class="ritem${S.fresh===t.id&&Date.now()-(S.freshT||0)<900?" fresh":""}" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
         <select class="spill p" data-pf="prio" data-id="${t.id}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${t.prio===q?" selected":""}>${PRIO[q].s}</option>`).join("")}</select>
         <label class="dpick" title="Change due date"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span><input type="date" data-pf="target" data-id="${t.id}" value="${esc(t.target||"")}"></label>
-        <input class="fromsel${t.from?" on":""}" data-pf="from" data-id="${t.id}" list="dl-from" value="${esc(t.from||"")}" placeholder="Needed from…" title="Who this is needed from. Separate several names with commas" autocomplete="off">
+        ${fpickH("fromsel",fromsOf(t),`id="fp-${t.id}" data-tid="${t.id}" title="Who this is needed from: pick a name, then pick another to add more"`,"","Needed from…")}
         <span class="hov"><button class="icon" data-open="${t.id}" title="Add details (partner, country, updates)">${IC.note}</button><button class="icon" data-act="tdel" data-id="${t.id}" title="Remove this">${IC.x}</button></span></div>`).join("")}
       ${none?`<div class="rnone">Nothing needed today <button type="button" class="link xs" data-act="tpnone" data-person="${esc(n)}">undo</button></div>`:`<div class="radd"><div class="savew"><input class="inp" id="tp-${i}" data-tp="${esc(n)}" placeholder="${items.length?"Anything else? (Enter on empty = next person)":"Anything needed from "+esc(n)+"?"}" maxlength="160" autocomplete="off"><button type="button" class="savebtn" data-act="tpadd" data-i="${i}" tabindex="-1">Add ↵</button></div>
-        <input class="inp fromin" id="tpf-${i}" data-tpf="${esc(n)}" list="dl-from" placeholder="Needed from…" title="Who it's needed from (optional). Several people: separate names with commas, e.g. Leila, Milhaan" autocomplete="off">
+        ${fpickH("inp fromin",(S.fd&&S.fd[n])||[],`data-tpf="${esc(n)}" title="Who it's needed from (optional): pick a name, then pick another to add more"`,`id="tpf-${i}" data-tpf="${esc(n)}"`,"Needed from…")}
         <select class="inp hov2" id="tpp-${i}" title="Priority">${[1,2,3,4].map(q=>`<option value="${q}"${q===1?" selected":""}>${PRIO[q].s}</option>`).join("")}</select></div>`}
       </div>
       <div class="rend">${attAbsent(tk,n)&&!items.length&&!none?`<span class="rst abs">Absent${attAbsent(tk,n).r?" · "+esc(ATR[attAbsent(tk,n).r]||""):""}</span>`:none?'<span class="rst ok">✓ Nothing needed</span>':items.length?`<span class="rst ok">✓ ${items.length} added</span>`:`<span class="rbtns"><button class="btn sm tpn" data-act="tpnone" data-person="${esc(n)}" title="Nothing needed (Shift + Enter in the box)">✓ Nothing today</button><button class="btn ghost sm" data-act="tplater" data-person="${esc(n)}" title="${isLater(n)?"Put back in order":"Move to the end and come back to them"}">${isLater(n)?"Back in order":"Ask later"}</button></span>`}</div>
@@ -2037,7 +2065,7 @@ function renderTodayShared(){
 function resolveFrom(v,owner){v=String(v||"").replace(/\s+/g," ").trim();if(!v)return "";const all=[...depts(),...[...new Set(D.staff)].filter(x=>x&&x!=="Unassigned")].filter(x=>Array.isArray(owner)?!owner.includes(x):x!==owner),lv=v.toLowerCase();
   return all.find(x=>x.toLowerCase()===lv)||all.filter(x=>x.toLowerCase().startsWith(lv)).sort(byName)[0]||all.find(x=>x.toLowerCase().split(" ").some(w=>w.startsWith(lv)))||all.find(x=>x.toLowerCase().includes(lv))||normName(v)}
 function addForPerson(i,stay){meetStart();const x=document.getElementById("tp-"+i);if(!x)return;const n=x.dataset.tp,title=x.value.replace(/\s+/g," ").trim();if(!title){x.focus();return}
-  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),from=fe?resolveFroms(fe.value,n):"";
+  const pe=document.getElementById("tpp-"+i),prio=pe?+pe.value:1,fe=document.getElementById("tpf-"+i),fw=fe&&fe.closest(".fpick"),from=fw?[...new Set([...fpVals(fw),...resolveFroms(fe.value,n).split(", ").filter(Boolean)])].join(", "):"";if(S.fd)delete S.fd[n];
   const t={id:uid(),title,partner:"",endUser:"",country:"",bdm:"",owners:[n],prio,status:"ns",start:todayKey(),target:todayKey(),updates:[],created:new Date().toISOString()};if(from)t.from=from;
   const m=M();D.tasks.push(t);m.added.push(t.id);D.seen[t.id]=todayKey();m.skip=m.skip.filter(z=>z!=="none:"+n);S.fresh=t.id;S.freshT=Date.now();save();render();
   toast("Added for "+n+" · "+PRIO[prio].s+(from?" · from "+from:""),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const mm=M();mm.added=mm.added.filter(z=>z!==t.id)});
@@ -2205,7 +2233,7 @@ function renderDrawer(){
     <div><span class="lbl">Responsible <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· tap to choose one or more people, tap again to remove</span></span>
       <div class="ochips">${staff.map(n=>`<button class="opt" data-d="owner" data-v="${esc(n)}" aria-pressed="${t.owners.includes(n)}">${av(n)}${esc(n)}${t.owners.includes(n)?" ✓":""}</button>`).join("")}</div>
       <p class="hint" style="margin:6px 0 0">${t.owners.length?"Responsible: <b>"+t.owners.map(esc).join(" + ")+"</b>":"No one chosen yet"}</p>
-      <div style="margin-top:10px"><label class="lbl" for="d-from">Needed from <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· optional: the people or departments they need something from, separated by commas</span></label><input class="inp" id="d-from" list="dl-from-d" value="${esc(t.from||"")}" placeholder="No one. Several people: separate with commas" autocomplete="off">${fromDL("dl-from-d")}</div>
+      <div style="margin-top:10px"><label class="lbl" for="d-from">Needed from <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· optional: pick a person or department, then pick another to add more</span></label>${fpickH("inp",fromsOf(t),`id="d-from" data-ph="No one yet: pick a name"`,"","No one yet: pick a name")}${fromDL("dl-from")}</div>
       <div class="addrow" style="margin-top:8px"><input class="inp" id="d-newp" placeholder="Add a new person, e.g. Byron" maxlength="40" autocomplete="off"><button class="btn ghost sm" data-d="addp">${IC.plus}Add</button></div></div>
     <div class="g2"><div><label class="lbl" for="d-start">Start date</label><input class="inp" type="date" id="d-start" value="${esc(t.start||"")}"></div>
       <div><label class="lbl" for="d-target">Target date</label><input class="inp" type="date" id="d-target" value="${esc(t.target||"")}">
@@ -2220,7 +2248,7 @@ function renderDrawer(){
   <div class="dfoot"><button class="btn" data-d="save">${E.isNew?IC.plus+"Add task":"Save"}</button>${!E.isNew?`<button class="btn ok" data-d="done">${IC.check}Mark completed</button>${t.prio===1?`<button class="btn mail" data-d="mail" title="Email the people responsible about this urgent task" aria-label="Email about this urgent task" style="padding-left:11px;padding-right:11px">${IC.mail}</button>`:""}<span class="spacer"></span><button class="btn ghost sm" data-d="remove" title="Take it off the list without completing it">Remove from list</button><button class="btn danger sm" data-d="delete">Delete</button>`:`<button class="btn ghost" data-d="close">Cancel</button>`}</div>`;
 }
 function readDrawer(){const E=S.edit,t=E.t,v=id=>{const x=document.getElementById(id);return x?x.value:null};
-  const g=(id,k)=>{const x=v(id);if(x!=null)t[k]=x.trim()};g("d-title","title");g("d-partner","partner");g("d-end","endUser");g("d-country","country");g("d-bdm","bdm");g("d-start","start");g("d-target","target");{const fx=v("d-from");if(fx!=null){const r=resolveFroms(fx,t.owners);if(r)t.from=r;else delete t.from}}
+  const g=(id,k)=>{const x=v(id);if(x!=null)t[k]=x.trim()};g("d-title","title");g("d-partner","partner");g("d-end","endUser");g("d-country","country");g("d-bdm","bdm");g("d-start","start");g("d-target","target");{const fw=document.getElementById("d-from");if(fw){const fi=fw.querySelector(".fpin"),r=[...new Set([...fpVals(fw),...resolveFroms(fi&&fi.value,t.owners).split(", ").filter(Boolean)])].join(", ");if(r)t.from=r;else delete t.from}}
   const nu=v("d-newu");if(nu!=null)E.newU=nu;const nd=v("d-newud");if(nd)E.newUDate=nd}
 function saveDrawer(close){
   readDrawer();const E=S.edit,t=E.t;
@@ -2359,7 +2387,6 @@ view.addEventListener("keydown",e=>{
   if(e.target.dataset&&e.target.dataset.tpf!=null){const i=e.target.id.slice(4);
     if(e.key==="Enter"){e.preventDefault();const tt=document.getElementById("tp-"+i);if(tt&&!tt.value.trim()){tt.focus();toast("Type the priority first");return}addForPerson(i);return}
     if(e.key==="Escape"){e.target.value="";document.getElementById("tp-"+i)?.focus();return}}
-  if(e.key==="Enter"&&e.target.matches&&e.target.matches("input.fromsel")){e.preventDefault();e.target.blur();return}
   if(e.key==="Enter"&&!e.shiftKey&&e.target.matches&&e.target.matches("textarea.ce.ct")){e.preventDefault();e.target.blur();return}
   if(e.target.id&&e.target.id.startsWith("fb-")&&e.key==="Enter"&&!e.shiftKey){e.preventDefault();const id=e.target.id.slice(3);feedback(id,e.target.value.trim()?"upd":"same");return}
   if(e.target.id&&e.target.id.startsWith("qu-")){if(e.key==="Enter"){e.preventDefault();view.querySelector(`[data-act=qusave][data-id="${e.target.id.slice(3)}"]`).click()}else if(e.key==="Escape"){S.quickU=null;render()}return}
