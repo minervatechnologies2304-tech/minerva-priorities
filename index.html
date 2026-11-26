@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v67</title>
+<title>Minerva Priorities · v68</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1066,6 +1066,19 @@ table.ptab tr.pr.absrow{opacity:.55}table.ptab tr.pr.absrow:hover{opacity:.85}
 .emsel{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:4px 6px;background:var(--surface);max-width:170px}
 .av.rb{background:linear-gradient(140deg,hsl(var(--h,210) 62% 56%),hsl(calc(var(--h,210) + 24) 60% 40%))!important;color:#fff!important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35),0 1px 2px rgba(0,0,0,.15)}
 .av.rb svg{width:62%;height:62%;display:block;stroke:#fff}
+.empick{font:inherit;font-size:12.5px;font-weight:600;border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap}
+.empick:hover{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+.emp-pop{position:fixed;z-index:80;width:min(680px,calc(100vw - 16px));max-height:min(520px,calc(100vh - 16px));overflow:auto;background:var(--surface,#fff);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(13,38,63,.25);padding:12px 14px}
+.emp-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.emp-g{margin-top:8px}.emp-gl{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 2px 4px}
+.emp-row{display:flex;gap:2px;flex-wrap:wrap}
+.emp-b{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 14px}@media (max-width:640px){.emp-b{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.emp-t{display:flex;flex-direction:column;align-items:center;gap:4px;width:66px;padding:7px 4px 6px;border:1.5px solid transparent;border-radius:11px;background:transparent;cursor:pointer;font:inherit}
+.emp-t:hover,.emp-t:focus-visible{background:color-mix(in srgb,var(--accent) 7%,transparent);outline:none}
+.emp-t.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.emp-t .av{width:40px;height:40px;font-size:14px}
+.emp-t small{font-size:10.5px;text-align:center;color:var(--text,inherit);line-height:1.2}
+.emp-ini{flex-direction:row;width:auto;padding:4px 10px 4px 4px}.emp-ini .av{width:30px;height:30px;font-size:11px}
 </style>
 </head>
 <body>
@@ -1073,7 +1086,7 @@ table.ptab tr.pr.absrow{opacity:.55}table.ptab tr.pr.absrow:hover{opacity:.85}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v67</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v68</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1331,7 +1344,19 @@ const RB={cs:["Customer service · headset",'<path d="M4.5 14v-2a7.5 7.5 0 0 1 1
 const EMO2RB={"🎧":"cs","💬":"chat","🙋":"hand","📣":"mkt","🎨":"pal","✨":"spark","🚚":"log","📦":"box","🗺️":"map","💰":"bag","📊":"fin","🧾":"rcpt","⚙️":"ops","🧭":"cmp","📋":"clip","🤝":"shake","🚀":"rkt","💼":"bdm","🎯":"sd","🏆":"tro","📈":"up","📻":"tech","📡":"dish","🛠️":"tool"};
 const rbSvg=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${RB[k][1]}</svg>`;
 const emoOf=n=>{const v=(D.emoji||{})[n]||"";return EMO2RB[v]?"rb:"+EMO2RB[v]:v};
-function emoSel(n){const cur=emoOf(n);return `<select class="emsel" data-emoji="${esc(n)}" title="Avatar for ${esc(n)}"><option value="">Initials</option>${[...new Set(Object.values(RB).map(v=>v[0].split(" · ")[0]))].map(g=>`<optgroup label="${g}">${Object.entries(RB).filter(([k,v])=>v[0].startsWith(g+" · ")).map(([k,v])=>`<option value="rb:${k}"${cur==="rb:"+k?" selected":""}>${v[0]}</option>`).join("")}</optgroup>`).join("")}</select>`}
+function emoSel(n){if(isView())return "";return `<button type="button" class="empick" data-empick="${esc(n)}" title="Choose an avatar for ${esc(n)}">Change avatar ▾</button>`}
+/* Visual avatar picker: a pop-up grid of the badges, drawn in the person's own colour */
+function empClose(){document.querySelectorAll(".emp-pop").forEach(x=>x.remove())}
+function empOpen(btn){empClose();const n=btn.dataset.empick,cur=emoOf(n),h=hue(n);const groups=[...new Set(Object.values(RB).map(v=>v[0].split(" · ")[0]))];
+  const pop=document.createElement("div");pop.className="emp-pop";pop.setAttribute("role","dialog");
+  pop.innerHTML=`<div class="emp-h"><b>Avatar for ${esc(n)}</b><button type="button" class="emp-t emp-ini${cur?"":" on"}" data-emset="" data-person="${esc(n)}"><span class="av" style="--h:${h}">${esc(initials(n))}</span><small>Initials</small></button></div><div class="emp-b">${groups.map(g=>`<div class="emp-g"><div class="emp-gl">${esc(g)}</div><div class="emp-row">${Object.entries(RB).filter(([k,v])=>v[0].startsWith(g+" · ")).map(([k,v])=>`<button type="button" class="emp-t${cur==="rb:"+k?" on":""}" data-emset="rb:${k}" data-person="${esc(n)}" title="${esc(v[0])}"><span class="av rb" style="--h:${h}">${rbSvg(k)}</span><small>${esc(v[0].split(" · ")[1])}</small></button>`).join("")}</div></div>`).join("")}</div>`;
+  document.body.appendChild(pop);const r=btn.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;let left=Math.min(Math.max(8,r.left),innerWidth-pw-8),top=r.bottom+6;if(top+ph>innerHeight-8)top=Math.max(8,r.top-ph-6);pop.style.left=left+"px";pop.style.top=top+"px";
+  const f=pop.querySelector(".emp-t.on")||pop.querySelector(".emp-t");f&&f.focus()}
+document.addEventListener("click",e=>{const pk=e.target.closest("[data-empick]");if(pk){e.preventDefault();const open=document.querySelector(".emp-pop");if(open&&open.dataset.for===pk.dataset.empick){empClose();return}empOpen(pk);document.querySelector(".emp-pop").dataset.for=pk.dataset.empick;return}
+  const t=e.target.closest("[data-emset]");if(t){const n=t.dataset.person,v=t.dataset.emset;D.emoji=D.emoji||{};if(v)D.emoji[n]=v;else delete D.emoji[n];empClose();save();render();toast(v?n+": "+RB[v.slice(3)][0]:n+": initials");return}
+  if(!e.target.closest(".emp-pop"))empClose()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.querySelector(".emp-pop")){empClose();e.stopPropagation()}},true);
+addEventListener("scroll",()=>empClose(),{passive:true});
 const av=n=>/^rb:/.test(emoOf(n))&&RB[emoOf(n).slice(3)]?`<span class="av rb" style="--h:${hue(n)}" title="${esc(n)} · ${RB[emoOf(n).slice(3)][0].split(" · ")[0]}">${rbSvg(emoOf(n).slice(3))}</span>`:emoOf(n)?`<span class="av emo" style="--h:${hue(n)}" title="${esc(n)}">${emoOf(n)}</span>`:isDept(n)?`<span class="av dept" style="--h:${hue(n)}" title="${esc(n)} department">${DEPT_IC}</span>`:`<span class="av" style="--h:${hue(n)}" title="${esc(n)}">${esc(initials(n))}</span>`;
 /* "needed from": who a priority depends on (a person or a department) */
 const fromsOf=t=>String(t&&t.from||"").split(/\s*,\s*/).filter(Boolean);
