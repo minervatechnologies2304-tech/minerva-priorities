@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v61</title>
+<title>Minerva Priorities · v62</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -648,8 +648,8 @@ table.ptab tr.handled td{background:color-mix(in srgb,var(--ok) 7%,transparent)}
 @keyframes toastDown{to{opacity:0;transform:translate(-50%,16px) scale(.96)}}
 @keyframes okPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 45%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
 @keyframes tickIn{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
-.enter>*{animation:pageIn .55s var(--spring) both}
-.enter>*:nth-child(2){animation-delay:.035s}.enter>*:nth-child(3){animation-delay:.07s}.enter>*:nth-child(4){animation-delay:.1s}.enter>*:nth-child(n+5){animation-delay:.13s}
+.enter .pgin{animation:pageIn .55s var(--spring) both}
+
 .enter .cas{animation:rowIn .5s var(--spring) both;animation-delay:calc(var(--i,0) * 22ms + 90ms)}
 .modal:not([hidden]){animation:dimIn .25s ease both}
 .modal:not([hidden]) .mbox{animation:sheetIn .42s var(--pop) both}
@@ -747,8 +747,8 @@ header{view-transition-name:hdr}
 /* page content: shorter, calmer cascade */
 @keyframes pageIn{from{opacity:0;transform:translate3d(calc(var(--dx,0px) * .5),var(--dy,6px),0)}to{opacity:1;transform:none}}
 @keyframes rowIn{from{opacity:0;transform:translate3d(0,6px,0)}to{opacity:1;transform:none}}
-.enter>*{animation:pageIn .46s var(--spring) both}
-.enter>*:nth-child(2){animation-delay:.025s}.enter>*:nth-child(3){animation-delay:.05s}.enter>*:nth-child(4){animation-delay:.075s}.enter>*:nth-child(n+5){animation-delay:.1s}
+.enter .pgin{animation:pageIn .46s var(--spring) both}
+
 .enter .cas{animation:rowIn .42s var(--spring) both;animation-delay:calc(var(--i,0) * 16ms + 60ms)}
 /* buttons: transform-only press, no shadow/filter animation on every button */
 button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transform .3s var(--spring),background-color var(--t-base) var(--ease-out),color var(--t-base) var(--ease-out),border-color var(--t-base) var(--ease-out)}
@@ -813,7 +813,7 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 @keyframes glowO{50%{opacity:1}}
 /* moving surfaces get their own layer; big panels don't relayout the page while animating */
 .drawer{will-change:transform}.modal .mbox{contain:layout paint}
-.enter>*,.enter .cas{backface-visibility:hidden}
+.enter .pgin,.enter .cas{backface-visibility:hidden}
 @media (prefers-reduced-motion:reduce){.btn.glow::after{animation:none}}
 
 /* ===== meeting adjourned ===== */
@@ -1029,8 +1029,8 @@ html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 
 /* speed: skip work for rows that are off screen, and keep page entrances short */
 .list>.row,.quad .card{content-visibility:auto;contain-intrinsic-size:auto 64px}
-.enter>*{animation-duration:.32s!important}
-.enter>*:nth-child(2){animation-delay:.02s}.enter>*:nth-child(3){animation-delay:.04s}.enter>*:nth-child(4){animation-delay:.06s}.enter>*:nth-child(n+5){animation-delay:.08s}
+.enter .pgin{animation-duration:.32s!important;animation-delay:calc(var(--pi,0) * 25ms)!important}
+
 .enter .cas{animation-duration:.3s!important;animation-delay:calc(var(--i,0) * 14ms + 40ms)!important}
 tr.pr.lite .litetx{white-space:pre-wrap;padding:2px 0;min-height:22px}
 tr.pr.lite .litebox{min-height:44px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2,transparent)}
@@ -1041,7 +1041,7 @@ tr.pr.lite .litebox{min-height:44px;border:1px solid var(--line);border-radius:9
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v61</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v62</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1574,8 +1574,18 @@ function render(){
   if(false){render.vt=true;S.vt=false;
     try{const t=document.startViewTransition(()=>renderNow());t.finished.finally(()=>{render.vt=false})}catch(e){render.vt=false;renderNow()}return}
   S.vt=false;renderNow()}
+/* On a page change, anything that looks the same as before (headings, date, clock) stays still; only new or changed parts animate in. */
+const PFRAME=".eyebrow,.mdrow,.mdate,.aclock,h1,.mclock";
+const psig=el=>el.tagName+"|"+el.className+"|"+el.textContent.replace(/\s+/g," ").trim().slice(0,400);
+const PBOX=/^(DIV|SECTION|ARTICLE|HEADER|NAV|UL|OL|TABLE|TBODY|THEAD|FORM|ASIDE|MAIN|FOOTER)$/;
+const PROWS=".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem";
+function pageSnap(){const m=new Set(),walk=(el,d)=>{for(const c of el.children){m.add(psig(c));if(d<3)walk(c,d+1)}};walk(view,0);view.querySelectorAll(PROWS).forEach(r=>m.add(psig(r)));return m}
+function pagePins(old){let n=0;view.querySelectorAll(".cas").forEach(r=>{if(old.has(psig(r)))r.classList.remove("cas")});const walk=(el,d)=>{for(const c of el.children){if(c.matches(PFRAME)||old.has(psig(c)))continue;
+    const hasRows=c.querySelector(".cas");if(c.classList.contains("cas"))continue;
+    if((hasRows||d<2)&&PBOX.test(c.tagName)&&c.children.length&&c.children.length<=14&&d<4){walk(c,d+1);continue}
+    if(hasRows)continue;c.classList.add("pgin");c.style.setProperty("--pi",Math.min(n++,6))}};walk(view,0)}
 function renderNow(){
-  if(S.anim)S.fullRows=new Set();
+  if(S.anim)S.fullRows=new Set();const pold=S.anim?pageSnap():null;
   const anim=!RM(),pageChange=S.anim,old=anim&&!pageChange?snapView():null,nums=anim&&!pageChange?snapNums():{m:new Map()},segs=snapSegs();
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));placeTabPill(false);
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
@@ -1584,7 +1594,7 @@ function renderNow(){
   if(S.anim){const dir=lastPos==null||pos===lastPos?0:(pos>lastPos?1:-1);view.style.setProperty("--dx",dir*36+"px");view.style.setProperty("--dy",dir?"0px":"8px");
     view.classList.remove("enter");void view.offsetWidth;
     let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<8){el.classList.add("cas");el.style.setProperty("--i",i++)}});
-    view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},550)}
+    if(pold)pagePins(pold);view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas,.pgin").forEach(el=>el.classList.remove("cas","pgin"))},700)}
   else if(old&&old.size&&!document.documentElement.classList.contains("present"))morph(old,nums);
   lastPos=pos;placeSegPills(pageChange?null:segs);if(liteIO){liteIO.disconnect();view.querySelectorAll("tr.pr.lite").forEach(r=>liteIO.observe(r))}try{localStorage.setItem("minerva-tracker:tab",S.tab)}catch(e){}
   const hd=document.querySelector("header");if(hd&&(pageChange||!render.hh)){const hh=hd.offsetHeight+"px";if(hh!==render.hh){render.hh=hh;document.documentElement.style.setProperty("--hh",hh)}}
