@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v60</title>
+<title>Minerva Priorities · v61</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1026,6 +1026,14 @@ html.present .rperson.spot .radd .inp[data-tp]{font-size:1.1em;border-width:2px;
 html.present .rperson.spot .btn.tpn{background:var(--ok);border-color:var(--ok);color:#fff}
 html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 @media (prefers-color-scheme:dark){html.present:root:not([data-theme="light"]) .rperson.spot .btn.tpn{color:#08241A}}
+
+/* speed: skip work for rows that are off screen, and keep page entrances short */
+.list>.row,.quad .card{content-visibility:auto;contain-intrinsic-size:auto 64px}
+.enter>*{animation-duration:.32s!important}
+.enter>*:nth-child(2){animation-delay:.02s}.enter>*:nth-child(3){animation-delay:.04s}.enter>*:nth-child(4){animation-delay:.06s}.enter>*:nth-child(n+5){animation-delay:.08s}
+.enter .cas{animation-duration:.3s!important;animation-delay:calc(var(--i,0) * 14ms + 40ms)!important}
+tr.pr.lite .litetx{white-space:pre-wrap;padding:2px 0;min-height:22px}
+tr.pr.lite .litebox{min-height:44px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2,transparent)}
 </style>
 </head>
 <body>
@@ -1033,7 +1041,7 @@ html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v60</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v61</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1340,7 +1348,7 @@ async function gPost(body,url,key){const ac=new AbortController(),tm=setTimeout(
   catch(e){throw new TypeError(e.name==="AbortError"?"timeout":"network")}finally{clearTimeout(tm)}
   try{return JSON.parse(t)}catch(e){const er=new Error(/<html/i.test(t)?"access":"bad");throw er}}
 function gState0(){return JSON.parse(JSON.stringify(D))}
-function applyRemote(st,v){D=noWait({...blank(),...st});try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}G.v=v;G.pending=false;gSave();if(!S.edit)render()}
+function applyRemote(st,v){const was=JSON.stringify(D);D=noWait({...blank(),...st});const now=JSON.stringify(D),ch=now!==was;if(ch){try{localStorage.setItem(KEY,now)}catch(e){}}G.v=v;G.pending=false;gSave();if(ch&&!S.edit)render();return ch}
 const bury=(...ids)=>{D.gone=D.gone||{};const k=todayKey();ids.forEach(id=>{if(id)D.gone[id]=k})};
 const unbury=id=>{if(D.gone)delete D.gone[id]};
 function mergeState(L,R){
@@ -1366,14 +1374,14 @@ async function gSync(){
   try{
     const p=await gPost({action:"ping"});if(!p.ok)throw new Error(p.error==="key"?"key":(p.error||"bad"));
     G.sheet=p.url||G.sheet;if(p.script)G.script=p.script;
-    if(isView()){G.pending=false;if(p.v!==G.v){const j=await gPost({action:"restore"});if(j.ok&&j.state){applyRemote(j.state,j.v);toast("Updated")}}G.last=Date.now();gSave();gStatus("ok");return}
+    if(isView()){G.pending=false;if(p.v!==G.v){const j=await gPost({action:"restore"});if(j.ok&&j.state){if(applyRemote(j.state,j.v))toast("Updated")}}G.last=Date.now();gSave();gStatus("ok");return}
     for(let i=0;i<3;i++){
       if(p.v===G.v){if(!G.pending){Object.assign(G,{open:p.open,total:p.total});gSave();if(!gConflict)gStatus("ok");return}
         const r=await gPush(G.v);if(r!=="stale")return;}
       const j=await gPost({action:"restore"});if(!j.ok)throw new Error(j.error||"bad");
       if(!j.state||!(j.state.tasks||[]).length){const r=await gPush(j.v);if(r!=="stale")return;p.v=j.v;continue}
-      if(!G.pending&&dirtyN===n0){applyRemote(j.state,j.v);Object.assign(G,{open:p.open,total:p.total,last:Date.now()});gSave();gStatus("ok");toast("Updated from the Google Sheet");return}
-      D=mergeState(gState0(),j.state);try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}if(!S.edit)render();
+      if(!G.pending&&dirtyN===n0){const ch=applyRemote(j.state,j.v);Object.assign(G,{open:p.open,total:p.total,last:Date.now()});gSave();gStatus("ok");if(ch)toast("Updated from the Google Sheet");return}
+      {const was=JSON.stringify(D);D=mergeState(gState0(),j.state);const now=JSON.stringify(D);try{localStorage.setItem(KEY,now)}catch(e){}if(now!==was&&!S.edit)render()}
       const r=await gPush(j.v);if(r!=="stale")return;p.v=-1;
     }
     gStatus("wait","Another computer is saving at the same time. Trying again shortly.");gTimer=setTimeout(gSync,15000);
@@ -1539,16 +1547,16 @@ function fkey(el,seen){let k;
   const n=(seen[k]=(seen[k]||0)+1);return n>1?k+"#"+n:k}
 function snapView(){const m=new Map(),seen={};view.querySelectorAll(FSEL).forEach(el=>{const r=el.getBoundingClientRect();if(r.bottom<-200||r.top>innerHeight+200)return;m.set(fkey(el,seen),{r,cls:el.className,el})});return m}
 function snapNums(){const m=new Map();view.querySelectorAll(".kpi").forEach(k=>{const l=k.querySelector("span"),b=k.querySelector("b");if(l&&b)m.set(l.textContent,+b.textContent)});const bar=view.querySelector(".mbar i");return {m,bar:bar?bar.style.width:null}}
-function tweenNum(el,from,to){if(isNaN(from)||isNaN(to)||from===to)return;const t0=performance.now(),d=550;const step=now=>{const k=Math.min(1,(now-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(step);else el.textContent=to};requestAnimationFrame(step);
+function tweenNum(el,from,to){if(isNaN(from)||isNaN(to)||from===to)return;const t0=performance.now(),d=380;const step=now=>{const k=Math.min(1,(now-t0)/d),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e);if(k<1)requestAnimationFrame(step);else el.textContent=to};requestAnimationFrame(step);
   el.animate&&el.animate([{transform:"scale(1)"},{transform:"scale(1.18)"},{transform:"scale(1)"}],{duration:450,easing:"cubic-bezier(.34,1.4,.64,1)"})}
 function morph(old,nums){
-  const seen={},easing="cubic-bezier(.32,.72,0,1)";let born=0;
+  const seen={},easing="cubic-bezier(.32,.72,0,1)";let born=0,moved=0;
   view.querySelectorAll(FSEL).forEach(el=>{const k=fkey(el,seen),o=old.get(k);
     if(o){old.delete(k);const r=el.getBoundingClientRect(),dx=o.r.left-r.left,dy=o.r.top-r.top;
-      if(Math.abs(dx)>1||Math.abs(dy)>1)el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],{duration:520,easing});
+      if((Math.abs(dx)>1||Math.abs(dy)>1)&&moved++<40&&r.bottom>0&&r.top<innerHeight)el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],{duration:340,easing});
       const gained=c=>!(" "+o.cls+" ").includes(" "+c+" ")&&el.classList.contains(c);
       if(gained("handled")||gained("asked")||gained("seen")){el.classList.add("just-ok");setTimeout(()=>el.classList.remove("just-ok"),800);const t=el.querySelector(".dtag,.rst");t&&t.classList.add("pop-in")}}
-    else if(old.size&&born<14){born++;const r=el.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)el.animate([{opacity:0,transform:"translateY(-6px) scale(.97)"},{opacity:1,transform:"none"}],{duration:480,easing,delay:born*25})}});
+    else if(old.size&&born<8){born++;const r=el.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)el.animate([{opacity:0,transform:"translateY(-6px) scale(.97)"},{opacity:1,transform:"none"}],{duration:320,easing,delay:born*18})}});
   // leavers fade and shrink in place
   let gone=0;old.forEach(o=>{if(gone>=6||o.el.tagName==="TR"||o.el.matches(".group,.kpi,.step,.pq"))return;gone++;const g=o.el.cloneNode(true);Object.assign(g.style,{position:"fixed",left:o.r.left+"px",top:o.r.top+"px",width:o.r.width+"px",height:o.r.height+"px",margin:"0",zIndex:30,pointerEvents:"none",boxSizing:"border-box"});document.body.appendChild(g);
     g.animate([{opacity:1,transform:"none"},{opacity:0,transform:"scale(.94) translateY(4px)"}],{duration:320,easing:"ease-out",fill:"forwards"}).onfinish=()=>g.remove();setTimeout(()=>g.remove(),600)});
@@ -1561,12 +1569,13 @@ function snapSegs(){return [...view.querySelectorAll(".seg")].map(sg=>{const b=s
 function placeSegPills(old){view.querySelectorAll(".seg").forEach((sg,i)=>{const b=sg.querySelector('button[aria-pressed="true"]');if(!b)return;const p=document.createElement("span");p.className="segpill";const sr=sg.getBoundingClientRect(),br=b.getBoundingClientRect();
   Object.assign(p.style,{left:(br.left-sr.left-sg.clientLeft)+"px",top:(br.top-sr.top-sg.clientTop)+"px",width:br.width+"px",height:br.height+"px"});sg.prepend(p);sg.classList.add("pilled");
   const o=old&&old[i];if(o&&o.key===sg.textContent.slice(0,60)&&!RM()){const dx=o.r.left-br.left;if(Math.abs(dx)>1)p.animate([{transform:`translateX(${dx}px)`,width:o.r.width+"px"},{transform:"none",width:br.width+"px"}],{duration:480,easing:"cubic-bezier(.32,.72,0,1)"})}})}
-addEventListener("resize",()=>placeTabPill(true));
+addEventListener("resize",()=>{placeTabPill(true);const hd=document.querySelector("header");if(hd){const hh=hd.offsetHeight+"px";if(hh!==render.hh){render.hh=hh;document.documentElement.style.setProperty("--hh",hh)}}});
 function render(){
-  if(S.anim&&S.vt&&!render.vt&&document.startViewTransition&&!RM()&&document.visibilityState==="visible"){render.vt=true;S.vt=false;
+  if(false){render.vt=true;S.vt=false;
     try{const t=document.startViewTransition(()=>renderNow());t.finished.finally(()=>{render.vt=false})}catch(e){render.vt=false;renderNow()}return}
   S.vt=false;renderNow()}
 function renderNow(){
+  if(S.anim)S.fullRows=new Set();
   const anim=!RM(),pageChange=S.anim,old=anim&&!pageChange?snapView():null,nums=anim&&!pageChange?snapNums():{m:new Map()},segs=snapSegs();
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));placeTabPill(false);
   const a=document.activeElement,aid=a&&view.contains(a)&&a.id?a.id:null;let s0=null,s1=null;try{if(aid){s0=a.selectionStart;s1=a.selectionEnd}}catch(e){}
@@ -1574,11 +1583,11 @@ function renderNow(){
   const pos=pagePos();
   if(S.anim){const dir=lastPos==null||pos===lastPos?0:(pos>lastPos?1:-1);view.style.setProperty("--dx",dir*36+"px");view.style.setProperty("--dy",dir?"0px":"8px");
     view.classList.remove("enter");void view.offsetWidth;
-    let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<14){el.classList.add("cas");el.style.setProperty("--i",i++)}});
-    view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},900)}
+    let i=0;view.querySelectorAll(".list>.row,tbody>tr,.round>.rperson,.fus>.fu,.ritem").forEach(el=>{if(i<8){el.classList.add("cas");el.style.setProperty("--i",i++)}});
+    view.classList.add("enter");S.anim=false;clearTimeout(render.t);render.t=setTimeout(()=>{view.classList.remove("enter");view.querySelectorAll(".cas").forEach(el=>el.classList.remove("cas"))},550)}
   else if(old&&old.size&&!document.documentElement.classList.contains("present"))morph(old,nums);
-  lastPos=pos;placeSegPills(pageChange?null:segs);try{localStorage.setItem("minerva-tracker:tab",S.tab)}catch(e){}
-  const hd=document.querySelector("header");if(hd)document.documentElement.style.setProperty("--hh",hd.offsetHeight+"px");
+  lastPos=pos;placeSegPills(pageChange?null:segs);if(liteIO){liteIO.disconnect();view.querySelectorAll("tr.pr.lite").forEach(r=>liteIO.observe(r))}try{localStorage.setItem("minerva-tracker:tab",S.tab)}catch(e){}
+  const hd=document.querySelector("header");if(hd&&(pageChange||!render.hh)){const hh=hd.offsetHeight+"px";if(hh!==render.hh){render.hh=hh;document.documentElement.style.setProperty("--hh",hh)}}
   if(aid){const el=document.getElementById(aid);if(el){el.focus({preventScroll:true});try{if(s0!=null)el.setSelectionRange(s0,s1)}catch(e){}}}
 }
 function counts(list){const tk=todayKey();return {open:list.length,over:list.filter(isOver).length,today:list.filter(t=>t.target===tk).length,stale:list.filter(t=>staleDays(t)>=2).length,seen:list.filter(seenToday).length}}
@@ -2081,8 +2090,20 @@ const FS=CSS.supports&&CSS.supports("field-sizing","content");
 function grow(el){if(FS||!el)return;el.style.height="auto";el.style.height=el.scrollHeight+"px"}
 if(!FS){document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.grow"))grow(e.target)},true);
   new MutationObserver(()=>{requestAnimationFrame(()=>document.querySelectorAll("textarea.grow").forEach(grow))}).observe(document.getElementById("view"),{childList:true,subtree:true})}
-function prow(t){
+/* Rows far down the table start as a light copy (plain text, no form boxes) and turn into the full row just before they scroll into view. */
+function prowLite(t,o,done,u,n,d,disc){
+  return `<tr class="pr lite${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
+    <td class="c-task"><div class="ce ct litetx">${esc(t.title)}</div>${t.partner||t.endUser?`<div class="ppx"><span class="ce sm">${esc(t.partner||"")}</span><span class="arr">→</span><span class="ce sm">${esc(t.endUser||"")}</span></div>`:""}</td>
+    <td class="c-own"><span class="ownb">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</span></td>
+    <td class="c-st"><span class="spill ${done?"done":t.status}">${done?"Completed":STATUS[t.status]||""}</span></td>
+    <td class="c-dt"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}</td>
+    <td class="c-lu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}${n>1?` <em>+${n-1} earlier</em>`:""}`:'<span class="none">—</span>'}</td>
+    <td class="c-upd">${done?"":`<div class="ce upd litebox"></div>`}</td><td class="c-act"></td></tr>`}
+function upLite(tr){if(!tr||!tr.classList.contains("lite")||!tr.isConnected)return tr;const t=find(tr.dataset.id);if(!t)return tr;if(liteIO)liteIO.unobserve(tr);S.fullRows=S.fullRows||new Set();S.fullRows.add(t.id);const tb=document.createElement("tbody");tb.innerHTML=prow(t);const nr=tb.firstElementChild;if(nr)tr.replaceWith(nr);return nr||tr}
+const liteIO=typeof IntersectionObserver==="function"?new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)upLite(e.target)})},{rootMargin:"900px 0px"}):null;
+function prow(t,ri){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
+  if(typeof ri==="number"&&ri>=12&&!(S.fullRows&&S.fullRows.has(t.id)))return prowLite(t,o,done,u,n,d,disc);
   const meta=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
   const tag=o||disc?(done?"✓ Completed":o==="upd"?"✓ Updated":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"):"";
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
@@ -2131,7 +2152,7 @@ function feedback(id,kind,stay){meetStart();if(S.run)S.run.spot=null;
   else if(kind==="wait"){t.status="wait"}
   else if(kind==="same"){D.seen[id]=todayKey()}
   m.f[id]=kind;save();render();
-  if(!stay){const nxt=view.querySelector(".fu:not(.handled) .inp, .pr:not(.handled) .upd");if(nxt)nxt.focus({preventScroll:false})}
+  if(!stay){let nxt=view.querySelector(".fu:not(.handled) .inp, .pr:not(.handled) .upd");if(nxt&&nxt.closest("tr.lite"))nxt=upLite(nxt.closest("tr.lite")).querySelector(".upd");if(nxt)nxt.focus({preventScroll:false})}
   toast(kind==="done"?"Completed: moved to the Completed list":OUT[kind][0],()=>{Object.assign(t,prev);if(prevO)m.f[id]=prevO;else delete m.f[id]});
 }
 function minutes(){
@@ -2342,7 +2363,7 @@ view.addEventListener("click",e=>{
   if(b){const id=b.dataset.id;switch(b.dataset.act){
     case "done":markDone(id);break;
     case "mail":{const t=find(id);if(t)mailTask(t);break}
-    case "spot":S.run.spot=id;render();{const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
+    case "spot":S.run.spot=id;render();{const lr=view.querySelector(`tr.lite[data-id="${id}"]`);if(lr)upLite(lr);const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
     case "fb-undo":{const m=M();delete m.f[id];if(S.run)S.run.spot=id;const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
