@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v59</title>
+<title>Minerva Priorities · v60</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -671,6 +671,8 @@ button,.btn,.icon,.opt,.pq,.step,.kpi,.chip,.ownb,.awchip,.rp{transition:transfo
 .row:active{transform:scale(.99)}
 /* sliding selection pills (tabs and segmented controls) */
 .tabs{position:relative}.tabs button{position:relative;z-index:1}
+.tabs{scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}.tabs::-webkit-scrollbar{display:none;height:0}
+@media (max-width:1300px){.tabs button{padding:5px 9px;font-size:13.5px}}@media (max-width:1100px){.tabs button{padding:5px 7px;font-size:13px}}
 .tabs .tabpill{position:absolute;left:0;top:2px;bottom:2px;width:0;border-radius:7px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);z-index:0;pointer-events:none;transition:transform .5s var(--spring),width .5s var(--spring)}
 .tabs.pilled button[aria-selected="true"]{background:transparent;box-shadow:none}
 .seg{position:relative}.seg button{position:relative;z-index:1}
@@ -1031,7 +1033,7 @@ html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v59</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v60</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1219,7 +1221,9 @@ function noWait(o){if(o&&o.gone){const lim=new Date();lim.setDate(lim.getDate()-
   if(o&&!Array.isArray(o.staff))o.staff=[];if(o&&!Array.isArray(o.depts))o.depts=defDepts();return o}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.tasks))return noWait({...blank(),...o})}}catch(e){}return blank()}
 let saveT=null, storageOk=true;
-function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
+{const nt=document.querySelector("nav.tabs");if(nt)nt.addEventListener("wheel",e=>{if(nt.scrollWidth>nt.clientWidth&&Math.abs(e.deltaY)>Math.abs(e.deltaX)){nt.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false})}
+let dirtyN=0;
+function save(){dirtyN++;clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(D));storageOk=true;if(window.gChanged)gChanged()}catch(e){storageOk=false;toast("Couldn't save on this computer. Download a backup from Data & settings.")}},120)}
 // one automatic snapshot per day, last 14 kept
 function snapshot(){try{const s=JSON.parse(localStorage.getItem(SNAP)||"[]");const k=todayKey();if(s.length&&s[s.length-1].d===k)return;if(!D.tasks.length)return;s.push({d:k,data:D});while(s.length>14)s.shift();localStorage.setItem(SNAP,JSON.stringify(s))}catch(e){}}
 
@@ -1341,7 +1345,7 @@ const bury=(...ids)=>{D.gone=D.gone||{};const k=todayKey();ids.forEach(id=>{if(i
 const unbury=id=>{if(D.gone)delete D.gone[id]};
 function mergeState(L,R){
   const out={...blank(),...R,...L};const rm=new Map((R.tasks||[]).map(t=>[t.id,t]));const tasks=[];
-  (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));tasks.push({...t,updates:[...ups.values()]});rm.delete(t.id)}else tasks.push(t)});
+  (L.tasks||[]).forEach(t=>{const r=rm.get(t.id);if(r){const ups=new Map();[...(r.updates||[]),...(t.updates||[])].forEach(u=>ups.set(u.id||u.date+u.text,u));const mt={...t,updates:[...ups.values()]};if(r.status==="done"&&t.status!=="done"&&!(t.reopenAt&&t.reopenAt>(r.doneTs||r.doneAt||""))){["status","doneAt","doneHow","doneTs"].forEach(k=>{if(r[k]!=null)mt[k]=r[k]})}tasks.push(mt);rm.delete(t.id)}else tasks.push(t)});
   rm.forEach(t=>tasks.push(t));out.tasks=tasks;out.staff=[...new Set([...(R.staff||[]),...(L.staff||[])])];
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
   out.emails={...(R.emails||{}),...(L.emails||{})};
@@ -1358,7 +1362,7 @@ async function gPush(expect,force){const w=await gPost({action:"save",state:gSta
 async function gSync(){
   if(!G.url||gBusy)return;
   if(!navigator.onLine){gStatus(G.pending?"wait":"ok","You're offline. Changes are safe on this computer and will back up when you reconnect.");return}
-  clearTimeout(gTimer);gBusy=true;gLastTry=Date.now();if(G.pending)gStatus("busy");
+  clearTimeout(gTimer);gBusy=true;gLastTry=Date.now();const n0=dirtyN;if(G.pending)gStatus("busy");
   try{
     const p=await gPost({action:"ping"});if(!p.ok)throw new Error(p.error==="key"?"key":(p.error||"bad"));
     G.sheet=p.url||G.sheet;if(p.script)G.script=p.script;
@@ -1368,7 +1372,7 @@ async function gSync(){
         const r=await gPush(G.v);if(r!=="stale")return;}
       const j=await gPost({action:"restore"});if(!j.ok)throw new Error(j.error||"bad");
       if(!j.state||!(j.state.tasks||[]).length){const r=await gPush(j.v);if(r!=="stale")return;p.v=j.v;continue}
-      if(!G.pending){applyRemote(j.state,j.v);Object.assign(G,{open:p.open,total:p.total,last:Date.now()});gSave();gStatus("ok");toast("Updated from the Google Sheet");return}
+      if(!G.pending&&dirtyN===n0){applyRemote(j.state,j.v);Object.assign(G,{open:p.open,total:p.total,last:Date.now()});gSave();gStatus("ok");toast("Updated from the Google Sheet");return}
       D=mergeState(gState0(),j.state);try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}if(!S.edit)render();
       const r=await gPush(j.v);if(r!=="stale")return;p.v=-1;
     }
@@ -1513,7 +1517,7 @@ window.addEventListener("error",ev=>{window.__lastErr=(ev.message||"")+" @"+(ev.
 const find=id=>D.tasks.find(t=>String(t.id)===String(id));
 function markDone(id){const t=find(id);if(!t||t.status==="done")return;const prev=JSON.parse(JSON.stringify(t));celebrate();
   const el=view.querySelector(`.row[data-id="${id}"]`);
-  const go=()=>{t.status="done";t.doneAt=todayKey();t.doneHow="completed";save();render();toast("“"+t.title+"” moved to Completed",()=>Object.assign(t,prev))};
+  const go=()=>{t.status="done";t.doneAt=todayKey();t.doneTs=new Date().toISOString();t.doneHow="completed";save();render();toast("“"+t.title+"” moved to Completed",()=>Object.assign(t,prev))};
   if(el&&!matchMedia("(prefers-reduced-motion:reduce)").matches){el.classList.add("leaving");setTimeout(go,260)}else go()}
 function markSeen(id){const t=find(id);if(!t)return;const was=D.seen[id];D.seen[id]=todayKey();save();render();
   const el=view.querySelector(`.row[data-id="${id}"]`);el&&el.classList.add("flash");toast("Marked as discussed today",()=>{if(was)D.seen[id]=was;else delete D.seen[id]})}
@@ -1930,15 +1934,17 @@ document.addEventListener("click",e=>{
 /* ================= run the meeting ================= */
 function M(){const tk=todayKey();D.meet=D.meet||{};return D.meet[tk]||(D.meet[tk]={f:{},added:[],skip:[]})}
 const carried=t=>(t.start||"")<todayKey();
-function followTasks(p){const tk=todayKey();return D.tasks.filter(t=>carried(t)&&ownersOf(t).includes(p)&&(t.status!=="done"||(t.doneAt===tk&&M().f[t.id]))).sort(sortTasks)}
+const waiting=t=>!!t.target&&t.target>todayKey();
+const inFollow=t=>carried(t)&&t.status!=="done"&&!waiting(t);
+function followTasks(p){const tk=todayKey();return D.tasks.filter(t=>inFollow(t)&&ownersOf(t).includes(p)).sort(sortTasks)}
 const handled=t=>!!M().f[t.id];
-function followPeople(){return [...new Set(D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===todayKey()&&M().f[t.id]))).flatMap(ownersOf))].sort(byName)}
+function followPeople(){return [...new Set(D.tasks.filter(inFollow).flatMap(ownersOf))].sort(byName)}
 function todayPeople(){return [...new Set([...open().flatMap(ownersOf),...D.staff])].filter(n=>n!=="Unassigned"||open().some(t=>!t.owners||!t.owners.length)).sort(byName)}
 const OUT={done:["Completed","st-done"],upd:["Update added","st-on"],wait:["Waiting","st-wait"],same:["No change","st-ns"]};
 function renderRun(){
   const tk=todayKey(), R=S.run, m=M();
   if(!D.tasks.length)return `<div class="empty"><h2>No tasks yet</h2><p>Import your Excel sheet first, then run the meeting from here.</p><div style="margin-top:12px"><button class="btn" data-act="goimport">${IC.up}Import the Excel sheet</button></div></div>`;
-  const fp=followPeople(), allF=D.tasks.filter(t=>carried(t)&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id]))), fDone=allF.filter(handled).length;
+  const fp=followPeople(), allF=D.tasks.filter(inFollow), fDone=allF.filter(handled).length;
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
   const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`]];
@@ -1974,8 +1980,8 @@ function renderRun(){
 /* ---------- meeting by priority: editable table, like the old sheet ---------- */
 const pDiscussed=t=>!!M().f[t.id]||seenToday(t)||t.status==="done";
 const isToday=t=>M().added.includes(t.id);
-function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t)&&(t.start||"")<=tk&&(t.status!=="done"||(t.doneAt===tk&&m.f[t.id])))}
-function todayAll(){const tk=todayKey();return D.tasks.filter(t=>isToday(t)&&(t.status!=="done"||t.doneAt===tk))}
+function pendAll(){const tk=todayKey(),m=M();return D.tasks.filter(t=>!isToday(t)&&(t.start||"")<=tk&&t.status!=="done"&&!waiting(t))}
+function todayAll(){const tk=todayKey();return D.tasks.filter(t=>isToday(t)&&t.status!=="done")}
 const prioSort=(a,b)=>((a.status==="done")-(b.status==="done"))||((isOver(b)?1:0)-(isOver(a)?1:0))||String(a.target||"9999").localeCompare(String(b.target||"9999"))||byName(ownersOf(a)[0],ownersOf(b)[0]);
 function prioTasks(p){return pendAll().filter(t=>t.prio===p).sort(prioSort)}
 const isPres=()=>document.documentElement.classList.contains("present");
@@ -2014,7 +2020,7 @@ function renderPrioRun(){
 /* step 2: go round everyone's name, "anything needed from your side?", write it down */
 const roundPeople=()=>[...new Set(D.staff)].filter(n=>n&&n!=="Unassigned").sort(byName);
 const saidNone=n=>M().skip.includes("none:"+n);
-const addedFor=n=>{const m=M();return D.tasks.filter(t=>m.added.includes(t.id)&&ownersOf(t).includes(n))};
+const addedFor=n=>{const m=M();return D.tasks.filter(t=>m.added.includes(t.id)&&t.status!=="done"&&ownersOf(t).includes(n))};
 const asked=n=>saidNone(n)||addedFor(n).length>0||!!attAbsent(todayKey(),n);
 const isLater=n=>M().skip.includes("later:"+n);
 function wl(n){const o=open().filter(t=>ownersOf(t).includes(n));return {o,over:o.filter(isOver)}}
@@ -2121,7 +2127,7 @@ function feedback(id,kind,stay){meetStart();if(S.run)S.run.spot=null;
   const t=find(id);if(!t)return;const inp=document.getElementById("fb-"+id), text=inp?inp.value.trim():"";const m=M();const prev=JSON.parse(JSON.stringify(t)), prevO=m.f[id];
   if(kind==="upd"&&!text){toast("Type the feedback first, or choose No change.");inp&&inp.focus();return}
   if(text)addUpdate(id,text);
-  if(kind==="done"){t.status="done";t.doneAt=todayKey();t.doneHow="completed";celebrate()}
+  if(kind==="done"){t.status="done";t.doneAt=todayKey();t.doneTs=new Date().toISOString();t.doneHow="completed";celebrate()}
   else if(kind==="wait"){t.status="wait"}
   else if(kind==="same"){D.seen[id]=todayKey()}
   m.f[id]=kind;save();render();
@@ -2283,7 +2289,7 @@ drawer.addEventListener("click",e=>{
   else if(k==="done"){if(!saveDrawer(false))return;const id=t.id;closeDrawer();markDone(id);return}
   else if(k==="remove"){const id=t.id;modal(`<div class="mh"><h2>Remove from the list?</h2></div><div class="mb"><p style="margin:0">It moves to the Completed list as <b>Removed</b>, and you can reopen it later.</p><label class="lbl" for="rm-why">Reason (optional)</label><input class="inp" id="rm-why" placeholder="e.g. Alex H asked to remove it"></div><div class="mf"><button class="btn ghost" data-m="close">Cancel</button><button class="btn" data-m="ok">Remove from list</button></div>`,ev=>{
       if(!ev.target.closest("[data-m=ok]"))return;const why=document.getElementById("rm-why").value.trim();closeModal();saveDrawer(false);const x=find(id);const prev=JSON.parse(JSON.stringify(x));
-      if(why)x.updates.push({id:uid(),date:todayKey(),text:"Removed from list: "+why,at:new Date().toISOString()});x.status="done";x.doneAt=todayKey();x.doneHow="removed";save();closeDrawer();render();toast("Removed from the list",()=>Object.assign(x,prev))});return}
+      if(why)x.updates.push({id:uid(),date:todayKey(),text:"Removed from list: "+why,at:new Date().toISOString()});x.status="done";x.doneAt=todayKey();x.doneTs=new Date().toISOString();x.doneHow="removed";save();closeDrawer();render();toast("Removed from the list",()=>Object.assign(x,prev))});return}
   else if(k==="delete"){const id=t.id;confirmBox("Delete this task?","“"+esc(t.title)+"” and all its updates will be deleted. This can't be undone (except from a backup).","Delete",()=>{D.tasks=D.tasks.filter(x=>x.id!==id);bury(id);save();closeDrawer();render();toast("Task deleted")},true);return}
   renderDrawer();
 });
@@ -2366,7 +2372,7 @@ view.addEventListener("click",e=>{
     case "new":openTask(null);break;
     case "goimport":S.tab="set";S.anim=true;render();break;
     case "fprev":case "fnext":{const ppl=[...new Set(open().flatMap(ownersOf))].sort(byName);const i=ppl.indexOf(S.focus);const j=b.dataset.act==="fnext"?i+1:i-1;if(ppl[j]){S.focus=ppl[j];S.anim=true;render();window.scrollTo({top:0,behavior:"smooth"})}break}
-    case "reopen":{const t=find(id);if(t){t.status="on";delete t.doneAt;delete t.doneHow;save();render();toast("“"+t.title+"” is back on the list")}break}
+    case "reopen":{const t=find(id);if(t){t.status="on";t.reopenAt=new Date().toISOString();delete t.doneAt;delete t.doneHow;save();render();toast("“"+t.title+"” is back on the list")}break}
     case "xlsx":exportExcel();break;
     case "print":S.tab="meet";render();setTimeout(()=>window.print(),100);break;
     case "backup":backup();break;
