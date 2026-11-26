@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#003660">
 <meta name="color-scheme" content="light dark">
-<title>Minerva Priorities · v62</title>
+<title>Minerva Priorities · v63</title>
 <link rel="icon" href="icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1034,6 +1034,27 @@ html.present:root[data-theme="dark"] .rperson.spot .btn.tpn{color:#08241A}
 .enter .cas{animation-duration:.3s!important;animation-delay:calc(var(--i,0) * 14ms + 40ms)!important}
 tr.pr.lite .litetx{white-space:pre-wrap;padding:2px 0;min-height:22px}
 tr.pr.lite .litebox{min-height:44px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2,transparent)}
+/* compact rows in Run meeting: one line each, the open one is highlighted */
+table.ptab tr.pr.cmp{cursor:pointer}
+table.ptab tr.pr.cmp td{padding-top:7px;padding-bottom:7px;vertical-align:middle}
+table.ptab tr.pr.cmp:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+table.ptab tr.pr.cmp .ctl{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:340px}
+table.ptab tr.pr.cmp .csub{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden}
+table.ptab tr.pr.cmp .clu{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-width:300px}
+table.ptab tr.pr.cmp .ownb{pointer-events:none}
+table.ptab tr.pr.cmp .due{margin-left:6px;display:inline-block}
+table.ptab tr.pr.cmp .c-dt{white-space:nowrap}
+table.ptab tr.pr:not(.cmp)[data-id]>td{background:color-mix(in srgb,var(--pc,var(--accent)) 6%,var(--surface,#fff))}
+table.ptab tr.pr:not(.cmp)[data-id]>td:first-child{box-shadow:inset 4px 0 0 var(--pc,var(--accent))}
+.ptkeys{font-size:12px;color:var(--muted);margin:6px 2px 0}.ptkeys kbd{font:inherit;font-weight:700;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--surface)}
+.mlen{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--muted);margin:6px 8px 0 0;vertical-align:middle}
+.mlen select{font:inherit;font-weight:700;color:var(--text,inherit);border:1px solid var(--line);border-radius:8px;padding:2px 6px;background:var(--surface)}
+.mlen span{padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent)}
+.mclock.warn{color:#b45309;border-color:#f59e0b}.mclock.over{color:#b91c1c;border-color:#ef4444}
+.ptime{display:inline-flex;align-items:center;margin-left:8px;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);background:color-mix(in srgb,var(--muted) 10%,transparent)}
+.ptime.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.ptime.warn{color:#b45309;background:#fef3c7}.ptime.over{color:#b91c1c;background:#fee2e2}
+.ptime.on.over{animation:ptPulse 1.2s ease-in-out infinite}@keyframes ptPulse{50%{box-shadow:0 0 0 4px rgba(239,68,68,.18)}}
 </style>
 </head>
 <body>
@@ -1041,7 +1062,7 @@ tr.pr.lite .litebox{min-height:44px;border:1px solid var(--line);border-radius:9
 <script>document.documentElement.classList.add("spl");setTimeout(function(){var s=document.getElementById("splash");if(s){void s.offsetWidth;s.classList.add("in")}},30)</script>
 <header>
   <div class="wrap bar">
-    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v62</small></div></div>
+    <div class="brand"><img src="logo-white.png" alt="Minerva"><span class="div"></span><div><b>Priorities</b><small id="hsub">Morning meeting tracker · v63</small></div></div>
     <nav class="tabs" role="tablist">
       <button data-tab="run" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13-8z"/></svg>Run meeting</button>
       <button data-tab="meet" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg>All tasks</button>
@@ -1358,7 +1379,7 @@ function mergeState(L,R){
   {const am=new Map((R.away||[]).map(a=>[a.id,a]));(L.away||[]).forEach(a=>am.set(a.id,a));out.away=[...am.values()]}
   out.emails={...(R.emails||{}),...(L.emails||{})};
   {const at={};[R.att||{},L.att||{}].forEach(src=>Object.entries(src).forEach(([d,m])=>{at[d]=at[d]||{};Object.entries(m||{}).forEach(([n,r])=>{const o=at[d][n];if(!o||String(r.at||"")>=String(o.at||""))at[d][n]=r})}));out.att=at}
-  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};mt[d]={f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])]}});out.meet=mt;
+  out.seen={...(R.seen||{}),...(L.seen||{})};const mt={...(R.meet||{})};Object.entries(L.meet||{}).forEach(([d,m])=>{const r=mt[d]||{f:{},added:[],skip:[]};const pt={...(r.pt||{})};Object.entries(m.pt||{}).forEach(([k,v])=>{pt[k]=Math.max(pt[k]||0,v)});mt[d]={...r,...m,f:{...r.f,...m.f},added:[...new Set([...(r.added||[]),...(m.added||[])])],skip:[...new Set([...(r.skip||[]),...(m.skip||[])])],pt}});out.meet=mt;
   const gone={...(R.gone||{}),...(L.gone||{})},lst=new Set(L.staff||[]),lt=new Set((L.tasks||[]).map(t=>t.id)),la=new Set((L.away||[]).map(a=>a.id));
   out.gone=gone;out.tasks=out.tasks.filter(t=>lt.has(t.id)||!gone[t.id]);out.away=(out.away||[]).filter(a=>la.has(a.id)||!gone[a.id]);out.staff=out.staff.filter(n=>lst.has(n)||!gone["staff:"+n]);
   return noWait(out)}
@@ -1967,7 +1988,7 @@ function renderRun(){
   const byP=R.by!=="person";
   const allP=pendAll(),pDisc=allP.filter(pDiscussed).length,tdy=todayAll();
   const steps=byP?[["follow","1","Pending priorities",`${pDisc} of ${allP.length} dealt with`],["today","2","Today's priorities",`${roundPeople().filter(asked).length} of ${roundPeople().length} asked`]]:[["follow","1","Follow up yesterday",`${fDone} of ${allF.length} done`],["today","2","Today's priorities",`${m.added.length} new`]];
-  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><div class="mdrow"><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${aclock()}</div>${clockHtml()}${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
+  let h=`<div class="runhead"><div><div class="eyebrow">Morning meeting</div><div class="mdrow"><h1 class="mdate">${esc(new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"}))}</h1>${aclock()}</div>${clockHtml()}${mlenHtml()}${(()=>{const a=attStats(tk);return a.n?`<button class="attpill${a.unmarked===a.n?" none":""}" data-act="attopen" title="Mark who is at the meeting">${a.unmarked===a.n?"Take attendance":`${a.here} of ${a.n} here${a.abs?` · ${a.abs} absent`:""}${a.unmarked?` · ${a.unmarked} not marked`:""}`}</button>`:""})()}</div>
     <div class="steps">${steps.map(([k,n,l,sub],i)=>`<button class="step${R.stage===k?" on":""}" data-stage="${k}"><span class="sn">${n}</span><span><b>${l}</b><small>${sub}</small></span></button>${i<steps.length-1?'<span class="sarr">›</span>':""}`).join("")}</div></div>`;
   if(awOn(tk).length)h+=awTodayBox();
   if(R.stage==="wrap")R.stage="today";
@@ -2032,8 +2053,8 @@ function renderPrioRun(){
     ${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok glow":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok glow":""}" data-stage="today">Next: today's priorities ›</button>`}</div>`;
   h+=`<datalist id="dl-partner">${L.partner.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>`;
   h+=`${isPres()&&list.length?spotHtml(list,p):`<div class="panel scroll ptwrap" style="--pc:var(--p${p})"><table class="t ptab"><thead><tr><th>Task</th><th>Owner</th><th>Status</th><th>Due</th><th>Latest update</th><th>Today's update</th><th></th></tr></thead><tbody>
-    ${list.map(prow).join("")||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
-    </div>`}<div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
+    ${(()=>{curOpen=list.some(t=>t.id===R.open)?R.open:((list.find(t=>!pDiscussed(t))||{}).id||null);return list.map(t=>prow(t)).join("")})()||`<tr><td colspan="7" style="text-align:center;padding:18px;color:var(--muted)">Nothing pending in ${PRIO[p].s}.</td></tr>`}</tbody></table>
+    </div>${list.length>1?`<p class="ptkeys">Click a task to open it, or use <kbd>↑</kbd> <kbd>↓</kbd> to move between tasks. Enter saves an update, and the next task opens.</p>`:""}`}<div class="pfoot"><button class="btn ghost sm" data-act="pprev" ${p<=1?"disabled":""}>‹ Back</button>${p<4?`<button class="btn sm qn q${p+1}${list.length&&!left(p)?" ok":""}" style="--qc:var(--p${p+1});--qcs:var(--p${p+1}s)" data-act="pnext">Next: ${PRIO[p+1].s} ›</button>`:`<button class="btn sm${pendAll().every(pDiscussed)?" ok":""}" data-stage="today">Next: today's priorities ›</button>`}</div>${pendAll().some(t=>!pDiscussed(t))&&p===4?`<p class="hint" style="margin:8px 2px">Still to deal with: ${[1,2,3].map(q=>{const l=prioTasks(q).filter(t=>!pDiscussed(t)).length;return l?l+" in "+PRIO[q].s:""}).filter(Boolean).join(", ")||"none in the other priorities"}.</p>`:""}`;
   return h+`</div></div>`;
 }
 /* step 2: go round everyone's name, "anything needed from your side?", write it down */
@@ -2067,7 +2088,7 @@ function renderTodayShared(){
   if(!ppl.length)return h+`<div class="empty"><p>No team yet. Add people in Data &amp; settings.</p></div>`;
   const rowH=(n,i)=>{const items=addedFor(n),none=saidNone(n),aw=awOn(tk).filter(a=>a.person===n);
     return `<section class="rperson${items.length||none?" asked":""}${attAbsent(tk,n)&&!items.length&&!none?" absent":""}" data-person="${esc(n)}">
-      <div class="rph">${av(n)}<b>${esc(n)}</b>${wlPill(n)}${isLater(n)&&!items.length&&!none?'<span class="rlater">Ask later</span>':""}${aw.length?`<span class="rout" title="${esc(aw.map(a=>(AWT[a.type]||AWT.other)[0]+" "+awTime(a,tk)).join(", "))}">${esc((AWT[aw[0].type]||AWT.other)[0])}</span>`:""}</div>
+      <div class="rph">${av(n)}<b>${esc(n)}</b>${wlPill(n)}${isLater(n)&&!items.length&&!none?'<span class="rlater">Ask later</span>':""}${isDept(n)?"":ptBadge(n,n===ptAct)}${aw.length?`<span class="rout" title="${esc(aw.map(a=>(AWT[a.type]||AWT.other)[0]+" "+awTime(a,tk)).join(", "))}">${esc((AWT[aw[0].type]||AWT.other)[0])}</span>`:""}</div>
       <div class="rmid">
       ${(()=>{const w=open().filter(t=>fromsOf(t).includes(n));return w.length?`<div class="rneeds"><span class="rnl">${IC_FROM}Needed from ${esc(n)}</span>${w.map(t=>`<button type="button" class="rneed" data-open="${t.id}" title="${esc(t.title)}">${esc(ownersOf(t).join(" + "))}<i>${esc(t.title)}</i></button>`).join("")}</div>`:""})()}
       ${items.map(t=>`<div class="ritem${S.fresh===t.id&&Date.now()-(S.freshT||0)<900?" fresh":""}" style="--qc:var(--p${t.prio})"><span class="qdot"></span><input class="ce ct" data-pf="title" data-id="${t.id}" value="${esc(t.title)}" title="${esc(t.title)}">
@@ -2101,6 +2122,24 @@ function grow(el){if(FS||!el)return;el.style.height="auto";el.style.height=el.sc
 if(!FS){document.addEventListener("input",e=>{if(e.target.matches&&e.target.matches("textarea.grow"))grow(e.target)},true);
   new MutationObserver(()=>{requestAnimationFrame(()=>document.querySelectorAll("textarea.grow").forEach(grow))}).observe(document.getElementById("view"),{childList:true,subtree:true})}
 /* Rows far down the table start as a light copy (plain text, no form boxes) and turn into the full row just before they scroll into view. */
+let curOpen=null;
+/* Compact one-line row; click it (or use the arrow keys) to open it up for updates. */
+function prowC(t,o,done,u,n,d,disc){const m=M();
+  const tag=o||disc?(done?"✓ Completed":o==="upd"?"✓ Updated":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"):"";
+  const sub=[t.partner&&(t.partner+(t.endUser?" → "+t.endUser:"")),!t.partner&&t.endUser].filter(Boolean).join("");
+  return `<tr class="pr cmp${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}" tabindex="-1" title="Click to open">
+    <td class="c-task"><div class="ctl">${esc(t.title)}</div>${sub||t.from?`<div class="csub">${sub?`<span>${esc(sub)}</span>`:""}${ftag(t)}</div>`:""}</td>
+    <td class="c-own"><span class="ownb">${ownersOf(t).map(x=>`<span class="oc">${av(x)}${esc(x)}</span>`).join("")}</span></td>
+    <td class="c-st"><span class="spill ${done?"done":t.status}">${done?"Completed":STATUS[t.status]||""}</span></td>
+    <td class="c-dt"><span class="dtext">${t.target?esc(dShort(t.target)):"No date"}</span>${t.target?`<span class="due ${d.c}">${esc(d.l)}</span>`:""}</td>
+    <td class="c-lu"><div class="clu">${u?`<time>${esc(fmt(u.date))}</time> ${esc(u.text)}`:'<span class="none">—</span>'}</div></td>
+    <td class="c-upd">${tag?`<span class="dtag">${tag}</span>`:done?"":`<button type="button" class="nupd" data-act="fb-same" data-id="${t.id}" title="Still ongoing, nothing new to add">✓ No update</button>`}</td>
+    <td class="c-act">${done?"":`<button class="icon okh" data-act="fb-done" data-id="${t.id}" title="Mark completed">${IC.check}</button>`}</td></tr>`}
+function openRow(id,focus){const tb=view.querySelector("table.ptab tbody");if(!tb)return;const t=find(id);if(!t)return;S.run.open=id;const old=curOpen;curOpen=id;
+  const swap=(tid)=>{const tr=tb.querySelector(`tr.pr[data-id="${tid}"]`),x=find(tid);if(!tr||!x)return null;const w=document.createElement("tbody");w.innerHTML=prow(x);const nr=w.firstElementChild;tr.replaceWith(nr);return nr};
+  if(old&&old!==id)swap(old);const nr=swap(id);
+  if(nr){if(!RM())nr.animate([{opacity:.6},{opacity:1}],{duration:220});const r=nr.getBoundingClientRect();if(r.top<120||r.bottom>innerHeight-40)nr.scrollIntoView({block:"center",behavior:RM()?"auto":"smooth"});if(focus!==false){const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}}}
+function stepRow(dir){const rows=[...view.querySelectorAll("table.ptab tr.pr[data-id]")];if(!rows.length)return false;const i=rows.findIndex(r=>r.dataset.id===curOpen);const j=Math.max(0,Math.min(rows.length-1,(i<0?0:i+dir)));if(j===i)return true;openRow(rows[j].dataset.id);return true}
 function prowLite(t,o,done,u,n,d,disc){
   return `<tr class="pr lite${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
     <td class="c-task"><div class="ce ct litetx">${esc(t.title)}</div>${t.partner||t.endUser?`<div class="ppx"><span class="ce sm">${esc(t.partner||"")}</span><span class="arr">→</span><span class="ce sm">${esc(t.endUser||"")}</span></div>`:""}</td>
@@ -2113,7 +2152,7 @@ function upLite(tr){if(!tr||!tr.classList.contains("lite")||!tr.isConnected)retu
 const liteIO=typeof IntersectionObserver==="function"?new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)upLite(e.target)})},{rootMargin:"900px 0px"}):null;
 function prow(t,ri){
   const m=M(),o=m.f[t.id],done=t.status==="done",u=lastUpdate(t),n=(t.updates||[]).length,d=dueInfo(t),disc=pDiscussed(t);
-  if(typeof ri==="number"&&ri>=12&&!(S.fullRows&&S.fullRows.has(t.id)))return prowLite(t,o,done,u,n,d,disc);
+  if(t.id!==curOpen)return prowC(t,o,done,u,n,d,disc);
   const meta=[t.country,t.bdm&&"BDM "+t.bdm].filter(Boolean).join(" · ");
   const tag=o||disc?(done?"✓ Completed":o==="upd"?"✓ Updated":o==="same"?"✓ No change":m.added.includes(t.id)?"★ New today":"✓ Discussed"):"";
   return `<tr class="pr${disc?" handled":""}${done?" isdone":""}" data-id="${t.id}">
@@ -2155,6 +2194,7 @@ function fu(t){
   </article>`;
 }
 function feedback(id,kind,stay){meetStart();if(S.run)S.run.spot=null;
+  if(!stay&&S.run&&id===curOpen){const rows=[...view.querySelectorAll("table.ptab tr.pr[data-id]")],i=rows.findIndex(r=>r.dataset.id===id);if(i>=0){const nx=rows.slice(i+1).concat(rows.slice(0,i)).find(r=>!r.classList.contains("handled")&&r.dataset.id!==id);S.run.open=nx?nx.dataset.id:id}}
   const t=find(id);if(!t)return;const inp=document.getElementById("fb-"+id), text=inp?inp.value.trim():"";const m=M();const prev=JSON.parse(JSON.stringify(t)), prevO=m.f[id];
   if(kind==="upd"&&!text){toast("Type the feedback first, or choose No change.");inp&&inp.focus();return}
   if(text)addUpdate(id,text);
@@ -2188,11 +2228,26 @@ function meetStart(){if(isView())return;const m=M();if(!m.st&&!m.adj)m.st=new Da
 const meetMin=m=>m&&m.st?Math.max(1,Math.round(((m.adj?new Date(m.adj):new Date())-new Date(m.st))/60000)):0;
 const durTxt=n=>n>=60?Math.floor(n/60)+" h "+(n%60)+" min":n+" min";
 let clockOff=(()=>{try{return localStorage.getItem("minerva-tracker:clock")==="0"}catch(_){return false}})();
+/* Meeting length and time per person (Today's priorities) */
+const mLen=()=>Math.max(5,+(D.meetLen||15));
+const presentN=()=>Math.max(1,roundPeople().filter(n=>!attAbsent(todayKey(),n)).length);
+const perPerson=()=>Math.round(mLen()*60/presentN());
+const mmss=x=>{x=Math.abs(Math.round(x));return Math.floor(x/60)+":"+String(x%60).padStart(2,"0")};
+function mlenHtml(){if(isView())return "";const v=mLen();return `<label class="mlen" title="How long the meeting should take. The time is shared equally between the people here today.">Meeting <select id="mlen">${[...new Set([10,15,20,25,30,45,60,v])].sort((a,b)=>a-b).map(x=>`<option value="${x}"${x===v?" selected":""}>${x} min</option>`).join("")}</select><span>${mmss(perPerson())} each</span></label>`}
+function ptInfo(n){const used=(M().pt||{})[n]||0,left=perPerson()-used;return {used,left,txt:left>=0?mmss(left)+" left":mmss(left)+" over",c:left<0?"over":left<=30?"warn":""}}
+function ptBadge(n,on){const i=ptInfo(n);if(!i.used&&!on)return "";return `<span class="ptime ${i.c}${on?" on":""}" data-pt="${esc(n)}" title="Time with ${esc(n)} (${mmss(perPerson())} each)">${on||i.left>=0?"⏱ "+i.txt:"⏱ "+mmss(i.used)+" used"}</span>`}
+let ptAct=null;
+setInterval(()=>{if(S.tab!=="run"||document.visibilityState!=="visible"||isView())return;const m=M();if(m.adj)return;
+  const a=document.activeElement,rp=a&&a.closest&&a.closest(".round:not(.dround) .rperson[data-person]"),n=rp?rp.dataset.person:null;
+  if(n!==ptAct){if(ptAct)save();view.querySelectorAll(".ptime.on").forEach(x=>x.classList.remove("on"));ptAct=n}
+  if(!n)return;meetStart();m.pt=m.pt||{};m.pt[n]=(m.pt[n]||0)+1;
+  let b=rp.querySelector(".ptime");if(!b){const h=rp.querySelector(".rph");if(!h)return;h.insertAdjacentHTML("beforeend",ptBadge(n,true));b=rp.querySelector(".ptime")}
+  const i=ptInfo(n);b.className="ptime on "+i.c;b.textContent="⏱ "+i.txt},1000);
 function clockHtml(){const m=M();if(!m.st)return "";const n=meetMin(m);
   if(clockOff)return `<button type="button" class="mclock off" data-act="clock" title="Show the meeting clock">${IC_CLK}</button>`;
-  return `<button type="button" class="mclock${m.adj?" done":""}" data-act="clock" title="Meeting time (click to hide)">${IC_CLK}<span id="mclockt">${m.adj?durTxt(n)+" · adjourned":"Meeting · "+durTxt(n)}</span></button>`}
+  return `<button type="button" class="mclock${m.adj?" done":n>mLen()?" over":n>=mLen()*.8?" warn":""}" data-act="clock" title="Meeting time (click to hide)">${IC_CLK}<span id="mclockt">${m.adj?durTxt(n)+" · adjourned":"Meeting · "+durTxt(n)+" of "+mLen()+" min"}</span></button>`}
 const IC_CLK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-setInterval(()=>{const el=document.getElementById("mclockt");if(!el)return;const m=M();if(m.adj||!m.st)return;el.textContent="Meeting · "+durTxt(meetMin(m))},20000);
+setInterval(()=>{const el=document.getElementById("mclockt");if(!el)return;const m=M();if(m.adj||!m.st)return;el.textContent="Meeting · "+durTxt(meetMin(m))+" of "+mLen()+" min";const b=el.closest(".mclock");if(b){b.classList.toggle("warn",meetMin(m)>=mLen()*.8&&meetMin(m)<=mLen());b.classList.toggle("over",meetMin(m)>mLen())}},20000);
 function aclock(){const d=new Date(),sec=d.getSeconds()+d.getMilliseconds()/1000,min=d.getMinutes()+sec/60,hr=(d.getHours()%12)+min/60;
   const t=[...Array(12)].map((_,i)=>{const a=i*30*Math.PI/180,r1=i%3?16.2:14.6,r2=18;return `<line x1="${(20+Math.sin(a)*r1).toFixed(2)}" y1="${(20-Math.cos(a)*r1).toFixed(2)}" x2="${(20+Math.sin(a)*r2).toFixed(2)}" y2="${(20-Math.cos(a)*r2).toFixed(2)}" class="${i%3?"tk":"tk q"}"/>`}).join("");
   return `<span class="aclock" role="img" aria-label="${esc(d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))}" title="${esc(d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}))}"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" class="face"/>${t}
@@ -2373,12 +2428,12 @@ view.addEventListener("click",e=>{
   if(b){const id=b.dataset.id;switch(b.dataset.act){
     case "done":markDone(id);break;
     case "mail":{const t=find(id);if(t)mailTask(t);break}
-    case "spot":S.run.spot=id;render();{const lr=view.querySelector(`tr.lite[data-id="${id}"]`);if(lr)upLite(lr);const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
+    case "spot":S.run.spot=id;S.run.open=id;render();{const lr=view.querySelector(`tr.lite[data-id="${id}"]`);if(lr)upLite(lr);const x=document.getElementById("fb-"+id);x&&x.focus({preventScroll:true})}break;
     case "fb-upd":feedback(id,"upd");break;case "fb-done":feedback(id,"done");break;case "fb-wait":feedback(id,"wait");break;case "fb-same":feedback(id,"same");break;
-    case "fb-undo":{const m=M();delete m.f[id];if(S.run)S.run.spot=id;const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
+    case "fb-undo":{const m=M();delete m.f[id];if(S.run){S.run.spot=id;S.run.open=id}const t=find(id);if(t&&t.status==="done"&&t.doneAt===todayKey()){t.status="on";delete t.doneAt}save();render();break}
     case "fb-push":{const t=find(id);if(t){const was=t.target;t.target=addWork(todayKey(),+b.dataset.n);save();render();toast("Target moved to "+fmt(t.target,{weekday:"short",day:"numeric",month:"short"}),()=>{t.target=was})}break}
     case "runby":{S.run.by=b.dataset.v;try{localStorage.setItem("minerva-tracker:runby",S.run.by)}catch(_){}if(S.run.stage==="today"&&S.run.by==="prio")S.run.stage="follow";S.anim=true;render();break}
-    case "pnext":case "pprev":{S.run.spot=null;S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
+    case "pnext":case "pprev":{S.run.spot=null;S.run.open=null;S.run.pq=Math.min(4,Math.max(1,(S.run.pq||1)+(b.dataset.act==="pnext"?1:-1)));S.anim=true;render();window.scrollTo({top:0});break}
     case "pown":openOwners(id);break;
     case "attopen":openAttModal();break;
     case "tpadd":addForPerson(b.dataset.i);break;
@@ -2429,6 +2484,10 @@ view.addEventListener("keydown",e=>{
   if(e.target.id&&e.target.id.startsWith("qu-")){if(e.key==="Enter"){e.preventDefault();view.querySelector(`[data-act=qusave][data-id="${e.target.id.slice(3)}"]`).click()}else if(e.key==="Escape"){S.quickU=null;render()}return}
   if(e.key==="Enter"&&e.target.classList.contains("row"))openTask(e.target.dataset.id);
 });
+view.addEventListener("click",e=>{const tr=e.target.closest("table.ptab tr.pr.cmp[data-id]");if(!tr||e.target.closest("button,a,input,select,textarea,label"))return;openRow(tr.dataset.id)});
+document.addEventListener("keydown",e=>{if((e.key!=="ArrowDown"&&e.key!=="ArrowUp")||e.altKey||e.ctrlKey||e.metaKey||!view.querySelector("table.ptab tr.pr")||document.querySelector(".drawer.on,.modal:not([hidden])"))return;
+  const a=document.activeElement,typing=a&&(a.isContentEditable||/^(INPUT|SELECT)$/.test(a.tagName)||(a.tagName==="TEXTAREA"&&(a.value!==""||!a.classList.contains("upd"))));if(typing)return;
+  if(stepRow(e.key==="ArrowDown"?1:-1))e.preventDefault()});
 view.addEventListener("click",e=>{const l=e.target.closest(".dpick");if(!l)return;const i=l.querySelector("input[type=date]");if(i&&i.showPicker){e.preventDefault();try{i.showPicker()}catch(_){i.focus()}}});
 view.addEventListener("focusout",e=>{const ft=e.target;if(ft&&ft.dataset&&(ft.dataset.tpf!=null||/^tpp-/.test(ft.id||""))){const i=ft.id.replace(/^tp[fp]-/,""),tt=document.getElementById("tp-"+i),box=ft.closest(".radd");
     if(tt&&tt.value.trim()&&!(e.relatedTarget&&box&&box.contains(e.relatedTarget)))setTimeout(()=>{const x=document.getElementById("tp-"+i);if(x&&x.value.trim()&&!(document.activeElement&&box&&box.contains(document.activeElement)))addForPerson(i,true)},0);return}});
@@ -2449,7 +2508,7 @@ view.addEventListener("submit",e=>{e.preventDefault();
     D.tasks.push(t);M().added.push(t.id);save();render();toast("Added to "+PRIO[t.prio].s+" for "+(R.person||"the team"),()=>{D.tasks=D.tasks.filter(z=>z.id!==t.id);const m=M();m.added=m.added.filter(z=>z!==t.id)});setTimeout(()=>{const y=document.getElementById("na-title");y&&y.focus()},0);return}if(e.target.id==="staffForm"){const n=normName(document.getElementById("staffName").value);if(!n)return;if(!D.staff.some(s=>s.toLowerCase()===n.toLowerCase()))D.staff.push(n);unbury("staff:"+n);save();render();toast(n+" added");setTimeout(()=>{const x=document.getElementById("staffName");x&&x.focus()},0)}});
 document.addEventListener("input",e=>{if(e.target&&e.target.list)fromSuggest(e.target)});
 view.addEventListener("input",e=>{const x=e.target;if(x.dataset&&x.dataset.tp!=null&&x.id&&x.id.startsWith("tp-"))dupCheck(x)});
-view.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.pf){const t=find(e.target.dataset.id);if(!t)return;const f=e.target.dataset.pf;let v=e.target.value;
+view.addEventListener("change",e=>{if(e.target.id==="mlen"){D.meetLen=+e.target.value;save();render();toast("Meeting length: "+D.meetLen+" min, "+mmss(perPerson())+" each");return}if(e.target.dataset&&e.target.dataset.pf){const t=find(e.target.dataset.id);if(!t)return;const f=e.target.dataset.pf;let v=e.target.value;
     if(f==="title"){v=v.replace(/\s+/g," ").trim();if(!v){e.target.value=t.title;return}}
     if(f==="prio"){const was=t.prio;t.prio=+v;D.seen[t.id]=todayKey();save();render();toast("Moved to "+PRIO[t.prio].s,()=>{t.prio=was});return}
     if(f==="from"){v=resolveFroms(v,ownersOf(t));if(v)t.from=v;else delete t.from;D.seen[t.id]=todayKey();save();render();toast(v?"Needed from "+v:"Cleared");return}
